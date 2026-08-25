@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Domain-Driven Design (DDD) Value Objects and compliance types for Argentine taxation (ARCA/AFIP, CUIT/CUIL Modulo 11, Punto de Venta, CAE/CAEA, CBU/CVU Modulo 10, RG 1415/03, RG 5616/24).</Description>
+    <PackageTags>$(CommonPackageTags);fiscal;argentina;arca;afip;cuit;cuil;cae;cbu;cvu;facturacion-electronica;electronic-invoicing</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

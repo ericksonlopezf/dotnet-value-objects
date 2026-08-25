@@ -1,0 +1,39 @@
+<Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/EricksonLopez.ValueObjects.Benchmarks/EricksonLopez.ValueObjects.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/EricksonLopez.ValueObjects.Samples/EricksonLopez.ValueObjects.Samples.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/EricksonLopez.ValueObjects.Analyzers/EricksonLopez.ValueObjects.Analyzers.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects.Dapper/EricksonLopez.ValueObjects.Dapper.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects.Fiscal.Argentina/EricksonLopez.ValueObjects.Fiscal.Argentina.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects.Fiscal.Chile/EricksonLopez.ValueObjects.Fiscal.Chile.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects.Fiscal.Colombia/EricksonLopez.ValueObjects.Fiscal.Colombia.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects.Fiscal.DominicanRepublic/EricksonLopez.ValueObjects.Fiscal.DominicanRepublic.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects.Fiscal.Mexico/EricksonLopez.ValueObjects.Fiscal.Mexico.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects.Fiscal.Peru/EricksonLopez.ValueObjects.Fiscal.Peru.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects.Generators/EricksonLopez.ValueObjects.Generators.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects.Serialization.Json/EricksonLopez.ValueObjects.Serialization.Json.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects.EntityFrameworkCore/EricksonLopez.ValueObjects.EntityFrameworkCore.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects.DomainPrimitives/EricksonLopez.ValueObjects.DomainPrimitives.csproj" />
+    <Project Path="src/EricksonLopez.ValueObjects/EricksonLopez.ValueObjects.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EricksonLopez.ValueObjects.Dapper.IntegrationTests/EricksonLopez.ValueObjects.Dapper.IntegrationTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.Serialization.Json.IntegrationTests/EricksonLopez.ValueObjects.Serialization.Json.IntegrationTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.Fiscal.Argentina.UnitTests/EricksonLopez.ValueObjects.Fiscal.Argentina.UnitTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.Fiscal.Chile.UnitTests/EricksonLopez.ValueObjects.Fiscal.Chile.UnitTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.Fiscal.Colombia.UnitTests/EricksonLopez.ValueObjects.Fiscal.Colombia.UnitTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.Fiscal.DominicanRepublic.UnitTests/EricksonLopez.ValueObjects.Fiscal.DominicanRepublic.UnitTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.Fiscal.Mexico.UnitTests/EricksonLopez.ValueObjects.Fiscal.Mexico.UnitTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.Fiscal.Peru.UnitTests/EricksonLopez.ValueObjects.Fiscal.Peru.UnitTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.Generators.UnitTests/EricksonLopez.ValueObjects.Generators.UnitTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.Analyzers.UnitTests/EricksonLopez.ValueObjects.Analyzers.UnitTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.EntityFrameworkCore.IntegrationTests/EricksonLopez.ValueObjects.EntityFrameworkCore.IntegrationTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.DomainPrimitives.UnitTests/EricksonLopez.ValueObjects.DomainPrimitives.UnitTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.UnitTests/EricksonLopez.ValueObjects.UnitTests.csproj" />
+    <Project Path="tests/EricksonLopez.ValueObjects.NativeAotTests/EricksonLopez.ValueObjects.NativeAotTests.csproj" />
+  </Folder>
+</Solution>

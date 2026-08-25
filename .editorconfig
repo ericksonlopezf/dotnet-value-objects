@@ -1,0 +1,82 @@
+# Copyright © Erickson Lopez. MIT License.
+root = true
+
+# All files
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{cs,csx}]
+# Formatting Conventions
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_indent_braces = false
+csharp_indent_switch_labels = true
+csharp_indent_case_contents = true
+
+# Organizing Usings
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# C# Coding Conventions
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = true:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = when_on_single_line:suggestion
+csharp_style_expression_bodied_operators = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_indexers = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+csharp_style_pattern_matching = true:suggestion
+csharp_style_throw_expression = true:suggestion
+csharp_style_null_propagation = true:suggestion
+
+# Quality & Analyzer Severities (Production Code Default)
+dotnet_diagnostic.CA1707.severity = error
+dotnet_diagnostic.IDE1006.severity = warning
+dotnet_diagnostic.CA1852.severity = warning
+dotnet_diagnostic.CA1305.severity = warning
+dotnet_diagnostic.CS0618.severity = error
+dotnet_diagnostic.CS0619.severity = error
+dotnet_diagnostic.CS1591.severity = warning
+dotnet_diagnostic.xUnit1051.severity = warning
+
+# Domain Architecture Specific Allowances
+# CA1000: Do not declare static members on generic types (Standard pattern for domain factory methods like Range<T>.Create)
+dotnet_diagnostic.CA1000.severity = none
+# CA1716: Identifiers should not match keywords (Standard in DDD / functional design)
+dotnet_diagnostic.CA1716.severity = none
+
+# Testing Living Specifications & Osherove Pattern (ADR-014)
+[tests/**/*.cs]
+# IDE1006: Permits Osherove naming pattern UnitOfWork_StateUnderTest_ExpectedBehavior
+dotnet_diagnostic.IDE1006.severity = none
+# CA1707: Permits underscores in test method identifiers
+dotnet_diagnostic.CA1707.severity = none
+# CS1591: XML comments not required for test suites
+dotnet_diagnostic.CS1591.severity = none
+# CA1305: String formatting in assertions does not require explicit culture info
+dotnet_diagnostic.CA1305.severity = none
+# xUnit1051: CancellationToken in test helper assertions not required
+dotnet_diagnostic.xUnit1051.severity = none
+# CA1826: Indexable collection enumerable methods permitted in assertions
+dotnet_diagnostic.CA1826.severity = none
+
+[benchmarks/**/*.cs]
+dotnet_diagnostic.CS1591.severity = none
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1305.severity = none
+
+[samples/**/*.cs]
+dotnet_diagnostic.CS1591.severity = none
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1305.severity = none

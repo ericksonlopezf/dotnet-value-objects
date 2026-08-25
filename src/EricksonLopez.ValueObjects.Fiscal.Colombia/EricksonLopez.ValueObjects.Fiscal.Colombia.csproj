@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Domain-Driven Design (DDD) Value Objects and compliance types for Colombian taxation (DIAN, NIT Modulo 11, CUFE, CUDE, CUNE, RADIAN, DANE, CIIU).</Description>
+    <PackageTags>$(CommonPackageTags);fiscal;colombia;dian;nit;cufe;cude;cune;radian;facturacion-electronica;electronic-invoicing</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

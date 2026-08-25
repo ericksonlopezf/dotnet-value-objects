@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);IL2026;IL3050</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.DominicanRepublic\EricksonLopez.ValueObjects.Fiscal.DominicanRepublic.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.Mexico\EricksonLopez.ValueObjects.Fiscal.Mexico.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.Argentina\EricksonLopez.ValueObjects.Fiscal.Argentina.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.Chile\EricksonLopez.ValueObjects.Fiscal.Chile.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.Colombia\EricksonLopez.ValueObjects.Fiscal.Colombia.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.Peru\EricksonLopez.ValueObjects.Fiscal.Peru.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.EntityFrameworkCore\EricksonLopez.ValueObjects.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="AwesomeAssertions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="coverlet.MTP" />
+  </ItemGroup>
+</Project>
+

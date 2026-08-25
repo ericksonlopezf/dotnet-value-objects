@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Domain-Driven Design (DDD) Value Objects and compliance types for Peruvian taxation (SUNAT, RUC Modulo 11, CPE Identifier Tipo-Serie-Correlativo, SPOT Detracciones, Ubigeo INEI, SIRE TaxPeriod).</Description>
+    <PackageTags>$(CommonPackageTags);fiscal;peru;sunat;ruc;cpe;detracciones;ubigeo;sire;facturacion-electronica;electronic-invoicing</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>EricksonLopez.ValueObjects.DomainPrimitives</AssemblyName>
+    <RootNamespace>EricksonLopez.ValueObjects.DomainPrimitives</RootNamespace>
+    <Description>DomainPrimitives bridge and adapter layer for EricksonLopez.ValueObjects. Enables bidirectional conversion and contract compatibility between Value Objects and IDomainPrimitive contracts.</Description>
+    <PackageTags>$(CommonPackageTags);domain-primitives;strongly-typed-id;abstractions;interoperability;type-safety</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+    <ProjectReference Include="..\..\..\dotnet-domain-primitives\src\EricksonLopez.DomainPrimitives.Abstractions\EricksonLopez.DomainPrimitives.Abstractions.csproj" 
+                      Condition="Exists('..\..\..\dotnet-domain-primitives\src\EricksonLopez.DomainPrimitives.Abstractions\EricksonLopez.DomainPrimitives.Abstractions.csproj')" />
+    <PackageReference Include="EricksonLopez.DomainPrimitives.Abstractions" 
+                      Condition="!Exists('..\..\..\dotnet-domain-primitives\src\EricksonLopez.DomainPrimitives.Abstractions\EricksonLopez.DomainPrimitives.Abstractions.csproj')" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="EricksonLopez.ValueObjects.DomainPrimitives.Tests" />
+  </ItemGroup>
+</Project>

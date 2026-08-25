@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Domain-Driven Design (DDD) Value Objects and compliance validators for Dominican Republic taxation (DGII, RNC, Cédula, NCF Serie B, e-CF Ley 32-23, Fiscal Periods).</Description>
+    <PackageTags>$(CommonPackageTags);fiscal;dominican-republic;dgii;rnc;cedula;ncf;ecf;facturacion-electronica;electronic-invoicing</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

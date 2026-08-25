@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Serialization.Json\EricksonLopez.ValueObjects.Serialization.Json.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.Argentina\EricksonLopez.ValueObjects.Fiscal.Argentina.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.Chile\EricksonLopez.ValueObjects.Fiscal.Chile.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.Colombia\EricksonLopez.ValueObjects.Fiscal.Colombia.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.DominicanRepublic\EricksonLopez.ValueObjects.Fiscal.DominicanRepublic.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.Mexico\EricksonLopez.ValueObjects.Fiscal.Mexico.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.Peru\EricksonLopez.ValueObjects.Fiscal.Peru.csproj" />
+  </ItemGroup>
+</Project>
