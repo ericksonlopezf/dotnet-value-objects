@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Domain-Driven Design (DDD) Value Objects and compliance types for Mexican taxation (SAT, RFC con homoclave, CURP RENAPO, CFDI 4.0 FiscalUuid, Pedimento Aduanal Anexo 22, Carta Porte 3.1 IdCcp, Catálogos SAT).</Description>
+    <PackageTags>$(CommonPackageTags);fiscal;mexico;sat;rfc;curp;cfdi;carta-porte;pedimento;facturacion-electronica;electronic-invoicing</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>
