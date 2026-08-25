@@ -1,0 +1,28 @@
+# Copyright © Erickson Lopez. MIT License.
+name: Weekly Deep Benchmarks
+
+on:
+  schedule:
+    - cron: "0 2 * * 1" # Every Monday at 02:00 UTC
+  workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  weekly-benchmarks:
+    name: Weekly Deep Benchmark Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Run Full Benchmark Matrix
+        run: |
+          dotnet run -c Release --project benchmarks/EricksonLopez.ValueObjects.Benchmarks/EricksonLopez.ValueObjects.Benchmarks.csproj -- --filter "*" --memory

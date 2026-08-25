@@ -1,0 +1,163 @@
+# Copyright © Erickson Lopez. MIT License.
+name: Publish NuGet
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (e.g. 1.2.3 — without 'v' prefix)"
+        required: false
+        type: string
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  publish:
+    name: Pack & Publish
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      attestations: write
+      statuses: read
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ -n "$INPUT_VERSION" ]; then
+            echo "VERSION=$INPUT_VERSION" >> $GITHUB_OUTPUT
+            echo "Resolved version from workflow_dispatch input: $INPUT_VERSION"
+          elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+            echo "Resolved version from git tag: $VERSION"
+          else
+            VERSION=$(grep -oP '(?<=<VersionPrefix>)[^<]+' Directory.Build.props || echo "1.0.0")
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+            echo "Resolved version from Directory.Build.props: $VERSION"
+          fi
+
+      - name: Validate Stryker Mutation Testing Quality Gate
+        id: mutation-gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const verifyMutationGate = require('./scripts/verify-mutation-gate.js');
+            await verifyMutationGate({ github, context, core });
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore Strong Name key
+        env:
+          SNK_KEY: ${{ secrets.SNK_KEY }}
+        run: |
+          if [ -n "$SNK_KEY" ]; then
+            echo "$SNK_KEY" | tr -d '\n\r ' | base64 --decode > EricksonLopez.snk
+            echo "Strong Name key restored from secret."
+          else
+            echo "SNK_KEY secret not set — building without strong name signing."
+          fi
+
+      - name: Restore
+        run: dotnet restore EricksonLopez.ValueObjects.slnx
+
+      - name: Build (Release)
+        run: dotnet build EricksonLopez.ValueObjects.slnx --no-restore --configuration Release
+
+      - name: Run tests before publish
+        run: |
+          dotnet test EricksonLopez.ValueObjects.slnx \
+            --no-build \
+            --configuration Release \
+            --logger "trx;LogFileName=test-results.trx" \
+            --results-directory ./test-results \
+            --collect:"XPlat Code Coverage" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+      - name: Upload coverage to Codecov (publish gate)
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: "**/coverage.opencover.xml"
+          fail_ci_if_error: false
+          flags: publish-gate
+          name: codecov-publish
+
+      - name: Pack All Packages
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          PACK_ARGS="--no-build --configuration Release --output ./nupkgs -p:VersionPrefix=$VERSION -p:TreatWarningsAsErrors=true"
+          dotnet pack src/EricksonLopez.ValueObjects/EricksonLopez.ValueObjects.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.Analyzers/EricksonLopez.ValueObjects.Analyzers.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.Dapper/EricksonLopez.ValueObjects.Dapper.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.DomainPrimitives/EricksonLopez.ValueObjects.DomainPrimitives.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.EntityFrameworkCore/EricksonLopez.ValueObjects.EntityFrameworkCore.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.Fiscal.Argentina/EricksonLopez.ValueObjects.Fiscal.Argentina.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.Fiscal.Chile/EricksonLopez.ValueObjects.Fiscal.Chile.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.Fiscal.Colombia/EricksonLopez.ValueObjects.Fiscal.Colombia.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.Fiscal.DominicanRepublic/EricksonLopez.ValueObjects.Fiscal.DominicanRepublic.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.Fiscal.Mexico/EricksonLopez.ValueObjects.Fiscal.Mexico.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.Fiscal.Peru/EricksonLopez.ValueObjects.Fiscal.Peru.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.Generators/EricksonLopez.ValueObjects.Generators.csproj $PACK_ARGS
+          dotnet pack src/EricksonLopez.ValueObjects.Serialization.Json/EricksonLopez.ValueObjects.Serialization.Json.csproj $PACK_ARGS
+          echo "Packed packages:"
+          ls -la ./nupkgs/
+
+      - name: Generate Sigstore Provenance Attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: './nupkgs/*.nupkg'
+
+      - name: NuGet login (OIDC)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ericksonlopezf
+
+      - name: Push to NuGet.org
+        run: >
+          dotnet nuget push ./nupkgs/*.nupkg
+          --api-key ${{ steps.login.outputs.NUGET_API_KEY }}
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+
+      - name: Create GitHub Release (tag-triggered only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          name: Release ${{ steps.version.outputs.VERSION }}
+          generate_release_notes: false
+          body: |
+            ## Ecosystem Packages in this release
+            - `EricksonLopez.ValueObjects`
+            - `EricksonLopez.ValueObjects.Analyzers`
+            - `EricksonLopez.ValueObjects.Dapper`
+            - `EricksonLopez.ValueObjects.DomainPrimitives`
+            - `EricksonLopez.ValueObjects.EntityFrameworkCore`
+            - `EricksonLopez.ValueObjects.Fiscal.Argentina`
+            - `EricksonLopez.ValueObjects.Fiscal.Chile`
+            - `EricksonLopez.ValueObjects.Fiscal.Colombia`
+            - `EricksonLopez.ValueObjects.Fiscal.DominicanRepublic`
+            - `EricksonLopez.ValueObjects.Fiscal.Mexico`
+            - `EricksonLopez.ValueObjects.Fiscal.Peru`
+            - `EricksonLopez.ValueObjects.Generators`
+            - `EricksonLopez.ValueObjects.Serialization.Json`
+          files: ./nupkgs/*.nupkg

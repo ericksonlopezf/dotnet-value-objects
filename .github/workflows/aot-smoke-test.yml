@@ -1,0 +1,42 @@
+# Copyright © Erickson Lopez. MIT License.
+name: NativeAOT Smoke Test
+
+on:
+  workflow_call:
+    secrets:
+      SNK_KEY:
+        required: false
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  aot-smoke-test:
+    name: NativeAOT Smoke Test (Linux-x64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore Strong Name key
+        env:
+          SNK_KEY: ${{ secrets.SNK_KEY }}
+        run: |
+          if [ -n "$SNK_KEY" ]; then
+            echo "$SNK_KEY" | tr -d '\n\r ' | base64 --decode > EricksonLopez.snk
+          fi
+
+      - name: Publish NativeAOT Test Binary
+        run: >
+          dotnet publish tests/EricksonLopez.ValueObjects.NativeAotTests/EricksonLopez.ValueObjects.NativeAotTests.csproj
+          --configuration Release
+          --output ./aot-output
+
+      - name: Run NativeAOT Smoke Test
+        run: ./aot-output/EricksonLopez.ValueObjects.NativeAotTests

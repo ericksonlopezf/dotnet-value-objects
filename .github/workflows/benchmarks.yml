@@ -1,0 +1,30 @@
+# Copyright © Erickson Lopez. MIT License.
+name: Benchmarks
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "benchmarks/**"
+  workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  benchmark:
+    name: BenchmarkDotNet Execution
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Run Benchmarks
+        run: |
+          dotnet run -c Release --project benchmarks/EricksonLopez.ValueObjects.Benchmarks/EricksonLopez.ValueObjects.Benchmarks.csproj -- --filter "*" --memory
