@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CA1822;IL2026;IL3050</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Fiscal.Argentina\EricksonLopez.ValueObjects.Fiscal.Argentina.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Serialization.Json\EricksonLopez.ValueObjects.Serialization.Json.csproj" />
+    <ProjectReference Include="..\..\src\EricksonLopez.ValueObjects.Dapper\EricksonLopez.ValueObjects.Dapper.csproj" />
+  </ItemGroup>
+</Project>

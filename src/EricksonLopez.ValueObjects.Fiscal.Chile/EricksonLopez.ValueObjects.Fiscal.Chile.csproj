@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Domain-Driven Design (DDD) Value Objects and compliance types for Chilean taxation (SII, RUT Modulo 11 body and check digit 'K', DTEs 33/34/39/41/52/61, Folios, Professional Fee Withholding Law 21.133).</Description>
+    <PackageTags>$(CommonPackageTags);fiscal;chile;sii;rut;dte;factura-electronica;facturacion-electronica;electronic-invoicing</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

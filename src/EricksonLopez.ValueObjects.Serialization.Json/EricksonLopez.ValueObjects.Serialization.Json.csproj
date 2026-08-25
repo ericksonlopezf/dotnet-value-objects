@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>System.Text.Json Native AOT-compatible serialization adapters for EricksonLopez.ValueObjects.</Description>
+    <PackageTags>$(CommonPackageTags);json;serialization;system-text-json;json-converter;native-aot</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+  </ItemGroup>
+</Project>
