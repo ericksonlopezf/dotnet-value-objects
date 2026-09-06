@@ -2,7 +2,7 @@
 <html lang='en'>
 <head>
 <meta charset='utf-8' />
-<title>EricksonLopez.ValueObjects.Benchmarks.ParsingBenchmarks-20260830-073742</title>
+<title>EricksonLopez.ValueObjects.Benchmarks.ParsingBenchmarks-20260906-063632</title>
 
 <style type="text/css">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
@@ -14,35 +14,35 @@
 <body>
 <pre><code>
 BenchmarkDotNet v0.15.8, Linux Ubuntu 24.04.4 LTS (Noble Numbat)
-AMD EPYC 7763 2.60GHz, 1 CPU, 4 logical and 2 physical cores
+INTEL XEON PLATINUM 8573C 3.35GHz, 1 CPU, 4 logical and 2 physical cores
 .NET SDK 10.0.400
-  [Host]    : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v3
-  .NET 10.0 : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v3
+  [Host]    : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v4
+  .NET 10.0 : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v4
 </code></pre>
 <pre><code></code></pre>
 
 <table>
 <thead><tr><th>Method            </th><th>Job</th><th>Runtime</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Allocated</th><th>Alloc Ratio</th>
 </tr>
-</thead><tbody><tr><td>Parse_Percentage_String</td><td>.NET 10.0</td><td>.NET 10.0</td><td>57.01 ns</td><td>0.075 ns</td><td>0.066 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</thead><tbody><tr><td>Parse_Percentage_String</td><td>.NET 10.0</td><td>.NET 10.0</td><td>37.18 ns</td><td>0.211 ns</td><td>0.187 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Parse_Percentage_String</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Parse_Percentage_String</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Parse_Percentage_Span</td><td>.NET 10.0</td><td>.NET 10.0</td><td>57.13 ns</td><td>0.085 ns</td><td>0.076 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Parse_Percentage_Span</td><td>.NET 10.0</td><td>.NET 10.0</td><td>36.16 ns</td><td>0.172 ns</td><td>0.161 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Parse_Percentage_Span</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Parse_Percentage_Span</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>TryParse_Percentage_Span</td><td>.NET 10.0</td><td>.NET 10.0</td><td>48.51 ns</td><td>0.045 ns</td><td>0.037 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>TryParse_Percentage_Span</td><td>.NET 10.0</td><td>.NET 10.0</td><td>34.23 ns</td><td>0.170 ns</td><td>0.133 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>TryParse_Percentage_Span</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>TryParse_Percentage_Span</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Parse_Cuit_String</td><td>.NET 10.0</td><td>.NET 10.0</td><td>53.10 ns</td><td>0.296 ns</td><td>0.277 ns</td><td>?</td><td>?</td><td>0.0029</td><td>48 B</td><td>?</td>
+</tr><tr><td>Parse_Cuit_String</td><td>.NET 10.0</td><td>.NET 10.0</td><td>33.84 ns</td><td>0.511 ns</td><td>0.478 ns</td><td>?</td><td>?</td><td>0.0005</td><td>48 B</td><td>?</td>
 </tr><tr><td>Parse_Cuit_String</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Parse_Cuit_String</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Parse_Cuit_Span</td><td>.NET 10.0</td><td>.NET 10.0</td><td>57.92 ns</td><td>0.150 ns</td><td>0.133 ns</td><td>?</td><td>?</td><td>0.0029</td><td>48 B</td><td>?</td>
+</tr><tr><td>Parse_Cuit_Span</td><td>.NET 10.0</td><td>.NET 10.0</td><td>38.31 ns</td><td>0.372 ns</td><td>0.348 ns</td><td>?</td><td>?</td><td>0.0005</td><td>48 B</td><td>?</td>
 </tr><tr><td>Parse_Cuit_Span</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Parse_Cuit_Span</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Parse_Cuit_Utf8</td><td>.NET 10.0</td><td>.NET 10.0</td><td>62.64 ns</td><td>0.376 ns</td><td>0.352 ns</td><td>?</td><td>?</td><td>0.0029</td><td>48 B</td><td>?</td>
+</tr><tr><td>Parse_Cuit_Utf8</td><td>.NET 10.0</td><td>.NET 10.0</td><td>43.71 ns</td><td>0.274 ns</td><td>0.256 ns</td><td>?</td><td>?</td><td>0.0005</td><td>48 B</td><td>?</td>
 </tr><tr><td>Parse_Cuit_Utf8</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Parse_Cuit_Utf8</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>TryParse_Cuit_Utf8</td><td>.NET 10.0</td><td>.NET 10.0</td><td>61.89 ns</td><td>0.231 ns</td><td>0.204 ns</td><td>?</td><td>?</td><td>0.0029</td><td>48 B</td><td>?</td>
+</tr><tr><td>TryParse_Cuit_Utf8</td><td>.NET 10.0</td><td>.NET 10.0</td><td>42.49 ns</td><td>0.377 ns</td><td>0.352 ns</td><td>?</td><td>?</td><td>0.0005</td><td>48 B</td><td>?</td>
 </tr><tr><td>TryParse_Cuit_Utf8</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>TryParse_Cuit_Utf8</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Parse_Cbu_String</td><td>.NET 10.0</td><td>.NET 10.0</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
