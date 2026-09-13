@@ -2,7 +2,7 @@
 <html lang='en'>
 <head>
 <meta charset='utf-8' />
-<title>EricksonLopez.ValueObjects.Benchmarks.ValueObjectBenchmarks-20260906-063845</title>
+<title>EricksonLopez.ValueObjects.Benchmarks.ValueObjectBenchmarks-20260913-065752</title>
 
 <style type="text/css">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
@@ -13,81 +13,81 @@
 </head>
 <body>
 <pre><code>
-BenchmarkDotNet v0.15.8, Linux Ubuntu 24.04.4 LTS (Noble Numbat)
-INTEL XEON PLATINUM 8573C 3.35GHz, 1 CPU, 4 logical and 2 physical cores
-.NET SDK 10.0.400
-  [Host]    : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v4
-  .NET 10.0 : .NET 10.0.11 (10.0.11, 10.0.1126.37416), X64 RyuJIT x86-64-v4
+BenchmarkDotNet v0.15.8, Linux Ubuntu 24.04.5 LTS (Noble Numbat)
+AMD EPYC 7763 2.45GHz, 1 CPU, 4 logical and 2 physical cores
+.NET SDK 10.0.401
+  [Host]    : .NET 10.0.12 (10.0.12, 10.0.1226.42308), X64 RyuJIT x86-64-v3
+  .NET 10.0 : .NET 10.0.12 (10.0.12, 10.0.1226.42308), X64 RyuJIT x86-64-v3
 </code></pre>
 <pre><code></code></pre>
 
 <table>
 <thead><tr><th>Method                 </th><th>Job</th><th>Runtime</th><th>Mean </th><th>Error</th><th>StdDev</th><th>Median</th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Allocated</th><th>Alloc Ratio</th>
 </tr>
-</thead><tbody><tr><td>Create_Class</td><td>.NET 10.0</td><td>.NET 10.0</td><td>5.7690 ns</td><td>0.1779 ns</td><td>0.1664 ns</td><td>5.7741 ns</td><td>?</td><td>?</td><td>0.0003</td><td>24 B</td><td>?</td>
+</thead><tbody><tr><td>Create_Class</td><td>.NET 10.0</td><td>.NET 10.0</td><td>6.1026 ns</td><td>0.0645 ns</td><td>0.0603 ns</td><td>6.1009 ns</td><td>?</td><td>?</td><td>0.0014</td><td>24 B</td><td>?</td>
 </tr><tr><td>Create_Class</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Create_Class</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Create_RecordClass</td><td>.NET 10.0</td><td>.NET 10.0</td><td>4.9926 ns</td><td>0.0965 ns</td><td>0.0806 ns</td><td>4.9655 ns</td><td>?</td><td>?</td><td>0.0003</td><td>24 B</td><td>?</td>
+</tr><tr><td>Create_RecordClass</td><td>.NET 10.0</td><td>.NET 10.0</td><td>6.4942 ns</td><td>0.1785 ns</td><td>0.1670 ns</td><td>6.4646 ns</td><td>?</td><td>?</td><td>0.0014</td><td>24 B</td><td>?</td>
 </tr><tr><td>Create_RecordClass</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Create_RecordClass</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Create_Struct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.0002 ns</td><td>0.0010 ns</td><td>0.0009 ns</td><td>0.0000 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Create_Struct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.0014 ns</td><td>0.0014 ns</td><td>0.0011 ns</td><td>0.0015 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Create_Struct</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Create_Struct</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Create_RecordStruct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.0003 ns</td><td>0.0012 ns</td><td>0.0010 ns</td><td>0.0000 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Create_RecordStruct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.0007 ns</td><td>0.0019 ns</td><td>0.0015 ns</td><td>0.0000 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Create_RecordStruct</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Create_RecordStruct</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Domain_Create_Email</td><td>.NET 10.0</td><td>.NET 10.0</td><td>129.0971 ns</td><td>1.0269 ns</td><td>0.9605 ns</td><td>129.3473 ns</td><td>?</td><td>?</td><td>0.0017</td><td>152 B</td><td>?</td>
+</tr><tr><td>Domain_Create_Email</td><td>.NET 10.0</td><td>.NET 10.0</td><td>166.9218 ns</td><td>0.2979 ns</td><td>0.2487 ns</td><td>166.9475 ns</td><td>?</td><td>?</td><td>0.0091</td><td>152 B</td><td>?</td>
 </tr><tr><td>Domain_Create_Email</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Domain_Create_Email</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Domain_Create_Money</td><td>.NET 10.0</td><td>.NET 10.0</td><td>9.1559 ns</td><td>0.1298 ns</td><td>0.1151 ns</td><td>9.1737 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Domain_Create_Money</td><td>.NET 10.0</td><td>.NET 10.0</td><td>11.1190 ns</td><td>0.0106 ns</td><td>0.0088 ns</td><td>11.1174 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Domain_Create_Money</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Domain_Create_Money</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Domain_Create_Percentage</td><td>.NET 10.0</td><td>.NET 10.0</td><td>4.8673 ns</td><td>0.0311 ns</td><td>0.0275 ns</td><td>4.8618 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Domain_Create_Percentage</td><td>.NET 10.0</td><td>.NET 10.0</td><td>7.4341 ns</td><td>0.0137 ns</td><td>0.0114 ns</td><td>7.4317 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Domain_Create_Percentage</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Domain_Create_Percentage</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Equals_Class</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.5515 ns</td><td>0.0064 ns</td><td>0.0057 ns</td><td>0.5518 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Equals_Class</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.5660 ns</td><td>0.0042 ns</td><td>0.0040 ns</td><td>0.5660 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Equals_Class</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Equals_Class</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Equals_RecordClass</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.5840 ns</td><td>0.0081 ns</td><td>0.0072 ns</td><td>0.5855 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Equals_RecordClass</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.7552 ns</td><td>0.0078 ns</td><td>0.0069 ns</td><td>0.7558 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Equals_RecordClass</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Equals_RecordClass</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Equals_Struct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.2690 ns</td><td>0.0067 ns</td><td>0.0063 ns</td><td>0.2711 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Equals_Struct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.4637 ns</td><td>0.0019 ns</td><td>0.0016 ns</td><td>0.4633 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Equals_Struct</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Equals_Struct</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Equals_RecordStruct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.5882 ns</td><td>0.0312 ns</td><td>0.0292 ns</td><td>0.5911 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Equals_RecordStruct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>0.3280 ns</td><td>0.0091 ns</td><td>0.0081 ns</td><td>0.3255 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Equals_RecordStruct</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Equals_RecordStruct</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Domain_Equals_Money</td><td>.NET 10.0</td><td>.NET 10.0</td><td>2.0023 ns</td><td>0.0159 ns</td><td>0.0149 ns</td><td>2.0006 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Domain_Equals_Money</td><td>.NET 10.0</td><td>.NET 10.0</td><td>5.1174 ns</td><td>0.0039 ns</td><td>0.0033 ns</td><td>5.1175 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Domain_Equals_Money</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Domain_Equals_Money</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>HashCode_Class</td><td>.NET 10.0</td><td>.NET 10.0</td><td>16.0014 ns</td><td>0.0827 ns</td><td>0.0773 ns</td><td>16.0040 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>HashCode_Class</td><td>.NET 10.0</td><td>.NET 10.0</td><td>18.8705 ns</td><td>0.0061 ns</td><td>0.0051 ns</td><td>18.8703 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>HashCode_Class</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>HashCode_Class</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>HashCode_RecordClass</td><td>.NET 10.0</td><td>.NET 10.0</td><td>16.3980 ns</td><td>0.0881 ns</td><td>0.0781 ns</td><td>16.3918 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>HashCode_RecordClass</td><td>.NET 10.0</td><td>.NET 10.0</td><td>22.3978 ns</td><td>0.0971 ns</td><td>0.0861 ns</td><td>22.4411 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>HashCode_RecordClass</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>HashCode_RecordClass</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>HashCode_Struct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>15.2149 ns</td><td>0.0896 ns</td><td>0.0839 ns</td><td>15.2171 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>HashCode_Struct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>18.5336 ns</td><td>0.0069 ns</td><td>0.0061 ns</td><td>18.5334 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>HashCode_Struct</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>HashCode_Struct</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>HashCode_RecordStruct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>15.2619 ns</td><td>0.0516 ns</td><td>0.0482 ns</td><td>15.2543 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>HashCode_RecordStruct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>17.7530 ns</td><td>0.0237 ns</td><td>0.0210 ns</td><td>17.7439 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>HashCode_RecordStruct</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>HashCode_RecordStruct</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>DictionaryLookup_RecordClass</td><td>.NET 10.0</td><td>.NET 10.0</td><td>19.9253 ns</td><td>0.1139 ns</td><td>0.0889 ns</td><td>19.9095 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>DictionaryLookup_RecordClass</td><td>.NET 10.0</td><td>.NET 10.0</td><td>26.0812 ns</td><td>0.0999 ns</td><td>0.0834 ns</td><td>26.0744 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>DictionaryLookup_RecordClass</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>DictionaryLookup_RecordClass</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>DictionaryLookup_RecordStruct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>18.5583 ns</td><td>0.0488 ns</td><td>0.0432 ns</td><td>18.5546 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>DictionaryLookup_RecordStruct</td><td>.NET 10.0</td><td>.NET 10.0</td><td>24.0436 ns</td><td>0.0241 ns</td><td>0.0213 ns</td><td>24.0328 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>DictionaryLookup_RecordStruct</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>DictionaryLookup_RecordStruct</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Domain_Money_Add</td><td>.NET 10.0</td><td>.NET 10.0</td><td>6.3323 ns</td><td>0.0300 ns</td><td>0.0280 ns</td><td>6.3330 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Domain_Money_Add</td><td>.NET 10.0</td><td>.NET 10.0</td><td>8.7502 ns</td><td>0.0052 ns</td><td>0.0041 ns</td><td>8.7505 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Domain_Money_Add</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Domain_Money_Add</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Domain_Money_Allocate</td><td>.NET 10.0</td><td>.NET 10.0</td><td>291.5490 ns</td><td>1.5281 ns</td><td>1.4293 ns</td><td>291.4719 ns</td><td>?</td><td>?</td><td>0.0010</td><td>96 B</td><td>?</td>
+</tr><tr><td>Domain_Money_Allocate</td><td>.NET 10.0</td><td>.NET 10.0</td><td>369.9921 ns</td><td>0.3734 ns</td><td>0.3310 ns</td><td>370.0024 ns</td><td>?</td><td>?</td><td>0.0057</td><td>96 B</td><td>?</td>
 </tr><tr><td>Domain_Money_Allocate</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Domain_Money_Allocate</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Domain_Money_ApplyTax</td><td>.NET 10.0</td><td>.NET 10.0</td><td>45.8323 ns</td><td>0.1697 ns</td><td>0.1587 ns</td><td>45.8408 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Domain_Money_ApplyTax</td><td>.NET 10.0</td><td>.NET 10.0</td><td>55.3658 ns</td><td>0.0247 ns</td><td>0.0219 ns</td><td>55.3622 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Domain_Money_ApplyTax</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Domain_Money_ApplyTax</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
-</tr><tr><td>Domain_Parse_BusinessDate</td><td>.NET 10.0</td><td>.NET 10.0</td><td>74.1420 ns</td><td>0.3468 ns</td><td>0.3244 ns</td><td>74.1589 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
+</tr><tr><td>Domain_Parse_BusinessDate</td><td>.NET 10.0</td><td>.NET 10.0</td><td>127.1179 ns</td><td>0.2004 ns</td><td>0.1776 ns</td><td>127.0445 ns</td><td>?</td><td>?</td><td>-</td><td>-</td><td>?</td>
 </tr><tr><td>Domain_Parse_BusinessDate</td><td>.NET 8.0</td><td>.NET 8.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr><tr><td>Domain_Parse_BusinessDate</td><td>.NET 9.0</td><td>.NET 9.0</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>?</td><td>?</td><td>NA</td><td>NA</td><td>?</td>
 </tr></tbody></table>
