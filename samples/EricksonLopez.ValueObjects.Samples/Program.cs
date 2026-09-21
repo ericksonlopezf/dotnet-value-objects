@@ -27,9 +27,10 @@ Level07_ZeroAllocationAot.Run();
 Level08_CustomValueObjects.Run();
 Level09_PersistenceAndSerialization.Run();
 Level10_EnterpriseDddPatterns.Run();
+Level11_ComprehensiveApiCoverageDemo.Run();
 
 Console.ForegroundColor = ConsoleColor.Green;
 Console.WriteLine("\n===============================================================================");
-Console.WriteLine(" ✔ ALL SHOWCASE LEVELS (0 THROUGH 10) EXECUTED SUCCESSFULLY.");
+Console.WriteLine(" ✔ ALL SHOWCASE LEVELS (0 THROUGH 11) EXECUTED SUCCESSFULLY.");
 Console.WriteLine("===============================================================================");
 Console.ResetColor();

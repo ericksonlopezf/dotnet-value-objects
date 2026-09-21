@@ -1,4 +1,4 @@
-﻿// Copyright © Erickson Lopez. MIT License.
+// Copyright © Erickson Lopez. MIT License.
 using System;
 using System.Text.RegularExpressions;
 using EricksonLopez.Result;
@@ -20,6 +20,11 @@ public readonly partial record struct CurrencyCode : IValueObject<CurrencyCode>,
     /// Gets the three-letter ISO 4217 currency code string.
     /// </summary>
     public string Value { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether this <see cref="CurrencyCode"/> instance was initialized through a factory rather than <c>default(CurrencyCode)</c>.
+    /// </summary>
+    public bool IsInitialized => !string.IsNullOrEmpty(Value);
 
     private CurrencyCode(string value) => Value = value;
 

@@ -32,10 +32,10 @@ public sealed class SingleValueObjectTests
 
         SingleValueObject<TestIntScalarVo, int> baseVo1 = vo1!;
         SingleValueObject<TestIntScalarVo, int> baseVo2 = vo2!;
-        baseVo1.Equals(vo2).Should().BeTrue();
-        baseVo1.Equals((TestIntScalarVo?)null).Should().BeFalse();
-        baseVo1.Equals(vo1).Should().BeTrue();
-        baseVo1.Equals(vo3).Should().BeFalse();
+        baseVo1!.Equals(vo2!).Should().BeTrue();
+        baseVo1!.Equals((TestIntScalarVo?)null).Should().BeFalse();
+        baseVo1!.Equals(vo1!).Should().BeTrue();
+        baseVo1!.Equals(vo3!).Should().BeFalse();
     }
 
     [Fact]

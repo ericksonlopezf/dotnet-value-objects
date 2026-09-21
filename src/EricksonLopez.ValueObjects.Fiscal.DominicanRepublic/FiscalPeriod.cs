@@ -130,7 +130,7 @@ public readonly record struct FiscalPeriod : IValueObject<FiscalPeriod>, ICompar
     public int CompareTo(object? obj) =>
         obj is FiscalPeriod other ? CompareTo(other) : throw new ArgumentException("Object is not a FiscalPeriod", nameof(obj));
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="FiscalPeriod"/> is less than the right <see cref="FiscalPeriod"/>.
     /// </summary>
     /// <param name="left">The first <see cref="FiscalPeriod"/> to compare.</param>

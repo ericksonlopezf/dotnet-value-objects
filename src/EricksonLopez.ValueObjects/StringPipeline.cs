@@ -1,5 +1,7 @@
 // Copyright © Erickson Lopez. MIT License.
 using System;
+using System.Buffers;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using EricksonLopez.Result;
@@ -71,7 +73,9 @@ internal static partial class StringPipeline
                 $"{fieldName} is required."));
         }
 
-        string normalized = normalize is null ? value.Trim() : normalize(value);
+        string trimmed = value.Trim();
+        string rawNormalized = normalize is null ? trimmed : normalize(trimmed).Trim();
+        string normalized = rawNormalized.Normalize(NormalizationForm.FormC);
 
         if (ContainsControlCharacters(normalized))
         {
@@ -200,6 +204,10 @@ internal static partial class StringPipeline
     /// <returns>The trimmed lowercase string.</returns>
     public static string NormalizeLower(string value) => value.Trim().ToLowerInvariant();
 
+    private static readonly SearchValues<char> AsciiControlChars = SearchValues.Create(
+        "\0\u0001\u0002\u0003\u0004\u0005\u0006\a\b\t\n\v\f\r\u000e\u000f" +
+        "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f\u007f");
+
     /// <summary>
     /// Determines whether the string contains any Unicode control characters.
     /// </summary>
@@ -207,15 +215,48 @@ internal static partial class StringPipeline
     /// <returns><see langword="true"/> if the string contains control characters; otherwise, <see langword="false"/>.</returns>
     public static bool ContainsControlCharacters(string value)
     {
-        foreach (char character in value)
+        ReadOnlySpan<char> span = value.AsSpan();
+        if (span.IndexOfAny(AsciiControlChars) >= 0)
+        {
+            return true;
+        }
+
+        foreach (char character in span)
         {
             if (char.IsControl(character))
+            {
+                return true;
+            }
+
+            UnicodeCategory category = char.GetUnicodeCategory(character);
+            if (category is UnicodeCategory.Format or UnicodeCategory.OtherNotAssigned)
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Strips Unicode Category 'Format' (Cf) characters (e.g. Zero-Width Non-Joiner, RTL marks) from the string.
+    /// This prevents canonicalization bypasses where invisible characters alter the string's byte representation.
+    /// </summary>
+    /// <param name="value">The raw string to sanitize.</param>
+    /// <returns>The sanitized string devoid of format characters.</returns>
+    public static string StripFormatCharacters(string value)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+
+        var builder = new StringBuilder(value.Length);
+        foreach (char c in value)
+        {
+            if (char.GetUnicodeCategory(c) != UnicodeCategory.Format)
+            {
+                builder.Append(c);
+            }
+        }
+        return builder.ToString();
     }
 }
 

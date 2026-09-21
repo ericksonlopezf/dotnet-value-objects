@@ -1,5 +1,11 @@
 # ADR-013: Sensitive Data Protection (PII) in Domain and Debugger
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** PII Defense & Security Logging

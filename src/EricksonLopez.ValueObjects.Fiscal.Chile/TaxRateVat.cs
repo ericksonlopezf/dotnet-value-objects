@@ -96,7 +96,7 @@ public readonly record struct TaxRateVat : ISpanParsable<TaxRateVat>, IComparabl
     /// <inheritdoc/>
     public int CompareTo(TaxRateVat other) => _percentage.CompareTo(other._percentage);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="TaxRateVat"/> is less than the right <see cref="TaxRateVat"/>.
     /// </summary>
     /// <param name="left">The first <see cref="TaxRateVat"/> to compare.</param>

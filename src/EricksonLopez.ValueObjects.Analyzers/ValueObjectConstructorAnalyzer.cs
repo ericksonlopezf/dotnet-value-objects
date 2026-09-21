@@ -57,11 +57,31 @@ public sealed class ValueObjectConstructorAnalyzer : DiagnosticAnalyzer
             }
         }
 
+        if (!isValueObject)
+        {
+            isValueObject = namedTypeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name is "ValueObjectAttribute" or "ValueObject");
+        }
+
         if (!isValueObject) return;
 
         foreach (var constructor in namedTypeSymbol.Constructors)
         {
-            if (constructor.IsImplicitlyDeclared) continue;
+            if (constructor.IsImplicitlyDeclared)
+            {
+                if (namedTypeSymbol.IsReferenceType)
+                {
+                    var loc = namedTypeSymbol.Locations.FirstOrDefault();
+                    if (loc is not null)
+                    {
+                        var diag = Diagnostic.Create(
+                            Rule,
+                            loc,
+                            namedTypeSymbol.Name);
+                        context.ReportDiagnostic(diag);
+                    }
+                }
+                continue;
+            }
 
             // Allow private constructors, or protected constructors if the type is abstract
             bool isAllowed = constructor.DeclaredAccessibility == Accessibility.Private

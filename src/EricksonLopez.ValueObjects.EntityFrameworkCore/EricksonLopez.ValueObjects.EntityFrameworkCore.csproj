@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <AssemblyName>EricksonLopez.ValueObjects.EntityFrameworkCore</AssemblyName>
     <RootNamespace>EricksonLopez.ValueObjects.EntityFrameworkCore</RootNamespace>
     
     <Title>EricksonLopez.ValueObjects.EntityFrameworkCore</Title>
     <Description>Entity Framework Core integration for EricksonLopez.ValueObjects. Provides NativeAOT-ready ValueConverters, value comparers, and model configuration conventions for domain Value Objects.</Description>
-    <PackageTags>$(CommonPackageTags);efcore;entity-framework-core;orm;value-converter;persistence;native-aot</PackageTags>
+    <PackageTags>$(CommonPackageTags);efcore;entity-framework-core;orm;value-converter;value-comparer;persistence;native-aot</PackageTags>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>

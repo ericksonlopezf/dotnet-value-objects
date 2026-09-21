@@ -194,6 +194,33 @@ public sealed class RangeTests
 
         range.ToString().Should().Be("[10 .. 20]");
     }
+
+    [Fact]
+    public void IsEmpty_WhenStartEqualsEnd_ReturnsTrue()
+    {
+        var range = Range<int>.Create(10, 10).Value;
+        range.IsEmpty.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsEmpty_WhenStartLessThanEnd_ReturnsFalse()
+    {
+        var range = Range<int>.Create(10, 20).Value;
+        range.IsEmpty.Should().BeFalse();
+    }
+
+    [Fact]
+    public void ContainsHalfOpen_ShouldExcludeUpperBoundary()
+    {
+        var range = Range<int>.Create(10, 20).Value;
+
+        range.ContainsHalfOpen(9).Should().BeFalse();
+        range.ContainsHalfOpen(10).Should().BeTrue();
+        range.ContainsHalfOpen(15).Should().BeTrue();
+        range.ContainsHalfOpen(19).Should().BeTrue();
+        range.ContainsHalfOpen(20).Should().BeFalse();
+        range.ContainsHalfOpen(21).Should().BeFalse();
+    }
 }
 
 

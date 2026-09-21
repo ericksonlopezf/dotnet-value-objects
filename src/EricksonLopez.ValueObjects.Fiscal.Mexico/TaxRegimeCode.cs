@@ -24,15 +24,15 @@ using EricksonLopez.ValueObjects.Attributes;
 public readonly record struct TaxRegimeCode : ISpanParsable<TaxRegimeCode>, IComparable<TaxRegimeCode>
 {
     /// <summary>Gets tax regime 601 (General de Ley Personas Morales).</summary>
-    public static TaxRegimeCode GeneralPersonasMorales => new("601", "General de Ley Personas Morales", false, true);
+    public static TaxRegimeCode GeneralLegalEntities => new("601", "General de Ley Personas Morales", false, true);
     /// <summary>Gets tax regime 605 (Sueldos y Salarios).</summary>
-    public static TaxRegimeCode SueldosYSalarios => new("605", "Sueldos y Salarios", true, false);
+    public static TaxRegimeCode WagesAndSalaries => new("605", "Sueldos y Salarios", true, false);
     /// <summary>Gets tax regime 606 (Arrendamiento).</summary>
-    public static TaxRegimeCode Arrendamiento => new("606", "Arrendamiento", true, false);
+    public static TaxRegimeCode Leasing => new("606", "Arrendamiento", true, false);
     /// <summary>Gets tax regime 612 (Personas Físicas con Actividades Empresariales y Profesionales).</summary>
-    public static TaxRegimeCode ActividadesEmpresariales => new("612", "Personas Físicas con Actividades Empresariales y Profesionales", true, false);
+    public static TaxRegimeCode BusinessActivities => new("612", "Personas Físicas con Actividades Empresariales y Profesionales", true, false);
     /// <summary>Gets tax regime 626 (Régimen Simplificado de Confianza - RESICO).</summary>
-    public static TaxRegimeCode Resico => new("626", "Régimen Simplificado de Confianza", true, true);
+    public static TaxRegimeCode SimplifiedTrustRegime => new("626", "Régimen Simplificado de Confianza", true, true);
 
 
     private readonly string _code;
@@ -98,11 +98,11 @@ public readonly record struct TaxRegimeCode : ISpanParsable<TaxRegimeCode>, ICom
 
         return trimmed switch
         {
-            "601" => Result<TaxRegimeCode>.Success(GeneralPersonasMorales),
-            "605" => Result<TaxRegimeCode>.Success(SueldosYSalarios),
-            "606" => Result<TaxRegimeCode>.Success(Arrendamiento),
-            "612" => Result<TaxRegimeCode>.Success(ActividadesEmpresariales),
-            "626" => Result<TaxRegimeCode>.Success(Resico),
+            "601" => Result<TaxRegimeCode>.Success(GeneralLegalEntities),
+            "605" => Result<TaxRegimeCode>.Success(WagesAndSalaries),
+            "606" => Result<TaxRegimeCode>.Success(Leasing),
+            "612" => Result<TaxRegimeCode>.Success(BusinessActivities),
+            "626" => Result<TaxRegimeCode>.Success(SimplifiedTrustRegime),
             _ => Result<TaxRegimeCode>.Success(new TaxRegimeCode(trimmed.ToString(), "Régimen Fiscal (Catálogo Dinámico)", false, false))
         };
     }
@@ -113,7 +113,7 @@ public readonly record struct TaxRegimeCode : ISpanParsable<TaxRegimeCode>, ICom
     /// <inheritdoc/>
     public int CompareTo(TaxRegimeCode other) => string.Compare(_code, other._code, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="TaxRegimeCode"/> is less than the right <see cref="TaxRegimeCode"/>.
     /// </summary>
     /// <param name="left">The first <see cref="TaxRegimeCode"/> to compare.</param>

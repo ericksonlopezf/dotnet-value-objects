@@ -70,7 +70,7 @@ public readonly record struct FiscalFolio : ISpanParsable<FiscalFolio>, ICompara
     /// <inheritdoc/>
     public int CompareTo(FiscalFolio other) => _value.CompareTo(other._value);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="FiscalFolio"/> is less than the right <see cref="FiscalFolio"/>.
     /// </summary>
     /// <param name="left">The first <see cref="FiscalFolio"/> to compare.</param>

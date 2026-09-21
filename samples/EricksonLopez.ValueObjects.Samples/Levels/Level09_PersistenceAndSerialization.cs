@@ -56,11 +56,11 @@ public static class Level09_PersistenceAndSerialization
         // RegisterStruct requires an additional valueSelector because structs cannot be null.
         // Signature: RegisterStruct<TVO, TPrimitive>(Func<TPrimitive, Result<TVO>>, Func<TVO, TPrimitive>)
         ValueObjectTypeHandler.RegisterStruct<TaxRate, decimal>(
-            factory:       TaxRate.Create,
+            factory: TaxRate.Create,
             valueSelector: vo => vo.Value);
 
         ValueObjectTypeHandler.RegisterStruct<Quantity, int>(
-            factory:       val => Quantity.Create(int.Parse(val.ToString()!)),
+            factory: val => Quantity.Create(int.Parse(val.ToString()!)),
             valueSelector: vo => vo.Value);
 
         Console.WriteLine("  - RegisterStruct<TaxRate, decimal>  ✔");
@@ -81,11 +81,11 @@ public static class Level09_PersistenceAndSerialization
 
             var sampleOrg = new SampleOrganization
             {
-                Id              = Guid.NewGuid(),
-                Name            = "EricksonLopez Corp",
-                BillingEmail    = Email.Create("billing@ericksonlopez.dev").Value,
-                SupportPhone    = PhoneNumber.Create("+1-809-555-0100").Value,
-                VatRate         = TaxRate.Create(18.0m).Value,
+                Id = Guid.NewGuid(),
+                Name = "EricksonLopez Corp",
+                BillingEmail = Email.Create("billing@ericksonlopez.dev").Value,
+                SupportPhone = PhoneNumber.Create("+1-809-555-0100").Value,
+                VatRate = TaxRate.Create(18.0m).Value,
                 DefaultCurrency = CurrencyCode.Create("USD").Value
             };
 
@@ -157,11 +157,11 @@ public static class Level09_PersistenceAndSerialization
     /// </summary>
     private sealed class SampleOrganization
     {
-        public Guid Id              { get; set; }
-        public string Name          { get; set; } = string.Empty;
-        public Email BillingEmail   { get; set; }
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public Email BillingEmail { get; set; }
         public PhoneNumber SupportPhone { get; set; }
-        public TaxRate VatRate      { get; set; }
+        public TaxRate VatRate { get; set; }
         public CurrencyCode DefaultCurrency { get; set; }
     }
 }

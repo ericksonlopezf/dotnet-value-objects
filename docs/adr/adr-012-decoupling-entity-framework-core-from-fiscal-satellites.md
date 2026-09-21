@@ -1,5 +1,11 @@
 # ADR-012: Decoupling EntityFrameworkCore from Fiscal Satellites
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Modular Packaging & EF Core Converters

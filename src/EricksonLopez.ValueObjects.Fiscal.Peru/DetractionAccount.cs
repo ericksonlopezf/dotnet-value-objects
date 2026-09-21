@@ -64,7 +64,7 @@ public readonly record struct DetractionAccount : ISpanParsable<DetractionAccoun
     /// <inheritdoc/>
     public int CompareTo(DetractionAccount other) => string.Compare(_accountNumber, other._accountNumber, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="DetractionAccount"/> is less than the right <see cref="DetractionAccount"/>.
     /// </summary>
     /// <param name="left">The first <see cref="DetractionAccount"/> to compare.</param>

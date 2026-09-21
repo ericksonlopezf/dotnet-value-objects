@@ -28,14 +28,14 @@ public static class Level06_ErrorHandlingAndValidation
         // ─── 1. Composite DTO validation ──────────────────────────────────────────────
         Console.WriteLine("[1. Composite Customer Registration DTO Validation]");
 
-        string rawEmail       = "invalid-email";
-        string rawPhone       = "123";
+        string rawEmail = "invalid-email";
+        string rawPhone = "123";
         decimal rawPercentage = 150.0m; // Invalid (> 100%)
-        string rawCountry     = "";
+        string rawCountry = "";
 
         List<Error> validationErrors = [];
 
-        var emailRes   = Email.Create(rawEmail);
+        var emailRes = Email.Create(rawEmail);
         if (emailRes.IsFailure) validationErrors.Add(emailRes.Error);
 
         var phoneRes = PhoneNumber.Create(rawPhone);
@@ -70,8 +70,8 @@ public static class Level06_ErrorHandlingAndValidation
         Console.WriteLine($"  - Percentage.Full    : {Percentage.Full}");
 
         // Create and IsZero
-        var pct18  = Percentage.Create(18.0m).Value;
-        var pct0   = Percentage.Zero;
+        var pct18 = Percentage.Create(18.0m).Value;
+        var pct0 = Percentage.Zero;
         Console.WriteLine($"  - 18%.IsZero         : {pct18.IsZero}");
         Console.WriteLine($"  - 0%.IsZero          : {pct0.IsZero}");
         Console.WriteLine($"  - Fraction of 18%    : {pct18.Fraction}");
@@ -118,7 +118,7 @@ public static class Level06_ErrorHandlingAndValidation
         Console.WriteLine($"  - TaxRate 21% >= 18% : {taxB >= taxA}");
 
         // Quantity operators
-        var qty5  = Quantity.Create(5).Value;
+        var qty5 = Quantity.Create(5).Value;
         var qty10 = Quantity.Create(10).Value;
         Console.WriteLine($"  - Qty 5 < 10         : {qty5 < qty10}");
         Console.WriteLine($"  - Qty 10 > 5         : {qty10 > qty5}");
@@ -130,7 +130,7 @@ public static class Level06_ErrorHandlingAndValidation
 
         // SingleValueObject<TSelf,TValue> defines: public static explicit operator TValue(...)
         // Only available on record-based SingleValueObject (reference types), not structs.
-        var tenantCode  = TenantCode.Create("my-tenant").Value;
+        var tenantCode = TenantCode.Create("my-tenant").Value;
         string rawTenantStr = (string)tenantCode;   // explicit cast to underlying string
         Console.WriteLine($"  - TenantCode explicit cast: '{rawTenantStr}'");
 

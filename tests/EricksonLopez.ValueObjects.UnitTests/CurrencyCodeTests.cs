@@ -251,6 +251,20 @@ public sealed class CurrencyCodeTests
         CurrencyCode.TryParse("A1C".AsSpan(), null, out var rNonLetter2).Should().BeFalse();
         CurrencyCode.TryParse("AB1".AsSpan(), null, out var rNonLetter3).Should().BeFalse();
     }
+
+    [Fact]
+    public void IsInitialized_WhenCreatedViaFactory_ReturnsTrue()
+    {
+        var usd = CurrencyCode.USD;
+        usd.IsInitialized.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsInitialized_WhenDefaultStruct_ReturnsFalse()
+    {
+        var uninit = default(CurrencyCode);
+        uninit.IsInitialized.Should().BeFalse();
+    }
 }
 
 

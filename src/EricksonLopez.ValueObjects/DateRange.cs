@@ -1,5 +1,6 @@
 // Copyright © Erickson Lopez. MIT License.
 using System;
+using System.Globalization;
 using EricksonLopez.Result;
 
 namespace EricksonLopez.ValueObjects;
@@ -11,7 +12,7 @@ namespace EricksonLopez.ValueObjects;
 /// Comparison is performed by <see cref="Start"/> date first; when start dates are equal,
 /// comparison is determined by <see cref="End"/> date.
 /// </remarks>
-public readonly record struct DateRange : IValueObject<DateRange>, IComparable<DateRange>, IComparable
+public readonly record struct DateRange : IValueObject<DateRange>, IComparable<DateRange>, IComparable, IParsable<DateRange>, ISpanParsable<DateRange>
 {
     /// <summary>
     /// Gets the starting date of the range.
@@ -27,6 +28,21 @@ public readonly record struct DateRange : IValueObject<DateRange>, IComparable<D
     /// Gets the total number of calendar days spanned by the range (inclusive).
     /// </summary>
     public int DurationInDays => End.DayNumber - Start.DayNumber + 1;
+
+    /// <summary>
+    /// Gets the inclusive number of calendar days spanned by the range (equivalent to <see cref="DurationInDays"/>).
+    /// </summary>
+    public int InclusiveDays => DurationInDays;
+
+    /// <summary>
+    /// Gets the difference in calendar days between start and end (exclusive of boundary point).
+    /// </summary>
+    public int DaysDifference => End.DayNumber - Start.DayNumber;
+
+    /// <summary>
+    /// Gets a value indicating whether this instance has been explicitly initialized and does not represent the default struct state.
+    /// </summary>
+    public bool IsInitialized => Start != DateOnly.MinValue;
 
     private DateRange(DateOnly start, DateOnly end)
     {
@@ -126,6 +142,85 @@ public readonly record struct DateRange : IValueObject<DateRange>, IComparable<D
 
     /// <inheritdoc/>
     public override string ToString() => $"[{Start:yyyy-MM-dd} .. {End:yyyy-MM-dd}]";
+
+    /// <summary>
+    /// Parses a string into a <see cref="DateRange"/>.
+    /// </summary>
+    /// <param name="s">The string to parse (e.g. <c>"[2026-01-01 .. 2026-12-31]"</c> or <c>"2026-01-01..2026-12-31"</c>).</param>
+    /// <param name="provider">An optional format provider.</param>
+    /// <returns>The parsed <see cref="DateRange"/>.</returns>
+    /// <exception cref="FormatException"><paramref name="s"/> is not in a valid format</exception>
+    public static DateRange Parse(string s, IFormatProvider? provider = null) =>
+        TryParse(s.AsSpan(), provider, out var res) ? res : throw new FormatException($"Invalid DateRange: '{s}'.");
+
+    /// <summary>
+    /// Parses a span of characters into a <see cref="DateRange"/>.
+    /// </summary>
+    /// <param name="s">The span of characters to parse.</param>
+    /// <param name="provider">An optional format provider.</param>
+    /// <returns>The parsed <see cref="DateRange"/>.</returns>
+    public static DateRange Parse(ReadOnlySpan<char> s, IFormatProvider? provider = null) =>
+        TryParse(s, provider, out var res) ? res : throw new FormatException($"Invalid DateRange: '{s.ToString()}'.");
+
+    /// <summary>
+    /// Attempts to parse a string into a <see cref="DateRange"/>.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">An optional format provider.</param>
+    /// <param name="result">When this method returns, contains the parsed range if successful; otherwise, default.</param>
+    /// <returns><see langword="true"/> if parsed successfully; otherwise, <see langword="false"/>.</returns>
+    public static bool TryParse(string? s, IFormatProvider? provider, out DateRange result) =>
+        TryParse(s.AsSpan(), provider, out result);
+
+    /// <summary>
+    /// Attempts to parse a span of characters into a <see cref="DateRange"/>.
+    /// </summary>
+    /// <param name="s">The span of characters to parse.</param>
+    /// <param name="provider">An optional format provider.</param>
+    /// <param name="result">When this method returns, contains the parsed range if successful; otherwise, default.</param>
+    /// <returns><see langword="true"/> if parsed successfully; otherwise, <see langword="false"/>.</returns>
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out DateRange result)
+    {
+        ReadOnlySpan<char> trimmed = s.Trim();
+        if (trimmed.StartsWith("[", StringComparison.Ordinal) && trimmed.EndsWith("]", StringComparison.Ordinal))
+        {
+            trimmed = trimmed[1..^1].Trim();
+        }
+
+        int separatorIndex = trimmed.IndexOf("..", StringComparison.Ordinal);
+        int separatorLen = 2;
+        if (separatorIndex < 0)
+        {
+            separatorIndex = trimmed.IndexOf('/');
+            separatorLen = 1;
+        }
+
+        if (separatorIndex < 0)
+        {
+            result = default;
+            return false;
+        }
+
+        ReadOnlySpan<char> startSpan = trimmed[..separatorIndex].Trim();
+        ReadOnlySpan<char> endSpan = trimmed[(separatorIndex + separatorLen)..].Trim();
+
+        if (!DateOnly.TryParse(startSpan, provider, DateTimeStyles.None, out var start) ||
+            !DateOnly.TryParse(endSpan, provider, DateTimeStyles.None, out var end))
+        {
+            result = default;
+            return false;
+        }
+
+        var res = Create(start, end);
+        if (res.IsSuccess)
+        {
+            result = res.Value;
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
 }
 
 

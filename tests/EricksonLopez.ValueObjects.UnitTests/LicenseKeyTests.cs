@@ -26,6 +26,14 @@ public sealed class LicenseKeyTests
         res2.Value.Value.Should().Be("PROD-KEY1-ABCD-9876");
     }
 
+    [Fact]
+    public void LicenseKey_TwoGroups_ShouldSucceed()
+    {
+        var res = LicenseKey.Create("AAAA-BBBB");
+        res.IsSuccess.Should().BeTrue();
+        res.Value.Value.Should().Be("AAAA-BBBB");
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -33,14 +41,14 @@ public sealed class LicenseKeyTests
     [InlineData("AAA-BBB-CCC")] // group length < 4
     [InlineData("AAAA_BBBB_CCCC")] // invalid separator
     [InlineData("TOOLONGGROUP12345-BBBB-CCCC")] // group > 8
-    [InlineData("AAAA-BBBB")] // only 2 groups (< 3 total needed in 1+2..8 regex)
+    [InlineData("AAAA")] // only 1 group (< 2 total needed)
     public void LicenseKey_InvalidFormat_ShouldFail(string? invalid)
     {
         var result = LicenseKey.Create(invalid);
 
         result.IsFailure.Should().BeTrue();
         if (string.IsNullOrWhiteSpace(invalid)) result.Error.Code.Should().Be("LicenseKey.Required");
-        else if (invalid == "AAA-BBB-CCC" || invalid == "AAAA-BBBB") result.Error.Code.Should().Be("LicenseKey.TooShort");
+        else if (invalid == "AAAA") result.Error.Code.Should().Be("LicenseKey.TooShort");
         else if (invalid == "AAAA_BBBB_CCCC")
         {
             result.Error.Code.Should().Be("LicenseKey.InvalidFormat");

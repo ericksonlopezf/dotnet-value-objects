@@ -36,17 +36,17 @@ public sealed class DteTypeCodeTests
     [Fact]
     public void StaticFields_DefaultState_ExhaustiveVerification()
     {
-        DteTypeCode.FacturaElectronica.Code.Should().Be(33);
-        DteTypeCode.FacturaExenta.Code.Should().Be(34);
-        DteTypeCode.BoletaElectronica.Code.Should().Be(39);
-        DteTypeCode.BoletaExenta.Code.Should().Be(41);
-        DteTypeCode.FacturaCompra.Code.Should().Be(46);
-        DteTypeCode.GuiaDespacho.Code.Should().Be(52);
-        DteTypeCode.NotaDebito.Code.Should().Be(56);
-        DteTypeCode.NotaCredito.Code.Should().Be(61);
-        DteTypeCode.FacturaExportacion.Code.Should().Be(110);
-        DteTypeCode.NotaDebitoExportacion.Code.Should().Be(111);
-        DteTypeCode.NotaCreditoExportacion.Code.Should().Be(112);
+        DteTypeCode.ElectronicInvoice.Code.Should().Be(33);
+        DteTypeCode.ExemptInvoice.Code.Should().Be(34);
+        DteTypeCode.ElectronicReceipt.Code.Should().Be(39);
+        DteTypeCode.ExemptReceipt.Code.Should().Be(41);
+        DteTypeCode.PurchaseInvoice.Code.Should().Be(46);
+        DteTypeCode.DispatchGuide.Code.Should().Be(52);
+        DteTypeCode.DebitNote.Code.Should().Be(56);
+        DteTypeCode.CreditNote.Code.Should().Be(61);
+        DteTypeCode.ExportInvoice.Code.Should().Be(110);
+        DteTypeCode.ExportDebitNote.Code.Should().Be(111);
+        DteTypeCode.ExportCreditNote.Code.Should().Be(112);
     }
 
     [Theory]
@@ -103,8 +103,8 @@ public sealed class DteTypeCodeTests
     [Fact]
     public void DteTypeCode_DefaultState_ComparisonOperators()
     {
-        var fe = DteTypeCode.FacturaElectronica;
-        var nc = DteTypeCode.NotaCredito;
+        var fe = DteTypeCode.ElectronicInvoice;
+        var nc = DteTypeCode.CreditNote;
         var feClone = DteTypeCode.Create(33).Value;
 
         (fe < nc).Should().BeTrue();

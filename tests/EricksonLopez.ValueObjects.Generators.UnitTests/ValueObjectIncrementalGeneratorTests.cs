@@ -25,6 +25,7 @@ public sealed class ValueObjectIncrementalGeneratorTests
     public sealed class ValueObjectAttribute : System.Attribute
     {
         public bool GenerateConversionOperators { get; set; }
+        public bool GeneratePersistenceHooks { get; set; } = true;
     }
     """;
 
@@ -205,7 +206,8 @@ public sealed class ValueObjectIncrementalGeneratorTests
         generatedSources.Should().HaveCount(1);
         var code = generatedSources.First().SourceText.ToString();
         code.Should().Contain("public static explicit operator string(Currency value) => value.Value;");
-        code.Should().Contain("public static explicit operator Currency(string value) => Create(value).Value;");
+        code.Should().Contain("public static explicit operator Currency(string value)");
+        code.Should().Contain("throw new global::System.InvalidCastException");
     }
 
     [Fact]
@@ -300,7 +302,8 @@ public sealed class ValueObjectIncrementalGeneratorTests
         generatedSources.Should().HaveCount(1);
         var code = generatedSources.First().SourceText.ToString();
         code.Should().Contain("public static explicit operator int(QuantityVo value) => value.Value;");
-        code.Should().Contain("public static explicit operator QuantityVo(int value) => Create(value).Value;");
+        code.Should().Contain("public static explicit operator QuantityVo(int value)");
+        code.Should().Contain("throw new global::System.InvalidCastException");
         code.Should().Contain("int? value = global::System.Text.Json.JsonSerializer.Deserialize<int>(ref reader, options);");
     }
 
@@ -329,7 +332,8 @@ public sealed class ValueObjectIncrementalGeneratorTests
         generatedSources.Should().HaveCount(1);
         var code = generatedSources.First().SourceText.ToString();
         code.Should().Contain("public static explicit operator long(DeepLongVo value) => value.Value;");
-        code.Should().Contain("public static explicit operator DeepLongVo(long value) => Create(value).Value;");
+        code.Should().Contain("public static explicit operator DeepLongVo(long value)");
+        code.Should().Contain("throw new global::System.InvalidCastException");
     }
 
     [Fact]
@@ -352,7 +356,8 @@ public sealed class ValueObjectIncrementalGeneratorTests
         generatedSources.Should().HaveCount(1);
         var code = generatedSources.First().SourceText.ToString();
         code.Should().Contain("public static explicit operator string(CustomerCode value) => value.Value;");
-        code.Should().Contain("public static explicit operator CustomerCode(string value) => Create(value).Value;");
+        code.Should().Contain("public static explicit operator CustomerCode(string value)");
+        code.Should().Contain("throw new global::System.InvalidCastException");
         code.Should().Contain("string? value = global::System.Text.Json.JsonSerializer.Deserialize<string>(ref reader, options);");
     }
 
@@ -378,7 +383,8 @@ public sealed class ValueObjectIncrementalGeneratorTests
         generatedSources.Should().HaveCount(1);
         var code = generatedSources.First().SourceText.ToString();
         code.Should().Contain("public static explicit operator decimal(Price value) => value.Value;");
-        code.Should().Contain("public static explicit operator Price(decimal value) => Create(value).Value;");
+        code.Should().Contain("public static explicit operator Price(decimal value)");
+        code.Should().Contain("throw new global::System.InvalidCastException");
     }
 
     [Fact]
@@ -835,6 +841,10 @@ public sealed class ValueObjectIncrementalGeneratorTests
         var voVal = opExplicitToVo!.Invoke(null, ["SKU-500"]);
         skuType.GetProperty("Value")!.GetValue(voVal).Should().Be("SKU-500");
 
+        Action failCast = () => opExplicitToVo.Invoke(null, ["invalid"]);
+        failCast.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidCastException>();
+
         // 6. System.Text.Json Serialization & Deserialization
         var jsonConverterType = assembly.GetType("ExecutionDomain.ItemSku+ItemSkuJsonConverter")
             ?? assembly.GetType("ExecutionDomain.ItemSkuJsonConverter");
@@ -1080,6 +1090,126 @@ public sealed class ValueObjectIncrementalGeneratorTests
         var generatedSources = runResult.Results.SelectMany(r => r.GeneratedSources).ToList();
 
         return (outputCompilation, generatedSources, diagnostics);
+    }
+
+    [Fact]
+    public void Generator_ShouldGeneratePersistenceHooks_WhenDapperAndEfCoreArePresent()
+    {
+        var dapperSource = """
+        namespace System.Data { public interface IDbDataParameter { object Value { get; set; } } }
+        namespace Dapper
+        {
+            public static class SqlMapper
+            {
+                public abstract class TypeHandler<T>
+                {
+                    public abstract void SetValue(System.Data.IDbDataParameter parameter, T value);
+                    public abstract T Parse(object value);
+                }
+            }
+        }
+        """;
+
+        var efCoreSource = """
+        namespace Microsoft.EntityFrameworkCore.Storage.ValueConversion
+        {
+            public class ValueConverter<TModel, TProvider>
+            {
+                public ValueConverter(System.Linq.Expressions.Expression<System.Func<TModel, TProvider>> a, System.Linq.Expressions.Expression<System.Func<TProvider, TModel>> b) {}
+            }
+        }
+        """;
+
+        var userSource = """
+        namespace SampleDomain;
+        using EricksonLopez.ValueObjects;
+
+        [ValueObject(GeneratePersistenceHooks = true)]
+        public sealed partial record class SampleSku : StringValueObject<SampleSku>
+        {
+            private SampleSku(string value) : base(value) {}
+            public static EricksonLopez.Result.Result<SampleSku> Create(string value) => new(value);
+        }
+        """;
+
+        var syntaxTrees = new[]
+        {
+            CSharpSyntaxTree.ParseText(ValueObjectAttributeSource),
+            CSharpSyntaxTree.ParseText(BaseInterfacesSource),
+            CSharpSyntaxTree.ParseText(dapperSource),
+            CSharpSyntaxTree.ParseText(efCoreSource),
+            CSharpSyntaxTree.ParseText(userSource)
+        };
+
+        var compilation = CSharpCompilation.Create(
+            "PersistenceAssembly",
+            syntaxTrees,
+            CreateReferences(),
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var generator = new ValueObjectIncrementalGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+        var runDriver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+
+        diagnostics.Should().BeEmpty();
+        var runResult = runDriver.GetRunResult();
+        var generated = runResult.GeneratedTrees.First().ToString();
+        generated.Should().Contain("SampleSkuDapperTypeHandler");
+        generated.Should().Contain("SampleSkuValueConverter");
+    }
+
+    [Fact]
+    public void Generator_ShouldNotGeneratePersistenceHooks_WhenGeneratePersistenceHooksIsFalse()
+    {
+        var dapperSource = """
+        namespace System.Data { public interface IDbDataParameter { object Value { get; set; } } }
+        namespace Dapper
+        {
+            public static class SqlMapper
+            {
+                public abstract class TypeHandler<T>
+                {
+                    public abstract void SetValue(System.Data.IDbDataParameter parameter, T value);
+                    public abstract T Parse(object value);
+                }
+            }
+        }
+        """;
+
+        var userSource = """
+        namespace SampleDomain;
+        using EricksonLopez.ValueObjects;
+
+        [ValueObject(GeneratePersistenceHooks = false)]
+        public sealed partial record class NoHooksSku : StringValueObject<NoHooksSku>
+        {
+            private NoHooksSku(string value) : base(value) {}
+            public static EricksonLopez.Result.Result<NoHooksSku> Create(string value) => new(value);
+        }
+        """;
+
+        var syntaxTrees = new[]
+        {
+            CSharpSyntaxTree.ParseText(ValueObjectAttributeSource),
+            CSharpSyntaxTree.ParseText(BaseInterfacesSource),
+            CSharpSyntaxTree.ParseText(dapperSource),
+            CSharpSyntaxTree.ParseText(userSource)
+        };
+
+        var compilation = CSharpCompilation.Create(
+            "NoHooksAssembly",
+            syntaxTrees,
+            CreateReferences(),
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var generator = new ValueObjectIncrementalGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+        var runDriver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+
+        diagnostics.Should().BeEmpty();
+        var runResult = runDriver.GetRunResult();
+        var generated = runResult.GeneratedTrees.First().ToString();
+        generated.Should().NotContain("NoHooksSkuDapperTypeHandler");
     }
 }
 

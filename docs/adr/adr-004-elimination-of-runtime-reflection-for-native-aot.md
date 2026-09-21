@@ -1,5 +1,11 @@
 # ADR-004: Elimination of Runtime Reflection for Native AOT
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Native AOT & Trimming Compatibility

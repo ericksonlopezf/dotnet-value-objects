@@ -42,6 +42,11 @@ public readonly record struct Nit : ISpanParsable<Nit>, IUtf8SpanParsable<Nit>, 
     public long BaseNumber => _baseNumber;
 
     /// <summary>
+    /// Gets a value indicating whether this instance has been explicitly initialized and does not represent the default struct state.
+    /// </summary>
+    public bool IsInitialized => _baseNumber > 0L;
+
+    /// <summary>
     /// Gets the computed DIAN Modulo 11 verification digit (DV, between 0 and 9).
     /// </summary>
     public byte VerificationDigit => _verificationDigit;
@@ -149,7 +154,7 @@ public readonly record struct Nit : ISpanParsable<Nit>, IUtf8SpanParsable<Nit>, 
     /// <summary>
     /// Formats the NIT in its canonical DIAN representation: <c>{BaseNumber}-{DV}</c>.
     /// </summary>
-    public string ToCanonicalString() => $"{_baseNumber.ToString(CultureInfo.InvariantCulture)}-{_verificationDigit.ToString(CultureInfo.InvariantCulture)}";
+    public string ToCanonicalString() => _baseNumber > 0L ? $"{_baseNumber.ToString(CultureInfo.InvariantCulture)}-{_verificationDigit.ToString(CultureInfo.InvariantCulture)}" : string.Empty;
 
     /// <inheritdoc/>
     public override string ToString() => ToCanonicalString();
@@ -157,7 +162,7 @@ public readonly record struct Nit : ISpanParsable<Nit>, IUtf8SpanParsable<Nit>, 
     /// <inheritdoc/>
     public int CompareTo(Nit other) => _baseNumber.CompareTo(other._baseNumber);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="Nit"/> is less than the right <see cref="Nit"/>.
     /// </summary>
     /// <param name="left">The first <see cref="Nit"/> to compare.</param>
@@ -216,8 +221,19 @@ public readonly record struct Nit : ISpanParsable<Nit>, IUtf8SpanParsable<Nit>, 
     /// <inheritdoc/>
     public static bool TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Nit result)
     {
-        Span<char> chars = stackalloc char[utf8Text.Length];
-        Encoding.UTF8.TryGetChars(utf8Text, chars, out int written);
+        if (utf8Text.Length > 64)
+        {
+            result = default;
+            return false;
+        }
+
+        Span<char> chars = stackalloc char[64];
+        if (!Encoding.UTF8.TryGetChars(utf8Text, chars, out int written))
+        {
+            result = default;
+            return false;
+        }
+
         return TryParse(chars[..written], provider, out result);
     }
 }

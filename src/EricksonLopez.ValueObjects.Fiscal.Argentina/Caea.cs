@@ -26,7 +26,12 @@ public readonly record struct Caea : ISpanParsable<Caea>, IEquatable<Caea>
     /// <summary>
     /// Gets the 14-digit CAEA code.
     /// </summary>
-    public string Code => _code;
+    public string Code => _code ?? string.Empty;
+
+    /// <summary>
+    /// Gets a value indicating whether this instance has been explicitly initialized and does not represent the default struct state.
+    /// </summary>
+    public bool IsInitialized => !string.IsNullOrEmpty(_code);
 
     /// <summary>
     /// Gets the authorization expiration date.
@@ -77,7 +82,7 @@ public readonly record struct Caea : ISpanParsable<Caea>, IEquatable<Caea>
     }
 
     /// <inheritdoc/>
-    public override string ToString() => $"{_code} (Vto: {_expirationDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)})";
+    public override string ToString() => !string.IsNullOrEmpty(_code) ? $"{_code} (Vto: {_expirationDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)})" : string.Empty;
 
     /// <inheritdoc/>
     public static Caea Parse(string s, IFormatProvider? provider = null) =>

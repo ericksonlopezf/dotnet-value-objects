@@ -133,7 +133,7 @@ public static class Level08_CustomValueObjects
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════════
-    // INTERNAL CUSTOM VALUE OBJECTS — Demonstración de implementación
+    // INTERNAL CUSTOM VALUE OBJECTS — Implementation demonstration
     // ═══════════════════════════════════════════════════════════════════════════════════
 
     /// <summary>
@@ -143,8 +143,8 @@ public static class Level08_CustomValueObjects
     [SensitiveData(mask: "sk-***")]
     private sealed record ApiKey : StringValueObject<ApiKey>
     {
-        // IsSensitive = true porque el atributo lo exige, pero como este VO
-        // es un record (no struct), necesitamos sobreescribir IsSensitive explícitamente.
+        // IsSensitive = true because the attribute requires it, but since this VO
+        // is a record (not a struct), we need to override IsSensitive explicitly.
         protected override bool IsSensitive => true;
         protected override string Mask => "sk-***";
 
@@ -226,12 +226,12 @@ public static class Level08_CustomValueObjects
     /// </summary>
     private sealed record GeoCoordinate : ValueObject
     {
-        public double Latitude  { get; }
+        public double Latitude { get; }
         public double Longitude { get; }
 
         private GeoCoordinate(double latitude, double longitude)
         {
-            Latitude  = latitude;
+            Latitude = latitude;
             Longitude = longitude;
         }
 
@@ -239,7 +239,7 @@ public static class Level08_CustomValueObjects
         public static Result<GeoCoordinate> Create(double latitude, double longitude)
         {
             if (latitude is < -90.0 or > 90.0)
-                return Result<GeoCoordinate>.Failure(Error.Validation("GeoCoordinate.InvalidLatitude",  "Latitude must be between -90 and 90."));
+                return Result<GeoCoordinate>.Failure(Error.Validation("GeoCoordinate.InvalidLatitude", "Latitude must be between -90 and 90."));
 
             if (longitude is < -180.0 or > 180.0)
                 return Result<GeoCoordinate>.Failure(Error.Validation("GeoCoordinate.InvalidLongitude", "Longitude must be between -180 and 180."));
@@ -251,7 +251,7 @@ public static class Level08_CustomValueObjects
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════════
-    // CUSTOM JSON CONVERTERS — Demonstración de extensión de los base converters
+    // CUSTOM JSON CONVERTERS — Demonstration of extending base converters
     // ═══════════════════════════════════════════════════════════════════════════════════
 
     /// <summary>

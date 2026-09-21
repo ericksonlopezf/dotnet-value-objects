@@ -87,6 +87,30 @@ public sealed class DateRangeTests
 
         range1.ShouldSatisfyEqualityContract(range1Copy, range2, (a, b) => a == b, (a, b) => a != b);
     }
+
+    [Fact]
+    public void Parse_And_TryParse_HandleValidAndInvalidInputs()
+    {
+        var dr = DateRange.Parse("[2026-01-01 .. 2026-01-10]");
+        dr.Start.Should().Be(new DateOnly(2026, 1, 1));
+        dr.End.Should().Be(new DateOnly(2026, 1, 10));
+
+        var drSpan = DateRange.Parse("[2026-01-01 .. 2026-01-10]".AsSpan());
+        drSpan.Start.Should().Be(new DateOnly(2026, 1, 1));
+
+        DateRange.TryParse("[2026-01-01 .. 2026-01-10]", null, out var parsed).Should().BeTrue();
+        parsed.Start.Should().Be(new DateOnly(2026, 1, 1));
+
+        DateRange.TryParse("invalid", null, out _).Should().BeFalse();
+        DateRange.TryParse("[invalid .. 2026-01-10]", null, out _).Should().BeFalse();
+        DateRange.TryParse("[2026-01-01 .. invalid]", null, out _).Should().BeFalse();
+
+        Action actInvalid = () => DateRange.Parse("invalid");
+        actInvalid.Should().Throw<FormatException>();
+
+        Action actInvalidSpan = () => DateRange.Parse("invalid".AsSpan());
+        actInvalidSpan.Should().Throw<FormatException>();
+    }
 }
 
 

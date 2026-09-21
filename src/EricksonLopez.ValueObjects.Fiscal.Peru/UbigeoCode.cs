@@ -73,7 +73,7 @@ public readonly record struct UbigeoCode : ISpanParsable<UbigeoCode>, IComparabl
     /// <inheritdoc/>
     public int CompareTo(UbigeoCode other) => string.Compare(_code, other._code, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="UbigeoCode"/> is less than the right <see cref="UbigeoCode"/>.
     /// </summary>
     /// <param name="left">The first <see cref="UbigeoCode"/> to compare.</param>

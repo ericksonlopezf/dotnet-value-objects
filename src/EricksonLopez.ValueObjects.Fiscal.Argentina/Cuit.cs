@@ -32,22 +32,33 @@ public readonly record struct Cuit : ISpanParsable<Cuit>, IUtf8SpanParsable<Cuit
     /// <summary>
     /// Gets the raw 11-digit numeric value of the CUIT.
     /// </summary>
-    public string Value => _value;
+    public string Value => _value ?? string.Empty;
+
+    /// <summary>
+    /// Gets a value indicating whether this instance has been explicitly initialized and does not represent the default struct state.
+    /// </summary>
+    public bool IsInitialized => !string.IsNullOrEmpty(_value);
 
     /// <summary>
     /// Gets the 2-digit type prefix (e.g. 20, 27, 30).
     /// </summary>
-    public int TypePrefix => int.Parse(_value.AsSpan(0, 2), CultureInfo.InvariantCulture);
+    public int TypePrefix => !string.IsNullOrEmpty(_value) && _value.Length >= 2
+        ? int.Parse(_value.AsSpan(0, 2), CultureInfo.InvariantCulture)
+        : 0;
 
     /// <summary>
     /// Gets the middle 8-digit document sequence.
     /// </summary>
-    public string DocumentNumber => _value[2..10];
+    public string DocumentNumber => !string.IsNullOrEmpty(_value) && _value.Length >= 10
+        ? _value[2..10]
+        : string.Empty;
 
     /// <summary>
     /// Gets the verification check digit.
     /// </summary>
-    public int VerificationDigit => _value[10] - '0';
+    public int VerificationDigit => !string.IsNullOrEmpty(_value) && _value.Length >= 11
+        ? _value[10] - '0'
+        : 0;
 
     /// <summary>
     /// Gets a value indicating whether this CUIT belongs to a physical person (prefixes 20, 23, 24, 27).
@@ -149,15 +160,17 @@ public readonly record struct Cuit : ISpanParsable<Cuit>, IUtf8SpanParsable<Cuit
     /// <summary>
     /// Formats the CUIT in its standard canonical ARCA format: <c>XX-XXXXXXXX-X</c>.
     /// </summary>
-    public string Formatted => $"{_value[..2]}-{_value[2..10]}-{_value[10]}";
+    public string Formatted => !string.IsNullOrEmpty(_value) && _value.Length == 11
+        ? $"{_value[..2]}-{_value[2..10]}-{_value[10]}"
+        : string.Empty;
 
     /// <inheritdoc/>
     public override string ToString() => Formatted;
 
     /// <inheritdoc/>
-    public int CompareTo(Cuit other) => string.Compare(_value, other._value, StringComparison.Ordinal);
+    public int CompareTo(Cuit other) => string.Compare(_value ?? string.Empty, other._value ?? string.Empty, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="Cuit"/> is less than the right <see cref="Cuit"/>.
     /// </summary>
     /// <param name="left">The first <see cref="Cuit"/> to compare.</param>
@@ -216,8 +229,19 @@ public readonly record struct Cuit : ISpanParsable<Cuit>, IUtf8SpanParsable<Cuit
     /// <inheritdoc/>
     public static bool TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Cuit result)
     {
-        Span<char> chars = stackalloc char[utf8Text.Length];
-        Encoding.UTF8.TryGetChars(utf8Text, chars, out int written);
+        if (utf8Text.Length > 64)
+        {
+            result = default;
+            return false;
+        }
+
+        Span<char> chars = stackalloc char[64];
+        if (!Encoding.UTF8.TryGetChars(utf8Text, chars, out int written))
+        {
+            result = default;
+            return false;
+        }
+
         return TryParse(chars[..written], provider, out result);
     }
 }

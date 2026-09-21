@@ -40,10 +40,10 @@ public sealed class AffectationTypeCodeTests
     [Fact]
     public void StaticFields_DefaultState_ExhaustiveVerification()
     {
-        AffectationTypeCode.GravadoOneroso.Code.Should().Be("10");
-        AffectationTypeCode.ExoneradoOneroso.Code.Should().Be("20");
-        AffectationTypeCode.InafectoOneroso.Code.Should().Be("30");
-        AffectationTypeCode.Exportacion.Code.Should().Be("40");
+        AffectationTypeCode.TaxedOnerous.Code.Should().Be("10");
+        AffectationTypeCode.ExemptOnerous.Code.Should().Be("20");
+        AffectationTypeCode.UnaffectedOnerous.Code.Should().Be("30");
+        AffectationTypeCode.Export.Code.Should().Be("40");
     }
 
     [Theory]
@@ -64,8 +64,8 @@ public sealed class AffectationTypeCodeTests
     [Fact]
     public void AffectationTypeCode_DefaultState_ComparisonOperators()
     {
-        var a1 = AffectationTypeCode.GravadoOneroso;
-        var a2 = AffectationTypeCode.Exportacion;
+        var a1 = AffectationTypeCode.TaxedOnerous;
+        var a2 = AffectationTypeCode.Export;
         var a1Clone = AffectationTypeCode.Create("10").Value;
 
         (a1 < a2).Should().BeTrue();
