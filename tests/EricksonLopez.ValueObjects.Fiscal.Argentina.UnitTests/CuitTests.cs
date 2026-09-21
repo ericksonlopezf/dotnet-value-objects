@@ -165,8 +165,47 @@ public sealed class CuitTests
             (x, y) => x > y,
             (x, y) => x >= y);
     }
+
+    [Fact]
+    public void DefaultCuit_ShouldNotThrowExceptions_AndReturnSafeValues()
+    {
+        Cuit cuit = default;
+        cuit.IsInitialized.Should().BeFalse();
+        cuit.ToString().Should().BeEmpty();
+        cuit.Formatted.Should().BeEmpty();
+        cuit.Value.Should().BeEmpty();
+        cuit.TypePrefix.Should().Be(0);
+        cuit.DocumentNumber.Should().BeEmpty();
+        cuit.VerificationDigit.Should().Be(0);
+        cuit.IsIndividual.Should().BeFalse();
+        cuit.IsCompany.Should().BeFalse();
+
+        var initialized = Cuit.Create("20-12345678-6").Value;
+        initialized.IsInitialized.Should().BeTrue();
+        initialized.TypePrefix.Should().Be(20);
+        initialized.DocumentNumber.Should().Be("12345678");
+        initialized.VerificationDigit.Should().Be(6);
+        initialized.IsIndividual.Should().BeTrue();
+        initialized.IsCompany.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Utf8Parsing_WorksCorrectly()
+    {
+        var cuit = Cuit.Parse("20-12345678-6"u8);
+        cuit.IsInitialized.Should().BeTrue();
+        Cuit.TryParse("20-12345678-6"u8, null, out var parsed).Should().BeTrue();
+        parsed.IsInitialized.Should().BeTrue();
+        Cuit.TryParse("invalid"u8, null, out _).Should().BeFalse();
+        Cuit.TryParse(new byte[100], null, out _).Should().BeFalse();
+        Cuit.TryParse(new byte[65], null, out _).Should().BeFalse();
+
+        byte[] padded = Encoding.UTF8.GetBytes("20-12345678-6".PadRight(64, ' '));
+        Cuit.TryParse(padded, null, out var tryPadded).Should().BeTrue();
+        tryPadded.IsInitialized.Should().BeTrue();
+
+        Action actInvalid = () => Cuit.Parse("invalid"u8);
+        actInvalid.Should().Throw<FormatException>();
+    }
 }
-
-
-
 

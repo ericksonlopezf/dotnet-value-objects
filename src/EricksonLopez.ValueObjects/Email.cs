@@ -1,4 +1,4 @@
-﻿// Copyright © Erickson Lopez. MIT License.
+// Copyright © Erickson Lopez. MIT License.
 using System;
 using System.Diagnostics;
 using System.Net.Mail;
@@ -18,6 +18,11 @@ public readonly record struct Email : IValueObject<Email>, IComparable<Email>, I
     /// </summary>
     public string Value { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether this <see cref="Email"/> instance was initialized through a factory rather than <c>default(Email)</c>.
+    /// </summary>
+    public bool IsInitialized => !string.IsNullOrEmpty(Value);
+
     private Email(string value) => Value = value;
 
     /// <summary>
@@ -25,15 +30,22 @@ public readonly record struct Email : IValueObject<Email>, IComparable<Email>, I
     /// </summary>
     /// <param name="value">The raw email address string.</param>
     /// <returns>A successful <see cref="Result{T}"/> containing the validated email, or a validation failure.</returns>
-    public static Result<Email> Create(string? value)
+    public static Result<Email> Create(string? value) =>
+        Create(value.AsSpan());
+
+    /// <summary>
+    /// Creates a validated <see cref="Email"/> instance from an email address character span.
+    /// </summary>
+    /// <param name="value">The raw email address character span.</param>
+    /// <returns>A successful <see cref="Result{T}"/> containing the validated email, or a validation failure.</returns>
+    public static Result<Email> Create(ReadOnlySpan<char> value)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        ReadOnlySpan<char> trimmed = value.Trim();
+        if (trimmed.IsEmpty)
         {
             return Result<Email>.Failure(Error.Validation(
                 "Email.Required", "Email is required."));
         }
-
-        string trimmed = value.Trim();
 
         if (trimmed.Length > 320)
         {
@@ -41,13 +53,37 @@ public readonly record struct Email : IValueObject<Email>, IComparable<Email>, I
                 "Email.TooLong", "Email must be ≤320 characters."));
         }
 
-        if (!MailAddress.TryCreate(trimmed, out _))
+        if (trimmed.Contains('\r') || trimmed.Contains('\n') || trimmed.Contains('<') || trimmed.Contains('>'))
         {
             return Result<Email>.Failure(Error.Validation(
-                "Email.InvalidFormat", $"Invalid email format: '{trimmed}'."));
+                "Email.InvalidFormat", $"Invalid email format: '{trimmed.ToString()}'."));
         }
 
-        return Result<Email>.Success(new Email(trimmed.ToLowerInvariant()));
+        int atIndex = trimmed.LastIndexOf('@');
+        if (atIndex <= 0 || atIndex >= trimmed.Length - 1)
+        {
+            return Result<Email>.Failure(Error.Validation(
+                "Email.InvalidFormat", $"Invalid email format: '{trimmed.ToString()}'."));
+        }
+
+        ReadOnlySpan<char> local = trimmed[..atIndex];
+        ReadOnlySpan<char> domain = trimmed[(atIndex + 1)..];
+
+        if (local.Length > 64 || domain.Length > 255 || !domain.Contains('.'))
+        {
+            return Result<Email>.Failure(Error.Validation(
+                "Email.InvalidFormat", $"Invalid email format: '{trimmed.ToString()}'."));
+        }
+
+        string rawString = trimmed.ToString();
+        if (!MailAddress.TryCreate(rawString, out var mailAddress) ||
+            !string.Equals(mailAddress.Address, rawString, StringComparison.OrdinalIgnoreCase))
+        {
+            return Result<Email>.Failure(Error.Validation(
+                "Email.InvalidFormat", $"Invalid email format: '{rawString}'."));
+        }
+
+        return Result<Email>.Success(new Email(rawString.ToLowerInvariant()));
     }
 
     /// <summary>
@@ -116,8 +152,17 @@ public readonly record struct Email : IValueObject<Email>, IComparable<Email>, I
     /// <returns><see langword="true"/> if <paramref name="left"/> is greater than or equal to <paramref name="right"/>; otherwise, <see langword="false"/>.</returns>
     public static bool operator >=(Email left, Email right) => left.CompareTo(right) >= 0;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns the normalized email address string.
+    /// </summary>
+    /// <returns>The raw normalized email address string.</returns>
     public override string ToString() => Value ?? string.Empty;
+
+    /// <summary>
+    /// Returns the email address with the local mailbox portion masked for secure diagnostic logging.
+    /// </summary>
+    /// <returns>The masked email address string.</returns>
+    public string ToMaskedString() => Masked();
 
     /// <summary>
     /// Parses a string into an <see cref="Email"/>.
@@ -158,8 +203,11 @@ public readonly record struct Email : IValueObject<Email>, IComparable<Email>, I
     /// <param name="s">The span of characters to parse.</param>
     /// <param name="provider">An optional format provider.</param>
     /// <returns>The parsed <see cref="Email"/>.</returns>
-    public static Email Parse(ReadOnlySpan<char> s, IFormatProvider? provider = null) =>
-        Parse(s.ToString(), provider);
+    public static Email Parse(ReadOnlySpan<char> s, IFormatProvider? provider = null)
+    {
+        var result = Create(s);
+        return result.IsSuccess ? result.Value : throw new FormatException(result.Error.Description);
+    }
 
     /// <summary>
     /// Attempts to parse a span of characters into an <see cref="Email"/>.
@@ -168,8 +216,18 @@ public readonly record struct Email : IValueObject<Email>, IComparable<Email>, I
     /// <param name="provider">An optional format provider.</param>
     /// <param name="result">When this method returns, contains the parsed email if successful; otherwise, default.</param>
     /// <returns><see langword="true"/> if parsed successfully; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Email result) =>
-        TryParse(s.ToString(), provider, out result);
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Email result)
+    {
+        var res = Create(s);
+        if (res.IsSuccess)
+        {
+            result = res.Value;
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
 }
 
 

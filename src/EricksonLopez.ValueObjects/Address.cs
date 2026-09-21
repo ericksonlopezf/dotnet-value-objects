@@ -59,6 +59,11 @@ public sealed record Address : ValueObject
         Country country,
         PostalCode? postalCode = null)
     {
+        if (country is null)
+        {
+            return Result<Address>.Failure(Error.Validation("Address.CountryRequired", "Country is required."));
+        }
+
         Result<string> streetResult = StringPipeline.RequiredString(
             street,
             "Address.Street",

@@ -107,7 +107,7 @@ public readonly record struct PedimentoNumber : ISpanParsable<PedimentoNumber>, 
     /// <inheritdoc/>
     public int CompareTo(PedimentoNumber other) => string.Compare(_digits, other._digits, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="PedimentoNumber"/> is less than the right <see cref="PedimentoNumber"/>.
     /// </summary>
     /// <param name="left">The first <see cref="PedimentoNumber"/> to compare.</param>

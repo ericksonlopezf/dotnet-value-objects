@@ -1,10 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <Description>System.Text.Json Native AOT-compatible serialization adapters for EricksonLopez.ValueObjects.</Description>
     <PackageTags>$(CommonPackageTags);json;serialization;system-text-json;json-converter;native-aot</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EricksonLopez.ValueObjects\EricksonLopez.ValueObjects.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="EricksonLopez.ValueObjects.Serialization.Json.IntegrationTests" />
   </ItemGroup>
 </Project>

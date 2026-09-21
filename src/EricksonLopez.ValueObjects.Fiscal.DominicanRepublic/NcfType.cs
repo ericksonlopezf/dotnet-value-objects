@@ -1,4 +1,4 @@
-﻿// Copyright © Erickson Lopez. MIT License.
+// Copyright © Erickson Lopez. MIT License.
 using System;
 using EricksonLopez.Result;
 
@@ -94,7 +94,7 @@ public readonly record struct NcfType : IComparable<NcfType>, IComparable
     public int CompareTo(object? obj) =>
         obj is NcfType other ? CompareTo(other) : throw new ArgumentException("Object is not an NcfType", nameof(obj));
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="NcfType"/> is less than the right <see cref="NcfType"/>.
     /// </summary>
     /// <param name="left">The first <see cref="NcfType"/> to compare.</param>

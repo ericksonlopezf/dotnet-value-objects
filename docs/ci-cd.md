@@ -97,8 +97,8 @@ Based on CI trigger patterns:
 
 ### 4.2 Release Procedure
 
-1. Update `<VersionPrefix>` in `Directory.Build.props` to the target Semantic Version (e.g., `1.0.0`).
-2. Create a version tag matching the prefix (e.g., `v1.0.0`).
+1. Update `<VersionPrefix>` in `Directory.Build.props` to the target Semantic Version (e.g., `2.0.0`).
+2. Create a version tag matching the prefix (e.g., `v2.0.0`).
 3. NuGet packages are packed with deterministic symbols (`.snupkg`) and SourceLink via `EmbedUntrackedSources=true`, `IncludeSymbols=true`, `SymbolPackageFormat=snupkg`.
 4. CI validates packaging via `dotnet pack` before the tag is promoted.
 

@@ -15,6 +15,11 @@ public readonly record struct BusinessDate : IValueObject<BusinessDate>, ICompar
     /// </summary>
     public DateOnly Value { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether this instance has been explicitly initialized and does not represent the default struct state.
+    /// </summary>
+    public bool IsInitialized => Value != DateOnly.MinValue;
+
     private BusinessDate(DateOnly value) => Value = value;
 
     /// <summary>

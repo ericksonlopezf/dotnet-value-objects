@@ -1,5 +1,6 @@
 // Copyright © Erickson Lopez. MIT License.
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using EricksonLopez.Result;
 
@@ -10,8 +11,14 @@ namespace EricksonLopez.ValueObjects;
 /// </summary>
 /// <remarks>
 /// Enforces same-currency arithmetic and canonical rounding at domain boundaries.
+/// <para>
+/// <b>Caution on Value Type Defaults:</b> As a value type (<c>readonly record struct</c>), C# permits
+/// uninitialized instances via <c>default(Money)</c>. In an uninitialized instance, <see cref="Currency"/>
+/// is unassigned, which violates domain invariants. Always create instances via <see cref="Create(decimal, CurrencyCode, int?)"/>,
+/// <see cref="Zero(CurrencyCode)"/>, or designated domain factories.
+/// </para>
 /// </remarks>
-public readonly record struct Money : IValueObject<Money>, IComparable<Money>, IComparable, IFormattable, ISpanFormattable
+public readonly record struct Money : IValueObject<Money>, IComparable<Money>, IComparable, IFormattable, ISpanFormattable, IParsable<Money>, ISpanParsable<Money>
 {
     private const decimal MaxAbsoluteAmount = 999_999_999_999_999.999999m;
 
@@ -26,11 +33,16 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     public CurrencyCode Currency { get; }
 
     /// <summary>
+    /// Gets a value indicating whether this <see cref="Money"/> instance was initialized through a factory or constructor rather than <c>default(Money)</c>.
+    /// </summary>
+    public bool IsInitialized => Currency.IsInitialized;
+
+    /// <summary>
     /// Gets a zero-value <see cref="Money"/> instance denominated in US Dollars (USD).
     /// </summary>
     public static readonly Money ZeroUsd = new(0m, CurrencyCode.USD);
 
-    private Money(decimal amount, CurrencyCode currency)
+    internal Money(decimal amount, CurrencyCode currency)
     {
         Amount = amount;
         Currency = currency;
@@ -45,6 +57,12 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     /// <returns>A successful <see cref="Result{T}"/> containing the created monetary value, or a validation failure.</returns>
     public static Result<Money> Create(decimal amount, CurrencyCode currency, int? decimals = null)
     {
+        if (!currency.IsInitialized)
+        {
+            return Result<Money>.Failure(Error.Validation(
+                "Money.InvalidCurrency", "Currency code must be initialized."));
+        }
+
         if (Math.Abs(amount) > MaxAbsoluteAmount)
         {
             return Result<Money>.Failure(Error.Validation(
@@ -101,7 +119,15 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     /// </summary>
     /// <param name="currency">The target currency code.</param>
     /// <returns>A zero-value monetary amount in the specified currency.</returns>
-    public static Money Zero(CurrencyCode currency) => new(0m, currency);
+    public static Money Zero(CurrencyCode currency)
+    {
+        if (!currency.IsInitialized)
+        {
+            throw new DomainException("Cannot create Money with uninitialized currency.");
+        }
+
+        return new(0m, currency);
+    }
 
     /// <summary>
     /// Adds another monetary amount to this instance, ensuring both amounts share the same currency.
@@ -110,13 +136,26 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     /// <returns>A successful <see cref="Result{T}"/> containing the sum, or a currency mismatch error.</returns>
     public Result<Money> Add(Money other)
     {
+        if (string.IsNullOrEmpty(Currency.Value) || string.IsNullOrEmpty(other.Currency.Value))
+        {
+            return Result<Money>.Failure(Error.Validation(
+                "Money.UninitializedCurrency", "Cannot operate on Money with uninitialized currency."));
+        }
+
         if (Currency != other.Currency)
         {
             return Result<Money>.Failure(Error.Validation(
                 "Money.CurrencyMismatch", $"Cannot add '{other.Currency}' to '{Currency}'."));
         }
 
-        return new Money(Amount + other.Amount, Currency);
+        decimal newAmount = Amount + other.Amount;
+        if (Math.Abs(newAmount) > MaxAbsoluteAmount)
+        {
+            return Result<Money>.Failure(Error.Validation(
+                "Money.AmountOutOfRange", "Money amount is outside the supported range."));
+        }
+
+        return new Money(newAmount, Currency);
     }
 
     /// <summary>
@@ -126,13 +165,57 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     /// <returns>A successful <see cref="Result{T}"/> containing the difference, or a currency mismatch error.</returns>
     public Result<Money> Subtract(Money other)
     {
+        if (string.IsNullOrEmpty(Currency.Value) || string.IsNullOrEmpty(other.Currency.Value))
+        {
+            return Result<Money>.Failure(Error.Validation(
+                "Money.UninitializedCurrency", "Cannot operate on Money with uninitialized currency."));
+        }
+
         if (Currency != other.Currency)
         {
             return Result<Money>.Failure(Error.Validation(
                 "Money.CurrencyMismatch", $"Cannot subtract '{other.Currency}' from '{Currency}'."));
         }
 
-        return new Money(Amount - other.Amount, Currency);
+        decimal newAmount = Amount - other.Amount;
+        if (Math.Abs(newAmount) > MaxAbsoluteAmount)
+        {
+            return Result<Money>.Failure(Error.Validation(
+                "Money.AmountOutOfRange", "Money amount is outside the supported range."));
+        }
+
+        return new Money(newAmount, Currency);
+    }
+
+    /// <summary>
+    /// Attempts to multiply the monetary amount by a scalar factor using banker's rounding without throwing exceptions.
+    /// </summary>
+    /// <param name="factor">The multiplier factor.</param>
+    /// <returns>A successful <see cref="Result{T}"/> containing the product, or a validation error if out of range or uninitialized.</returns>
+    public Result<Money> TryMultiply(decimal factor)
+    {
+        if (!Currency.IsInitialized)
+        {
+            return Result<Money>.Failure(Error.Validation(
+                "Money.UninitializedCurrency", "Cannot operate on Money with uninitialized currency."));
+        }
+
+        try
+        {
+            decimal newAmount = Math.Round(Amount * factor, Currency.DecimalPlaces, MidpointRounding.ToEven);
+            if (Math.Abs(newAmount) > MaxAbsoluteAmount)
+            {
+                return Result<Money>.Failure(Error.Validation(
+                    "Money.AmountOutOfRange", "Money amount is outside the supported range."));
+            }
+
+            return new Money(newAmount, Currency);
+        }
+        catch (OverflowException)
+        {
+            return Result<Money>.Failure(Error.Validation(
+                "Money.AmountOutOfRange", "Money amount is outside the supported range."));
+        }
     }
 
     /// <summary>
@@ -140,28 +223,71 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     /// </summary>
     /// <param name="factor">The multiplier factor.</param>
     /// <returns>The product rounded to the currency's standard decimal places.</returns>
-    public Money Multiply(decimal factor) =>
-        new(Math.Round(Amount * factor, Currency.DecimalPlaces, MidpointRounding.ToEven), Currency);
+    /// <exception cref="DomainException">Currency is uninitialized or amount is outside supported range.</exception>
+    public Money Multiply(decimal factor)
+    {
+        var result = TryMultiply(factor);
+        if (result.IsFailure)
+        {
+            throw new DomainException(result.Error.Description);
+        }
+
+        return result.Value;
+    }
+
+    /// <summary>
+    /// Attempts to apply a percentage to this monetary amount using banker's rounding without throwing exceptions.
+    /// </summary>
+    /// <param name="percentage">The percentage to apply.</param>
+    /// <returns>A successful <see cref="Result{T}"/> containing the calculated share, or a validation error.</returns>
+    public Result<Money> TryApplyPercentage(Percentage percentage) => TryMultiply(percentage.Fraction);
 
     /// <summary>
     /// Applies a percentage to this monetary amount using banker's rounding.
     /// </summary>
     /// <param name="percentage">The percentage to apply.</param>
     /// <returns>The calculated monetary share.</returns>
-    public Money ApplyPercentage(Percentage percentage) =>
-        new(Math.Round(Amount * percentage.Fraction, Currency.DecimalPlaces, MidpointRounding.ToEven), Currency);
+    /// <exception cref="DomainException">Currency is uninitialized or amount is outside supported range.</exception>
+    public Money ApplyPercentage(Percentage percentage)
+    {
+        var result = TryApplyPercentage(percentage);
+        if (result.IsFailure)
+        {
+            throw new DomainException(result.Error.Description);
+        }
+
+        return result.Value;
+    }
 
     /// <summary>
     /// Returns the negated monetary amount.
     /// </summary>
     /// <returns>A new <see cref="Money"/> instance with the negated amount.</returns>
-    public Money Negate() => new(-Amount, Currency);
+    /// <exception cref="DomainException">Currency is uninitialized.</exception>
+    public Money Negate()
+    {
+        if (!Currency.IsInitialized)
+        {
+            throw new DomainException("Cannot operate on Money with uninitialized currency.");
+        }
+
+        return new(-Amount, Currency);
+    }
 
     /// <summary>
     /// Returns the absolute value of this monetary amount.
     /// </summary>
     /// <returns>A new <see cref="Money"/> instance with a non-negative amount.</returns>
-    public Money Abs() => new(Math.Abs(Amount), Currency);
+    /// <exception cref="DomainException">Currency is uninitialized.</exception>
+    public Money Abs()
+    {
+        if (!Currency.IsInitialized)
+        {
+            throw new DomainException("Cannot operate on Money with uninitialized currency.");
+        }
+
+        return new(Math.Abs(Amount), Currency);
+    }
 
     /// <summary>
     /// Allocates the monetary amount proportionally across the specified integer ratios without fractional currency loss.
@@ -180,9 +306,15 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     /// An array of <see cref="Money"/> instances representing each allocated portion, one per ratio.
     /// Returns an empty array if <paramref name="ratios"/> is empty.
     /// </returns>
+    /// <exception cref="DomainException">Currency is uninitialized.</exception>
     /// <exception cref="ArgumentException"><paramref name="ratios"/> contains a value less than or equal to zero</exception>
     public Money[] Allocate(params ReadOnlySpan<int> ratios)
     {
+        if (!Currency.IsInitialized)
+        {
+            throw new DomainException("Cannot operate on Money with uninitialized currency.");
+        }
+
         if (ratios.Length == 0)
         {
             return [];
@@ -200,7 +332,7 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
 
         int decimalPlaces = Currency.DecimalPlaces;
         decimal scaleFactor = (decimal)Math.Pow(10, decimalPlaces);
-        decimal minUnit = scaleFactor == 0m ? 1m : 1m / scaleFactor;
+        decimal minUnit = 1m / scaleFactor;
 
         var results = new Money[ratios.Length];
         decimal remainder = Amount;
@@ -212,11 +344,17 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
             remainder -= share;
         }
 
-        // Distribute remainder one minimum currency unit at a time to avoid fractional currency loss
-        for (int i = 0; remainder > 0m; i++)
+        // Distribute remainder using modulo arithmetic to prevent CPU exhaustion on massive ratios (O(N) instead of O(Remainder))
+        decimal step = Amount >= 0m ? minUnit : -minUnit;
+        decimal totalStepsDecimal = Math.Abs(remainder / minUnit);
+        int totalSteps = (int)Math.Round(totalStepsDecimal);
+
+        if (totalSteps > 0)
         {
-            results[i] = new Money(results[i].Amount + minUnit, Currency);
-            remainder -= minUnit;
+            for (int i = 0; i < totalSteps; i++)
+            {
+                results[i] = new Money(results[i].Amount + step, Currency);
+            }
         }
 
         return results;
@@ -232,16 +370,9 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     {
         DomainException.ThrowIf(parts <= 0, $"Cannot distribute Money into {parts} parts.");
 
-        var share = new Money(Math.Round(Amount / parts, Currency.DecimalPlaces, MidpointRounding.ToEven), Currency);
-        var remainder = new Money(Amount - (share.Amount * parts), Currency);
-        var result = new Money[parts];
-        result[0] = new Money(share.Amount + remainder.Amount, Currency);
-        for (int i = 1; i < parts; i++)
-        {
-            result[i] = share;
-        }
-
-        return result;
+        Span<int> ratios = parts <= 128 ? stackalloc int[parts] : new int[parts];
+        ratios.Fill(1);
+        return Allocate(ratios);
     }
 
     /// <summary>
@@ -315,6 +446,17 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     /// <exception cref="DomainException"><paramref name="other"/> has a different currency</exception>
     public int CompareTo(Money other)
     {
+        bool thisUninit = string.IsNullOrEmpty(Currency.Value);
+        bool otherUninit = string.IsNullOrEmpty(other.Currency.Value);
+
+        if (thisUninit && otherUninit)
+        {
+            return Amount.CompareTo(other.Amount);
+        }
+
+        if (thisUninit) return -1;
+        if (otherUninit) return 1;
+
         EnsureSameCurrency(other);
         return Amount.CompareTo(other.Amount);
     }
@@ -379,6 +521,11 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     /// <summary>
     /// Adds two monetary amounts having the same currency.
     /// </summary>
+    /// <remarks>
+    /// Use <see cref="Add(Money)"/> for defensive workflows returning <see cref="Result{T}"/>.
+    /// The <c>+</c> operator is designed for ergonomic expressions where invariants are assumed to hold;
+    /// a currency mismatch is treated as an unrecoverable domain error throwing <see cref="DomainException"/>.
+    /// </remarks>
     /// <param name="a">The first monetary amount.</param>
     /// <param name="b">The second monetary amount.</param>
     /// <returns>The resulting sum.</returns>
@@ -393,6 +540,11 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     /// <summary>
     /// Subtracts the second monetary amount from the first when both have the same currency.
     /// </summary>
+    /// <remarks>
+    /// Use <see cref="Subtract(Money)"/> for defensive workflows returning <see cref="Result{T}"/>.
+    /// The <c>-</c> operator is designed for ergonomic expressions where invariants are assumed to hold;
+    /// a currency mismatch is treated as an unrecoverable domain error throwing <see cref="DomainException"/>.
+    /// </remarks>
     /// <param name="a">The first monetary amount.</param>
     /// <param name="b">The second monetary amount to subtract.</param>
     /// <returns>The resulting difference.</returns>
@@ -433,27 +585,135 @@ public readonly record struct Money : IValueObject<Money>, IComparable<Money>, I
     /// <inheritdoc cref="IFormattable.ToString(string?, IFormatProvider?)"/>
     public string ToString(string? format, IFormatProvider? formatProvider)
     {
-        string numFormat = string.IsNullOrEmpty(format) ? "N2" : format;
-        return $"{Amount.ToString(numFormat, formatProvider ?? CultureInfo.InvariantCulture)} {Currency}";
+        string numFormat = string.IsNullOrEmpty(format) ? $"N{Currency.DecimalPlaces}" : format;
+        string formattedAmount = Amount.ToString(numFormat, formatProvider ?? CultureInfo.InvariantCulture);
+        return string.IsNullOrEmpty(Currency.Value)
+            ? formattedAmount
+            : $"{formattedAmount} {Currency}";
     }
 
     /// <inheritdoc/>
     public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
     {
-        string formatted = ToString(format.ToString(), provider);
-        if (formatted.Length <= destination.Length)
+        ReadOnlySpan<char> numFormat = format.IsEmpty
+            ? (Currency.DecimalPlaces switch
+            {
+                0 => "N0",
+                3 => "N3",
+                4 => "N4",
+                _ => "N2"
+            })
+            : format;
+        if (!Amount.TryFormat(destination, out int amountChars, numFormat, provider ?? CultureInfo.InvariantCulture))
         {
-            formatted.AsSpan().CopyTo(destination);
-            charsWritten = formatted.Length;
+            charsWritten = 0;
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(Currency.Value))
+        {
+            charsWritten = amountChars;
             return true;
         }
 
-        charsWritten = 0;
+        string currencyStr = Currency.ToString();
+        int needed = amountChars + 1 + currencyStr.Length;
+        if (destination.Length < needed)
+        {
+            charsWritten = 0;
+            return false;
+        }
+
+        destination[amountChars] = ' ';
+        currencyStr.AsSpan().CopyTo(destination[(amountChars + 1)..]);
+        charsWritten = needed;
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public static Money Parse(string s, IFormatProvider? provider = null)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        return TryParse(s.AsSpan(), provider, out var result)
+            ? result
+            : throw new FormatException($"Cannot parse '{s}' as Money.");
+    }
+
+    /// <inheritdoc/>
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Money result)
+    {
+        if (s is null)
+        {
+            result = default;
+            return false;
+        }
+
+        return TryParse(s.AsSpan(), provider, out result);
+    }
+
+    /// <inheritdoc/>
+    public static Money Parse(ReadOnlySpan<char> s, IFormatProvider? provider = null) =>
+        TryParse(s, provider, out var result)
+            ? result
+            : throw new FormatException($"Cannot parse '{s.ToString()}' as Money.");
+
+    /// <inheritdoc/>
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Money result)
+    {
+        result = default;
+        ReadOnlySpan<char> trimmed = s.Trim();
+        if (trimmed.IsEmpty)
+        {
+            return false;
+        }
+
+        int firstSpace = trimmed.IndexOf(' ');
+        int lastSpace = trimmed.LastIndexOf(' ');
+
+        if (firstSpace < 0)
+        {
+            return false;
+        }
+
+        // Case 1: "100.50 USD" -> amount at start, currency at end
+        ReadOnlySpan<char> candidateAmount = trimmed[..lastSpace].Trim();
+        ReadOnlySpan<char> candidateCurrency = trimmed[(lastSpace + 1)..].Trim();
+
+        if (CurrencyCode.TryParse(candidateCurrency, provider, out var curr1) &&
+            decimal.TryParse(candidateAmount, NumberStyles.Number | NumberStyles.AllowCurrencySymbol, provider ?? CultureInfo.InvariantCulture, out decimal amt1))
+        {
+            var res = Create(amt1, curr1);
+            if (res.IsSuccess)
+            {
+                result = res.Value;
+                return true;
+            }
+        }
+
+        // Case 2: "USD 100.50" -> currency at start, amount at end
+        candidateCurrency = trimmed[..firstSpace].Trim();
+        candidateAmount = trimmed[(firstSpace + 1)..].Trim();
+
+        if (CurrencyCode.TryParse(candidateCurrency, provider, out var curr2) &&
+            decimal.TryParse(candidateAmount, NumberStyles.Number | NumberStyles.AllowCurrencySymbol, provider ?? CultureInfo.InvariantCulture, out decimal amt2))
+        {
+            var res = Create(amt2, curr2);
+            if (res.IsSuccess)
+            {
+                result = res.Value;
+                return true;
+            }
+        }
+
         return false;
     }
 
     private void EnsureSameCurrency(Money other)
     {
+        DomainException.ThrowIf(
+            string.IsNullOrEmpty(Currency.Value) || string.IsNullOrEmpty(other.Currency.Value),
+            "Cannot operate on Money with uninitialized currency.");
+
         DomainException.ThrowIf(
             Currency != other.Currency,
             $"Cannot operate on Money with different currencies: '{Currency}' vs '{other.Currency}'.");

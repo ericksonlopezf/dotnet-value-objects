@@ -1,5 +1,11 @@
 # ADR-011: Rejection of Implicit Conversion Operators
 
+## Status
+Rejected
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Type Safety and Domain Integrity

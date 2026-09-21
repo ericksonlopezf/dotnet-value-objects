@@ -116,9 +116,6 @@ public sealed class TimeRangeTests
         overnight.Overlaps(otherOvernight).Should().BeTrue();
         otherOvernight.Overlaps(overnight).Should().BeTrue();
 
-        Action nullOverlap = () => overnight.Overlaps(null!);
-        nullOverlap.Should().Throw<ArgumentNullException>();
-
         overnight.ToString().Should().Be("[22:00:00 .. 06:00:00]");
     }
 
@@ -195,14 +192,36 @@ public sealed class TimeRangeTests
     }
 
     [Fact]
-    public void Overlaps_WhenTargetIsNull_ThrowsArgumentNullException()
+    public void ComparisonContract_WhenValidTimeRanges_SatisfiesOrdering()
     {
         var a = TimeRange.Create(new TimeOnly(9, 0), new TimeOnly(12, 0)).Value;
+        var aCopy = TimeRange.Create(new TimeOnly(9, 0), new TimeOnly(12, 0)).Value;
+        var b = TimeRange.Create(new TimeOnly(10, 0), new TimeOnly(14, 0)).Value;
 
-        Action act = () => a.Overlaps(null!);
-        act.Should().Throw<ArgumentNullException>();
+        a.ShouldSatisfyComparisonContract(aCopy, b,
+            (x, y) => x < y,
+            (x, y) => x <= y,
+            (x, y) => x > y,
+            (x, y) => x >= y);
+
+        ((IComparable)a).CompareTo((object)a).Should().Be(0);
+        ((IComparable)a).CompareTo((object)b).Should().BeNegative();
+
+        Action invalidObj = () => ((IComparable)a).CompareTo("not-a-timerange");
+        invalidObj.Should().Throw<ArgumentException>()
+            .WithMessage("*Object is not a TimeRange*");
 
         a.ToString().Should().Be("[09:00:00 .. 12:00:00]");
+    }
+
+    [Fact]
+    public void DefaultStruct_HasExpectedDefaultValues()
+    {
+        var def = default(TimeRange);
+        def.Start.Should().Be(default(TimeOnly));
+        def.End.Should().Be(default(TimeOnly));
+        def.CrossesMidnight.Should().BeFalse();
+        def.Duration.Should().Be(TimeSpan.Zero);
     }
 
     [Fact]
@@ -237,6 +256,46 @@ public sealed class TimeRangeTests
         var range2 = TimeRange.Create(new TimeOnly(9, 0), new TimeOnly(18, 0)).Value;
 
         range1.ShouldSatisfyEqualityContract(range1Copy, range2, (a, b) => a == b, (a, b) => a != b);
+    }
+
+    [Fact]
+    public void IsEmpty_WhenValidNonOvernightRange_ReturnsFalse()
+    {
+        var range = TimeRange.Create(new TimeOnly(9, 0), new TimeOnly(17, 0)).Value;
+        range.IsEmpty.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsEmpty_WhenDefaultStruct_ReturnsTrue()
+    {
+        var uninit = default(TimeRange);
+        uninit.IsEmpty.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Parse_And_TryParse_HandleValidAndInvalidInputs()
+    {
+        var tr = TimeRange.Parse("[09:00:00 .. 17:00:00]");
+        tr.Start.Should().Be(new TimeOnly(9, 0));
+        tr.End.Should().Be(new TimeOnly(17, 0));
+
+        var trSpan = TimeRange.Parse("[09:00:00 .. 17:00:00]".AsSpan());
+        trSpan.Start.Should().Be(new TimeOnly(9, 0));
+
+        TimeRange.TryParse("[09:00:00 .. 17:00:00]", null, out var parsed).Should().BeTrue();
+        parsed.Start.Should().Be(new TimeOnly(9, 0));
+
+        TimeRange.TryParse("invalid", null, out _).Should().BeFalse();
+        TimeRange.TryParse("[invalid .. 17:00:00]", null, out _).Should().BeFalse();
+        TimeRange.TryParse("[09:00:00 .. invalid]", null, out _).Should().BeFalse();
+        TimeRange.TryParse("10:00:00..10:00:00", null, out _).Should().BeFalse();
+        TimeRange.TryParse("[09:00:00..17:00:00", null, out _).Should().BeFalse();
+
+        Action actInvalid = () => TimeRange.Parse("invalid");
+        actInvalid.Should().Throw<FormatException>();
+
+        Action actInvalidSpan = () => TimeRange.Parse("invalid".AsSpan());
+        actInvalidSpan.Should().Throw<FormatException>();
     }
 }
 

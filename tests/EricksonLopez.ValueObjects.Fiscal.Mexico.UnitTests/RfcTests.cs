@@ -180,6 +180,20 @@ public sealed class RfcTests
             (x, y) => x > y,
             (x, y) => x >= y);
     }
+
+    [Fact]
+    public void Utf8Parsing_WorksCorrectly()
+    {
+        var rfc = Rfc.Parse("ABC680524P76"u8);
+        rfc.Value.Should().Be("ABC680524P76");
+        Rfc.TryParse("ABC680524P76"u8, null, out var parsed).Should().BeTrue();
+        parsed.Value.Should().Be("ABC680524P76");
+        Rfc.TryParse("invalid"u8, null, out _).Should().BeFalse();
+        Rfc.TryParse(new byte[100], null, out _).Should().BeFalse();
+
+        Action actInvalid = () => Rfc.Parse("invalid"u8);
+        actInvalid.Should().Throw<FormatException>();
+    }
 }
 
 

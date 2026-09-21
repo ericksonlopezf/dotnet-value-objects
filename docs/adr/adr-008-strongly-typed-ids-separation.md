@@ -1,5 +1,11 @@
 # ADR-008: Separation of Strongly Typed IDs into Dedicated Package
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Entity Identity vs. Value Objects

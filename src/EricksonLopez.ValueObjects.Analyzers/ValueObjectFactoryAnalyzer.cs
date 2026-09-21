@@ -45,18 +45,15 @@ public sealed class ValueObjectFactoryAnalyzer : DiagnosticAnalyzer
         // Skip abstract types or interfaces
         if (namedTypeSymbol.IsAbstract || namedTypeSymbol.TypeKind == TypeKind.Interface) return;
 
-        bool isValueObject = namedTypeSymbol.AllInterfaces.Any(i => i.Name is "IValueObject" or "IValueObject`1");
+        bool isValueObject = namedTypeSymbol.AllInterfaces.Any(i => i.Name == "IValueObject");
         if (!isValueObject)
         {
-            var baseType = namedTypeSymbol.BaseType;
-            while (baseType is not null)
+            for (var baseType = namedTypeSymbol.BaseType; baseType is not null && !isValueObject; baseType = baseType.BaseType)
             {
                 if (baseType.Name is "ValueObject" or "SingleValueObject" or "StringValueObject")
                 {
                     isValueObject = true;
-                    break;
                 }
-                baseType = baseType.BaseType;
             }
         }
 
@@ -69,15 +66,12 @@ public sealed class ValueObjectFactoryAnalyzer : DiagnosticAnalyzer
 
         if (!hasCreateFactory)
         {
-            var location = namedTypeSymbol.Locations.FirstOrDefault();
-            if (location is not null)
-            {
-                var diagnostic = Diagnostic.Create(
-                    Rule,
-                    location,
-                    namedTypeSymbol.Name);
-                context.ReportDiagnostic(diagnostic);
-            }
+            var location = namedTypeSymbol.Locations[0];
+            var diagnostic = Diagnostic.Create(
+                Rule,
+                location,
+                namedTypeSymbol.Name);
+            context.ReportDiagnostic(diagnostic);
         }
     }
 }

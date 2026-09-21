@@ -31,12 +31,17 @@ public readonly record struct Ruc : ISpanParsable<Ruc>, IUtf8SpanParsable<Ruc>, 
     /// <summary>
     /// Gets the raw 11-digit numeric RUC string.
     /// </summary>
-    public string Value => _value;
+    public string Value => _value ?? string.Empty;
+
+    /// <summary>
+    /// Gets a value indicating whether this instance has been explicitly initialized and does not represent the default struct state.
+    /// </summary>
+    public bool IsInitialized => !string.IsNullOrEmpty(_value);
 
     /// <summary>
     /// Gets the 2-digit prefix (10, 15, 17, 20).
     /// </summary>
-    public int Prefix => int.Parse(_value.AsSpan(0, 2), CultureInfo.InvariantCulture);
+    public int Prefix => !string.IsNullOrEmpty(_value) && _value.Length >= 2 ? int.Parse(_value.AsSpan(0, 2), CultureInfo.InvariantCulture) : 0;
 
     /// <summary>
     /// Gets a value indicating whether this RUC belongs to a natural person (prefixes 10, 15, 17).
@@ -119,12 +124,12 @@ public readonly record struct Ruc : ISpanParsable<Ruc>, IUtf8SpanParsable<Ruc>, 
     }
 
     /// <inheritdoc/>
-    public override string ToString() => _value;
+    public override string ToString() => _value ?? string.Empty;
 
     /// <inheritdoc/>
-    public int CompareTo(Ruc other) => string.Compare(_value, other._value, StringComparison.Ordinal);
+    public int CompareTo(Ruc other) => string.Compare(_value ?? string.Empty, other._value ?? string.Empty, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="Ruc"/> is less than the right <see cref="Ruc"/>.
     /// </summary>
     /// <param name="left">The first <see cref="Ruc"/> to compare.</param>
@@ -183,8 +188,14 @@ public readonly record struct Ruc : ISpanParsable<Ruc>, IUtf8SpanParsable<Ruc>, 
     /// <inheritdoc/>
     public static bool TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Ruc result)
     {
-        Span<char> chars = stackalloc char[utf8Text.Length];
-        Encoding.UTF8.TryGetChars(utf8Text, chars, out int written);
+        if (utf8Text.Length > 64)
+        {
+            result = default;
+            return false;
+        }
+
+        Span<char> chars = stackalloc char[64];
+        int written = Encoding.UTF8.GetChars(utf8Text, chars);
         return TryParse(chars[..written], provider, out result);
     }
 }

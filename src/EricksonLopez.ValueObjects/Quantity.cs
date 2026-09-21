@@ -8,6 +8,14 @@ namespace EricksonLopez.ValueObjects;
 /// <summary>
 /// Represents a discrete, non-negative integer quantity.
 /// </summary>
+/// <remarks>
+/// <para>
+/// <b>Caution on Value Type Defaults:</b> As a value type (<c>readonly record struct</c>), C# permits
+/// uninitialized instances via <c>default(Quantity)</c>. In an uninitialized instance, <see cref="Value"/>
+/// defaults to 0. While 0 is technically non-negative, always favor explicit creation via <see cref="Create(int)"/>
+/// or <see cref="Zero"/> for clear domain intent.
+/// </para>
+/// </remarks>
 public readonly record struct Quantity : IValueObject<Quantity>, IComparable<Quantity>, IComparable, IParsable<Quantity>, ISpanParsable<Quantity>, IFormattable, ISpanFormattable
 {
     private const NumberStyles QuantityNumberStyles = NumberStyles.Integer | NumberStyles.AllowThousands;
@@ -40,7 +48,21 @@ public readonly record struct Quantity : IValueObject<Quantity>, IComparable<Qua
     /// </summary>
     /// <param name="other">The quantity to add.</param>
     /// <returns>A successful <see cref="Result{T}"/> containing the resulting sum.</returns>
-    public Result<Quantity> Add(Quantity other) => Create(Value + other.Value);
+    public Result<Quantity> Add(Quantity other)
+    {
+        try
+        {
+            checked
+            {
+                return Create(Value + other.Value);
+            }
+        }
+        catch (OverflowException)
+        {
+            return Result<Quantity>.Failure(Error.Validation(
+                "Quantity.Overflow", "Quantity addition resulted in an arithmetic overflow."));
+        }
+    }
 
     /// <summary>
     /// Subtracts another quantity from this instance.

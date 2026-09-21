@@ -9,7 +9,7 @@ namespace EricksonLopez.ValueObjects;
 ///
 /// <para><b>Rules:</b> Required, 1–64 characters, uppercase alphanumeric with <c>. _ / -</c> separators
 /// (code pattern). Stored uppercase.</para>
-/// <para><b>Used by:</b> Inventory, POS, ERP, Manufactura, CRM</para>
+/// <para><b>Used by:</b> Inventory, POS, ERP, Manufacturing, CRM</para>
 ///
 /// <para><b>Design note:</b> SKU is the canonical product-level identifier used by inventory
 /// and purchasing systems. It differs from <see cref="Barcode"/>

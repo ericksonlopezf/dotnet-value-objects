@@ -32,12 +32,12 @@ public sealed class CpeTypeCodeTests
     [Fact]
     public void StaticFields_DefaultState_ExhaustiveVerification()
     {
-        CpeTypeCode.Factura.Code.Should().Be("01");
-        CpeTypeCode.Boleta.Code.Should().Be("03");
-        CpeTypeCode.NotaCredito.Code.Should().Be("07");
-        CpeTypeCode.NotaDebito.Code.Should().Be("08");
-        CpeTypeCode.GuiaRemitente.Code.Should().Be("09");
-        CpeTypeCode.GuiaTransportista.Code.Should().Be("31");
+        CpeTypeCode.Invoice.Code.Should().Be("01");
+        CpeTypeCode.Receipt.Code.Should().Be("03");
+        CpeTypeCode.CreditNote.Code.Should().Be("07");
+        CpeTypeCode.DebitNote.Code.Should().Be("08");
+        CpeTypeCode.SenderDispatchGuide.Code.Should().Be("09");
+        CpeTypeCode.CarrierDispatchGuide.Code.Should().Be("31");
     }
 
     [Theory]
@@ -59,8 +59,8 @@ public sealed class CpeTypeCodeTests
     [Fact]
     public void CpeTypeCode_DefaultState_ComparisonOperators()
     {
-        var f = CpeTypeCode.Factura;
-        var b = CpeTypeCode.Boleta;
+        var f = CpeTypeCode.Invoice;
+        var b = CpeTypeCode.Receipt;
         var fClone = CpeTypeCode.Create("01").Value;
 
         (f < b).Should().BeTrue();

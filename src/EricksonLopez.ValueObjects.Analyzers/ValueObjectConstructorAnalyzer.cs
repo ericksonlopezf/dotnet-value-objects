@@ -42,26 +42,40 @@ public sealed class ValueObjectConstructorAnalyzer : DiagnosticAnalyzer
     {
         var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
 
-        bool isValueObject = namedTypeSymbol.AllInterfaces.Any(i => i.Name is "IValueObject" or "IValueObject`1");
+        bool isValueObject = namedTypeSymbol.AllInterfaces.Any(i => i.Name == "IValueObject");
         if (!isValueObject)
         {
-            var baseType = namedTypeSymbol.BaseType;
-            while (baseType is not null)
+            for (var baseType = namedTypeSymbol.BaseType; baseType is not null && !isValueObject; baseType = baseType.BaseType)
             {
                 if (baseType.Name is "ValueObject" or "SingleValueObject" or "StringValueObject")
                 {
                     isValueObject = true;
-                    break;
                 }
-                baseType = baseType.BaseType;
             }
+        }
+
+        if (!isValueObject)
+        {
+            isValueObject = namedTypeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name is "ValueObjectAttribute" or "ValueObject");
         }
 
         if (!isValueObject) return;
 
         foreach (var constructor in namedTypeSymbol.Constructors)
         {
-            if (constructor.IsImplicitlyDeclared) continue;
+            if (constructor.IsImplicitlyDeclared)
+            {
+                if (namedTypeSymbol.IsReferenceType)
+                {
+                    var loc = namedTypeSymbol.Locations[0];
+                    var diag = Diagnostic.Create(
+                        Rule,
+                        loc,
+                        namedTypeSymbol.Name);
+                    context.ReportDiagnostic(diag);
+                }
+                continue;
+            }
 
             // Allow private constructors, or protected constructors if the type is abstract
             bool isAllowed = constructor.DeclaredAccessibility == Accessibility.Private
@@ -69,15 +83,12 @@ public sealed class ValueObjectConstructorAnalyzer : DiagnosticAnalyzer
 
             if (!isAllowed)
             {
-                var location = constructor.Locations.FirstOrDefault();
-                if (location is not null)
-                {
-                    var diagnostic = Diagnostic.Create(
-                        Rule,
-                        location,
-                        namedTypeSymbol.Name);
-                    context.ReportDiagnostic(diagnostic);
-                }
+                var location = constructor.Locations[0];
+                var diagnostic = Diagnostic.Create(
+                    Rule,
+                    location,
+                    namedTypeSymbol.Name);
+                context.ReportDiagnostic(diagnostic);
             }
         }
     }

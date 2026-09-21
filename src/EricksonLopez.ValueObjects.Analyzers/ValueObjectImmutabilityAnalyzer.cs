@@ -44,18 +44,15 @@ public sealed class ValueObjectImmutabilityAnalyzer : DiagnosticAnalyzer
         var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
 
         // Check if type implements IValueObject or inherits SingleValueObject / ValueObject
-        bool isValueObject = namedTypeSymbol.AllInterfaces.Any(i => i.Name is "IValueObject" or "IValueObject`1");
+        bool isValueObject = namedTypeSymbol.AllInterfaces.Any(i => i.Name == "IValueObject");
         if (!isValueObject)
         {
-            var baseType = namedTypeSymbol.BaseType;
-            while (baseType is not null)
+            for (var baseType = namedTypeSymbol.BaseType; baseType is not null && !isValueObject; baseType = baseType.BaseType)
             {
                 if (baseType.Name is "ValueObject" or "SingleValueObject" or "StringValueObject")
                 {
                     isValueObject = true;
-                    break;
                 }
-                baseType = baseType.BaseType;
             }
         }
 

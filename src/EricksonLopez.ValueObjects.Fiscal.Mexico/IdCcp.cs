@@ -29,6 +29,11 @@ public readonly record struct IdCcp : ISpanParsable<IdCcp>, IComparable<IdCcp>
     public FiscalUuid Uuid => _uuid;
 
     /// <summary>
+    /// Gets a value indicating whether this instance has been explicitly initialized and does not represent the default struct state.
+    /// </summary>
+    public bool IsInitialized => _uuid.IsInitialized;
+
+    /// <summary>
     /// Creates a validated <see cref="IdCcp"/> from a <see cref="FiscalUuid"/>.
     /// </summary>
     public static Result<IdCcp> Create(FiscalUuid uuid) =>
@@ -71,7 +76,7 @@ public readonly record struct IdCcp : ISpanParsable<IdCcp>, IComparable<IdCcp>
     /// <summary>
     /// Formats the IdCCP in canonical format: <c>CCCXXXXXXXX-XXXX-4XXX-YXXX-XXXXXXXXXXXX</c>.
     /// </summary>
-    public string Formatted => $"{Prefix}{_uuid.Formatted}";
+    public string Formatted => _uuid.IsInitialized ? $"{Prefix}{_uuid.Formatted}" : string.Empty;
 
     /// <inheritdoc/>
     public override string ToString() => Formatted;
@@ -79,7 +84,7 @@ public readonly record struct IdCcp : ISpanParsable<IdCcp>, IComparable<IdCcp>
     /// <inheritdoc/>
     public int CompareTo(IdCcp other) => _uuid.CompareTo(other._uuid);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="IdCcp"/> is less than the right <see cref="IdCcp"/>.
     /// </summary>
     /// <param name="left">The first <see cref="IdCcp"/> to compare.</param>

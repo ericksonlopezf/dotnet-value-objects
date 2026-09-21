@@ -25,6 +25,7 @@ public sealed class ValueObjectIncrementalGeneratorTests
     public sealed class ValueObjectAttribute : System.Attribute
     {
         public bool GenerateConversionOperators { get; set; }
+        public bool GeneratePersistenceHooks { get; set; } = true;
     }
     """;
 
@@ -82,6 +83,7 @@ public sealed class ValueObjectIncrementalGeneratorTests
         code.Should().Contain("public static OrderId Parse(global::System.ReadOnlySpan<char> s, global::System.IFormatProvider? provider = null)");
         code.Should().Contain("public static bool TryParse(global::System.ReadOnlySpan<char> s, global::System.IFormatProvider? provider, out OrderId result)");
         code.Should().Contain("public sealed class OrderIdJsonConverter : global::System.Text.Json.Serialization.JsonConverter<OrderId>");
+        code.Should().Contain("\n\n    public sealed class OrderIdJsonConverter");
         code.Should().NotContain("operator");
     }
 
@@ -205,7 +207,8 @@ public sealed class ValueObjectIncrementalGeneratorTests
         generatedSources.Should().HaveCount(1);
         var code = generatedSources.First().SourceText.ToString();
         code.Should().Contain("public static explicit operator string(Currency value) => value.Value;");
-        code.Should().Contain("public static explicit operator Currency(string value) => Create(value).Value;");
+        code.Should().Contain("public static explicit operator Currency(string value)");
+        code.Should().Contain("throw new global::System.InvalidCastException");
     }
 
     [Fact]
@@ -300,7 +303,8 @@ public sealed class ValueObjectIncrementalGeneratorTests
         generatedSources.Should().HaveCount(1);
         var code = generatedSources.First().SourceText.ToString();
         code.Should().Contain("public static explicit operator int(QuantityVo value) => value.Value;");
-        code.Should().Contain("public static explicit operator QuantityVo(int value) => Create(value).Value;");
+        code.Should().Contain("public static explicit operator QuantityVo(int value)");
+        code.Should().Contain("throw new global::System.InvalidCastException");
         code.Should().Contain("int? value = global::System.Text.Json.JsonSerializer.Deserialize<int>(ref reader, options);");
     }
 
@@ -329,7 +333,8 @@ public sealed class ValueObjectIncrementalGeneratorTests
         generatedSources.Should().HaveCount(1);
         var code = generatedSources.First().SourceText.ToString();
         code.Should().Contain("public static explicit operator long(DeepLongVo value) => value.Value;");
-        code.Should().Contain("public static explicit operator DeepLongVo(long value) => Create(value).Value;");
+        code.Should().Contain("public static explicit operator DeepLongVo(long value)");
+        code.Should().Contain("throw new global::System.InvalidCastException");
     }
 
     [Fact]
@@ -352,7 +357,8 @@ public sealed class ValueObjectIncrementalGeneratorTests
         generatedSources.Should().HaveCount(1);
         var code = generatedSources.First().SourceText.ToString();
         code.Should().Contain("public static explicit operator string(CustomerCode value) => value.Value;");
-        code.Should().Contain("public static explicit operator CustomerCode(string value) => Create(value).Value;");
+        code.Should().Contain("public static explicit operator CustomerCode(string value)");
+        code.Should().Contain("throw new global::System.InvalidCastException");
         code.Should().Contain("string? value = global::System.Text.Json.JsonSerializer.Deserialize<string>(ref reader, options);");
     }
 
@@ -378,7 +384,8 @@ public sealed class ValueObjectIncrementalGeneratorTests
         generatedSources.Should().HaveCount(1);
         var code = generatedSources.First().SourceText.ToString();
         code.Should().Contain("public static explicit operator decimal(Price value) => value.Value;");
-        code.Should().Contain("public static explicit operator Price(decimal value) => Create(value).Value;");
+        code.Should().Contain("public static explicit operator Price(decimal value)");
+        code.Should().Contain("throw new global::System.InvalidCastException");
     }
 
     [Fact]
@@ -835,6 +842,10 @@ public sealed class ValueObjectIncrementalGeneratorTests
         var voVal = opExplicitToVo!.Invoke(null, ["SKU-500"]);
         skuType.GetProperty("Value")!.GetValue(voVal).Should().Be("SKU-500");
 
+        Action failCast = () => opExplicitToVo.Invoke(null, ["invalid"]);
+        failCast.Should().Throw<TargetInvocationException>()
+            .WithInnerException<InvalidCastException>();
+
         // 6. System.Text.Json Serialization & Deserialization
         var jsonConverterType = assembly.GetType("ExecutionDomain.ItemSku+ItemSkuJsonConverter")
             ?? assembly.GetType("ExecutionDomain.ItemSkuJsonConverter");
@@ -1081,7 +1092,493 @@ public sealed class ValueObjectIncrementalGeneratorTests
 
         return (outputCompilation, generatedSources, diagnostics);
     }
+
+    [Fact]
+    public void Generator_ShouldGeneratePersistenceHooks_WhenDapperAndEfCoreArePresent()
+    {
+        var dapperSource = """
+        namespace System.Data { public interface IDbDataParameter { object Value { get; set; } } }
+        namespace Dapper
+        {
+            public static class SqlMapper
+            {
+                public abstract class TypeHandler<T>
+                {
+                    public abstract void SetValue(System.Data.IDbDataParameter parameter, T value);
+                    public abstract T Parse(object value);
+                }
+            }
+        }
+        """;
+
+        var efCoreSource = """
+        namespace Microsoft.EntityFrameworkCore.Storage.ValueConversion
+        {
+            public class ValueConverter<TModel, TProvider>
+            {
+                public ValueConverter(System.Linq.Expressions.Expression<System.Func<TModel, TProvider>> a, System.Linq.Expressions.Expression<System.Func<TProvider, TModel>> b) {}
+            }
+        }
+        """;
+
+        var userSource = """
+        namespace SampleDomain;
+        using EricksonLopez.ValueObjects;
+
+        [ValueObject(GeneratePersistenceHooks = true)]
+        public sealed partial record class SampleSku : StringValueObject<SampleSku>
+        {
+            private SampleSku(string value) : base(value) {}
+            public static EricksonLopez.Result.Result<SampleSku> Create(string value) => new(value);
+        }
+        """;
+
+        var syntaxTrees = new[]
+        {
+            CSharpSyntaxTree.ParseText(ValueObjectAttributeSource),
+            CSharpSyntaxTree.ParseText(BaseInterfacesSource),
+            CSharpSyntaxTree.ParseText(dapperSource),
+            CSharpSyntaxTree.ParseText(efCoreSource),
+            CSharpSyntaxTree.ParseText(userSource)
+        };
+
+        var compilation = CSharpCompilation.Create(
+            "PersistenceAssembly",
+            syntaxTrees,
+            CreateReferences(),
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var generator = new ValueObjectIncrementalGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+        var runDriver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+
+        diagnostics.Should().BeEmpty();
+        var runResult = runDriver.GetRunResult();
+        var generated = runResult.GeneratedTrees.First().ToString();
+        generated.Should().Contain("SampleSkuDapperTypeHandler");
+        generated.Should().Contain("SampleSkuValueConverter");
+        generated.Should().Contain("parameter.Value = value.ToString();");
+        var normalized = generated.Replace("\r\n", "\n");
+        normalized.Should().Contain("\n\n    public sealed class SampleSkuDapperTypeHandler");
+        normalized.Should().Contain("\n\n    public sealed class SampleSkuValueConverter");
+    }
+
+    [Fact]
+    public void Generator_ShouldNotGeneratePersistenceHooks_WhenGeneratePersistenceHooksIsFalse()
+    {
+        var dapperSource = """
+        namespace System.Data { public interface IDbDataParameter { object Value { get; set; } } }
+        namespace Dapper
+        {
+            public static class SqlMapper
+            {
+                public abstract class TypeHandler<T>
+                {
+                    public abstract void SetValue(System.Data.IDbDataParameter parameter, T value);
+                    public abstract T Parse(object value);
+                }
+            }
+        }
+        """;
+
+        var userSource = """
+        namespace SampleDomain;
+        using EricksonLopez.ValueObjects;
+
+        [ValueObject(GeneratePersistenceHooks = false)]
+        public sealed partial record class NoHooksSku : StringValueObject<NoHooksSku>
+        {
+            private NoHooksSku(string value) : base(value) {}
+            public static EricksonLopez.Result.Result<NoHooksSku> Create(string value) => new(value);
+        }
+        """;
+
+        var syntaxTrees = new[]
+        {
+            CSharpSyntaxTree.ParseText(ValueObjectAttributeSource),
+            CSharpSyntaxTree.ParseText(BaseInterfacesSource),
+            CSharpSyntaxTree.ParseText(dapperSource),
+            CSharpSyntaxTree.ParseText(userSource)
+        };
+
+        var compilation = CSharpCompilation.Create(
+            "NoHooksAssembly",
+            syntaxTrees,
+            CreateReferences(),
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var generator = new ValueObjectIncrementalGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+        var runDriver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+
+        diagnostics.Should().BeEmpty();
+        var runResult = runDriver.GetRunResult();
+        var generated = runResult.GeneratedTrees.First().ToString();
+        generated.Should().NotContain("NoHooksSkuDapperTypeHandler");
+    }
+
+    [Theory]
+    [InlineData("long", "long")]
+    [InlineData("decimal", "decimal")]
+    [InlineData("double", "double")]
+    [InlineData("float", "float")]
+    [InlineData("short", "short")]
+    [InlineData("byte", "byte")]
+    [InlineData("bool", "bool")]
+    [InlineData("int", "int")]
+    public void Generator_ShouldGenerateParseAndTryParse_ForAllPrimitiveScalars(string rawType, string expectedParseTarget)
+    {
+        var userSource = $$"""
+        namespace ScalarDomain;
+        using EricksonLopez.ValueObjects;
+
+        [ValueObject]
+        public readonly partial record struct PrimitiveVo : SingleValueObject<PrimitiveVo, {{rawType}}>
+        {
+            public PrimitiveVo({{rawType}} value) : base(value) {}
+            public static EricksonLopez.Result.Result<PrimitiveVo> Create({{rawType}} value) => new(value);
+        }
+        """;
+
+        var (outputCompilation, generatedSources, diagnostics) = RunGenerator(userSource);
+        diagnostics.Should().BeEmpty();
+        generatedSources.Should().HaveCount(1);
+        var code = generatedSources.First().SourceText.ToString();
+        code.Should().Contain("public static PrimitiveVo Parse(string s, global::System.IFormatProvider? provider = null)");
+        code.Should().Contain($"if (!{expectedParseTarget}.TryParse(s, provider, out var parsedVal))");
+        code.Should().Contain($"Cannot parse '{{s}}' as {rawType} for PrimitiveVo.");
+    }
+
+
+    [Fact]
+    public void Generator_ShouldPrefixGlobal_ForCustomNonPrimitiveScalars()
+    {
+        var customTypeSource = """
+        namespace CustomTypes;
+        public struct CustomScalar : global::System.IParsable<CustomScalar>
+        {
+            public static CustomScalar Parse(string s, global::System.IFormatProvider? provider) => default;
+            public static bool TryParse(string? s, global::System.IFormatProvider? provider, out CustomScalar result) { result = default; return true; }
+        }
+        """;
+
+        var userSource = """
+        namespace CustomDomain;
+        using EricksonLopez.ValueObjects;
+        using CustomTypes;
+
+        [ValueObject]
+        public readonly partial record struct CustomVo : SingleValueObject<CustomVo, CustomScalar>
+        {
+            public CustomVo(CustomScalar value) : base(value) {}
+            public static EricksonLopez.Result.Result<CustomVo> Create(CustomScalar value) => new(value);
+        }
+        """;
+
+        var syntaxTrees = new[]
+        {
+            CSharpSyntaxTree.ParseText(ValueObjectAttributeSource),
+            CSharpSyntaxTree.ParseText(BaseInterfacesSource),
+            CSharpSyntaxTree.ParseText(customTypeSource),
+            CSharpSyntaxTree.ParseText(userSource)
+        };
+
+        var compilation = CSharpCompilation.Create(
+            "CustomScalarAssembly",
+            syntaxTrees,
+            CreateReferences(),
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var generator = new ValueObjectIncrementalGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+        var runDriver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+
+        diagnostics.Should().BeEmpty();
+        var code = runDriver.GetRunResult().GeneratedTrees.First().ToString();
+        code.Should().Contain("if (!global::CustomTypes.CustomScalar.TryParse(s, provider, out var parsedVal))");
+    }
+
+    [Fact]
+    public void Generator_ShouldUseToString_ForDapperTypeHandler_WhenNoValuePropertyExists()
+    {
+        var dapperSource = """
+        namespace Dapper
+        {
+            public static class SqlMapper
+            {
+                public abstract class TypeHandler<T>
+                {
+                    public abstract void SetValue(global::System.Data.IDbDataParameter parameter, T value);
+                    public abstract T Parse(object value);
+                }
+            }
+        }
+        """;
+
+        var userSource = """
+        namespace DapperDomain;
+        using EricksonLopez.ValueObjects;
+
+        [ValueObject(GeneratePersistenceHooks = true)]
+        public sealed partial record class SimpleNoValVo
+        {
+            private readonly string _text;
+            private SimpleNoValVo(string text) => _text = text;
+            public static EricksonLopez.Result.Result<SimpleNoValVo> Create(string text) => new(text);
+            public override string ToString() => _text;
+        }
+        """;
+
+        var syntaxTrees = new[]
+        {
+            CSharpSyntaxTree.ParseText(ValueObjectAttributeSource),
+            CSharpSyntaxTree.ParseText(BaseInterfacesSource),
+            CSharpSyntaxTree.ParseText(dapperSource),
+            CSharpSyntaxTree.ParseText(userSource)
+        };
+
+        var compilation = CSharpCompilation.Create(
+            "DapperNoValAssembly",
+            syntaxTrees,
+            CreateReferences(),
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var generator = new ValueObjectIncrementalGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+        var runDriver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+
+        diagnostics.Should().BeEmpty();
+        var code = runDriver.GetRunResult().GeneratedTrees.First().ToString();
+        code.Should().Contain("parameter.Value = value.ToString();");
+    }
+
+    [Fact]
+    public void Generator_ShouldUseValueProperty_ForDapperTypeHandler_WhenValuePropertyExists()
+    {
+        var dapperSource = """
+        namespace System.Data { public interface IDbDataParameter { object Value { get; set; } } }
+        namespace Dapper
+        {
+            public static class SqlMapper
+            {
+                public abstract class TypeHandler<T>
+                {
+                    public abstract void SetValue(global::System.Data.IDbDataParameter parameter, T value);
+                    public abstract T Parse(object value);
+                }
+            }
+        }
+        """;
+
+        var userSource = """
+        namespace DapperDomain;
+        using EricksonLopez.ValueObjects;
+
+        [ValueObject(GeneratePersistenceHooks = true)]
+        public readonly partial record struct DirectValVo
+        {
+            public string Value { get; }
+            private DirectValVo(string text) => Value = text;
+            public static EricksonLopez.Result.Result<DirectValVo> Create(string text) => new(text);
+        }
+        """;
+
+        var syntaxTrees = new[]
+        {
+            CSharpSyntaxTree.ParseText(ValueObjectAttributeSource),
+            CSharpSyntaxTree.ParseText(BaseInterfacesSource),
+            CSharpSyntaxTree.ParseText(dapperSource),
+            CSharpSyntaxTree.ParseText(userSource)
+        };
+
+        var compilation = CSharpCompilation.Create(
+            "DapperDirectValAssembly",
+            syntaxTrees,
+            CreateReferences(),
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var generator = new ValueObjectIncrementalGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+        var runDriver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+
+        diagnostics.Should().BeEmpty();
+        var code = runDriver.GetRunResult().GeneratedTrees.First().ToString();
+        code.Should().Contain("parameter.Value = value.Value;");
+    }
+
+    [Fact]
+    public void Generator_ShouldGeneratePersistenceHooksByDefault_WhenDapperAndEfCoreArePresent()
+    {
+        var dapperSource = """
+        namespace System.Data { public interface IDbDataParameter { object Value { get; set; } } }
+        namespace Dapper
+        {
+            public static class SqlMapper
+            {
+                public abstract class TypeHandler<T>
+                {
+                    public abstract void SetValue(global::System.Data.IDbDataParameter parameter, T value);
+                    public abstract T Parse(object value);
+                }
+            }
+        }
+        """;
+
+        var efCoreSource = """
+        namespace Microsoft.EntityFrameworkCore.Storage.ValueConversion
+        {
+            public class ValueConverter<TModel, TProvider>
+            {
+                public ValueConverter(
+                    global::System.Linq.Expressions.Expression<global::System.Func<TModel, TProvider>> convertToProviderExpression,
+                    global::System.Linq.Expressions.Expression<global::System.Func<TProvider, TModel>> convertFromProviderExpression) {}
+            }
+        }
+        """;
+
+        var userSource = """
+        namespace SampleDomain;
+        using EricksonLopez.ValueObjects;
+
+        [ValueObject]
+        public sealed partial record class DefaultHooksSku : StringValueObject<DefaultHooksSku>
+        {
+            private DefaultHooksSku(string value) : base(value) {}
+            public static EricksonLopez.Result.Result<DefaultHooksSku> Create(string value) => new(value);
+        }
+        """;
+
+        var syntaxTrees = new[]
+        {
+            CSharpSyntaxTree.ParseText(ValueObjectAttributeSource),
+            CSharpSyntaxTree.ParseText(BaseInterfacesSource),
+            CSharpSyntaxTree.ParseText(dapperSource),
+            CSharpSyntaxTree.ParseText(efCoreSource),
+            CSharpSyntaxTree.ParseText(userSource)
+        };
+
+        var compilation = CSharpCompilation.Create(
+            "DefaultHooksAssembly",
+            syntaxTrees,
+            CreateReferences(),
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var generator = new ValueObjectIncrementalGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+        var runDriver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diagnostics);
+
+        diagnostics.Should().BeEmpty();
+        var runResult = runDriver.GetRunResult();
+        var generated = runResult.GeneratedTrees.First().ToString();
+        generated.Should().Contain("DefaultHooksSkuDapperTypeHandler");
+        generated.Should().Contain("DefaultHooksSkuValueConverter");
+    }
+
+    [Fact]
+    public void Generator_ShouldProperlyDetectSpanCreate_OnlyWhenExactStaticSingleParameterMethodMatches()
+    {
+        // 1. Valid ReadOnlySpan Create method -> uses direct Create(s)
+        var validSpanSource = """
+        namespace TestDomain;
+        using EricksonLopez.ValueObjects;
+        using EricksonLopez.Result;
+
+        [ValueObject]
+        public readonly partial record struct ValidSpanVo
+        {
+            public static Result<ValidSpanVo> Create(string value) => Result.Success(new ValidSpanVo());
+            public static Result<ValidSpanVo> Create(System.ReadOnlySpan<char> value) => Result.Success(new ValidSpanVo());
+        }
+        """;
+
+        var (_, validTrees, validDiags) = RunGenerator(validSpanSource);
+        validDiags.Should().BeEmpty();
+        var validCode = validTrees.First().SourceText.ToString();
+        validCode.Should().Contain("var result = Create(s);");
+        validCode.Should().NotContain("var str = s.ToString();");
+
+        // 2. Non-static ReadOnlySpan Create method -> falls back to s.ToString()
+        var instanceSpanSource = """
+        namespace TestDomain;
+        using EricksonLopez.ValueObjects;
+        using EricksonLopez.Result;
+
+        [ValueObject]
+        public readonly partial record struct InstanceSpanVo
+        {
+            public static Result<InstanceSpanVo> Create(string value) => Result.Success(new InstanceSpanVo());
+            public Result<InstanceSpanVo> Create(System.ReadOnlySpan<char> value) => Result.Success(new InstanceSpanVo());
+        }
+        """;
+
+        var (_, instanceTrees, instanceDiags) = RunGenerator(instanceSpanSource);
+        instanceDiags.Should().BeEmpty();
+        var instanceCode = instanceTrees.First().SourceText.ToString();
+        instanceCode.Should().Contain("var str = s.ToString();");
+
+        // 3. Two-parameter ReadOnlySpan Create method -> falls back to s.ToString()
+        var twoParamSource = """
+        namespace TestDomain;
+        using EricksonLopez.ValueObjects;
+        using EricksonLopez.Result;
+
+        [ValueObject]
+        public readonly partial record struct TwoParamVo
+        {
+            public static Result<TwoParamVo> Create(string value) => Result.Success(new TwoParamVo());
+            public static Result<TwoParamVo> Create(System.ReadOnlySpan<char> value, int flags) => Result.Success(new TwoParamVo());
+        }
+        """;
+
+        var (_, twoParamTrees, twoParamDiags) = RunGenerator(twoParamSource);
+        twoParamDiags.Should().BeEmpty();
+        var twoParamCode = twoParamTrees.First().SourceText.ToString();
+        twoParamCode.Should().Contain("var str = s.ToString();");
+
+        // 4. Method not named Create -> falls back to s.ToString()
+        var otherNameSource = """
+        namespace TestDomain;
+        using EricksonLopez.ValueObjects;
+        using EricksonLopez.Result;
+
+        [ValueObject]
+        public readonly partial record struct OtherNameVo
+        {
+            public static Result<OtherNameVo> Create(string value) => Result.Success(new OtherNameVo());
+            public static Result<OtherNameVo> ParseSpan(System.ReadOnlySpan<char> value) => Result.Success(new OtherNameVo());
+        }
+        """;
+
+        var (_, otherTrees, otherDiags) = RunGenerator(otherNameSource);
+        otherDiags.Should().BeEmpty();
+        var otherCode = otherTrees.First().SourceText.ToString();
+        otherCode.Should().Contain("var str = s.ToString();");
+    }
+
+    [Fact]
+    public void Generator_ShouldNotDoublePrefixGlobal_WhenRawValueTypeNameAlreadyStartsWithGlobal()
+    {
+        var source = """
+        namespace TestDomain;
+        using EricksonLopez.ValueObjects;
+        using EricksonLopez.Result;
+
+        [ValueObject]
+        public sealed partial record class GuidWrapper : SingleValueObject<GuidWrapper, global::System.Guid>
+        {
+            public static Result<GuidWrapper> Create(global::System.Guid value) => Result.Success(new GuidWrapper(value));
+            private GuidWrapper(global::System.Guid value) : base(value) {}
+        }
+        """;
+
+        var (compilation, generatedTrees, diagnostics) = RunGenerator(source);
+        diagnostics.Should().BeEmpty();
+        var code = generatedTrees.First().SourceText.ToString();
+        code.Should().NotContain("global::global::");
+        code.Should().Contain("global::System.Guid.TryParse");
+    }
 }
+
 
 
 

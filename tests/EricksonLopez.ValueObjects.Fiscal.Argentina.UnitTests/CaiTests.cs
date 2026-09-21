@@ -90,6 +90,18 @@ public sealed class CaiTests
         (a == aCopy).Should().BeTrue();
         (a != b).Should().BeTrue();
     }
+
+    [Fact]
+    public void Cai_DefaultStruct_ExposesIsInitializedSafely()
+    {
+        Cai defaultCai = default;
+        defaultCai.IsInitialized.Should().BeFalse();
+        defaultCai.Code.Should().Be(string.Empty);
+        defaultCai.ToString().Should().Be(string.Empty);
+
+        var initialized = Cai.Create("12345678901234", new DateOnly(2026, 12, 31)).Value;
+        initialized.IsInitialized.Should().BeTrue();
+    }
 }
 
 

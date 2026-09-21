@@ -84,7 +84,7 @@ public readonly record struct SunatProductCode : ISpanParsable<SunatProductCode>
     /// <inheritdoc/>
     public int CompareTo(SunatProductCode other) => string.Compare(_code, other._code, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="SunatProductCode"/> is less than the right <see cref="SunatProductCode"/>.
     /// </summary>
     /// <param name="left">The first <see cref="SunatProductCode"/> to compare.</param>

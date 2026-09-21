@@ -112,7 +112,7 @@ public readonly record struct PaymentFormCode : ISpanParsable<PaymentFormCode>, 
     /// <inheritdoc/>
     public int CompareTo(PaymentFormCode other) => string.Compare(_code, other._code, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="PaymentFormCode"/> is less than the right <see cref="PaymentFormCode"/>.
     /// </summary>
     /// <param name="left">The first <see cref="PaymentFormCode"/> to compare.</param>

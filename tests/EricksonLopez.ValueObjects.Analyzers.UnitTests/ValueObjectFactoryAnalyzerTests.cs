@@ -247,7 +247,38 @@ public sealed class ValueObjectFactoryAnalyzerTests
         var diagnostics = await RoslynAnalyzerTestHelper.RunAnalyzerAsync(_analyzer, source, TestContext.Current.CancellationToken);
         diagnostics.Should().BeEmpty();
     }
+
+    [Fact]
+    public void Initialize_ConfiguresConcurrentExecutionAndGeneratedCode()
+    {
+        var context = new RoslynAnalyzerTestHelper.TrackingAnalysisContext();
+        _analyzer.Initialize(context);
+
+        context.ConcurrentExecutionEnabled.Should().BeTrue();
+        context.GeneratedCodeFlags.Should().Be(Microsoft.CodeAnalysis.Diagnostics.GeneratedCodeAnalysisFlags.None);
+        context.SymbolActionRegistered.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Analyze_WhenGenericInterfaceIValueObjectHasNoCreate_ReportsDiagnostic()
+    {
+        var source = """
+        namespace SampleNamespace;
+
+        public interface IValueObject<TSelf> {}
+
+        public sealed class GenericVo : IValueObject<GenericVo>
+        {
+            public string Value { get; }
+            private GenericVo(string value) => Value = value;
+        }
+        """;
+
+        var diagnostics = await RoslynAnalyzerTestHelper.RunAnalyzerAsync(_analyzer, source, TestContext.Current.CancellationToken);
+        diagnostics.Should().ContainSingle(d => d.Id == "ELVO002" && d.GetMessage().Contains("GenericVo"));
+    }
 }
+
 
 
 

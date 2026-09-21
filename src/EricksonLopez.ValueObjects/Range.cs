@@ -24,6 +24,17 @@ public readonly record struct Range<T> : IValueObject, IComparable<Range<T>>, IC
     /// </summary>
     public T End { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether this range is degenerate (i.e. <see cref="Start"/> equals <see cref="End"/>).
+    /// In an inclusive closed interval, a degenerate range contains exactly one point.
+    /// </summary>
+    public bool IsDegenerate => Start.CompareTo(End) == 0;
+
+    /// <summary>
+    /// Gets a value indicating whether this range has zero measure / is degenerate (<see cref="Start"/> equals <see cref="End"/>).
+    /// </summary>
+    public bool IsEmpty => IsDegenerate;
+
     private Range(T start, T end)
     {
         Start = start;
@@ -54,6 +65,14 @@ public readonly record struct Range<T> : IValueObject, IComparable<Range<T>>, IC
     /// <returns><see langword="true"/> if the value falls within the inclusive range boundaries; otherwise, <see langword="false"/>.</returns>
     public bool Contains(T value) =>
         value.CompareTo(Start) >= 0 && value.CompareTo(End) <= 0;
+
+    /// <summary>
+    /// Determines whether the specified value is strictly contained within the range, excluding the upper boundary [Start, End).
+    /// </summary>
+    /// <param name="value">The value to test for containment.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> falls within the half-open interval [Start, End); otherwise, <see langword="false"/>.</returns>
+    public bool ContainsHalfOpen(T value) =>
+        value.CompareTo(Start) >= 0 && value.CompareTo(End) < 0;
 
     /// <summary>
     /// Determines whether another range is entirely contained within this range.

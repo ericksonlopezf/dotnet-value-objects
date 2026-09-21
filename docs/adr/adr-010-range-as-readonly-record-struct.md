@@ -1,5 +1,11 @@
 # ADR-010: Range<T> as Zero-Allocation readonly record struct
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Core Abstractions & Mathematical Interval Types

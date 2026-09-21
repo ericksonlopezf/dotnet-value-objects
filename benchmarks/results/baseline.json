@@ -1,0 +1,269 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/master/docs/guide/reports.md",
+  "SchemaVersion": "1.0",
+  "GeneratedAt": "2026-09-08T00:00:00Z",
+  "Description": "Canonical zero-allocation and latency performance baseline for dotnet-value-objects",
+  "ZeroAllocPattern": "^(Bind|Map|Tap|ValidateAll|Success|Failure|ZeroAlloc|Span|Stackalloc|TryFormat|.*_TState.*)",
+  "Benchmarks": {
+    "Parse_TenantCode_ValidObject": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Parse_TenantCode_Null": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Parse_Percentage_String": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Parse_Percentage_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "TryParse_Percentage_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Parse_Cuit_String": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Parse_Cuit_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Parse_Cuit_Utf8": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "TryParse_Cuit_Utf8": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Parse_Cbu_String": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Parse_Cbu_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Parse_Cbu_Utf8": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Parse_Money_String": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Parse_Money_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "TryParse_Money_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "TryFormat_Money_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Parse_DateRange_String": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Parse_DateRange_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "TryParse_DateRange_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Parse_TimeRange_String": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Parse_TimeRange_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "TryParse_TimeRange_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Parse_GeoCoordinate_String": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Parse_GeoCoordinate_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "TryParse_GeoCoordinate_Span": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Serialize_TenantCode": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Deserialize_TenantCode": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Serialize_CompanyName": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Deserialize_CompanyName": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Serialize_Range": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Deserialize_Range": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Create_Class": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Create_RecordClass": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Create_Struct": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Create_RecordStruct": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Domain_Create_Email": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Domain_Create_Money": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Domain_Create_Percentage": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Equals_Class": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Equals_RecordClass": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Equals_Struct": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Equals_RecordStruct": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Domain_Equals_Money": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "HashCode_Class": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "HashCode_RecordClass": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "HashCode_Struct": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "HashCode_RecordStruct": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "DictionaryLookup_RecordClass": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "DictionaryLookup_RecordStruct": {
+      "MeanNs": 25.0,
+      "AllocatedBytes": 0,
+      "ZeroAlloc": true
+    },
+    "Domain_Money_Add": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Domain_Money_ApplyTax": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    },
+    "Domain_Parse_BusinessDate": {
+      "MeanNs": 150.0,
+      "AllocatedBytes": 32,
+      "ZeroAlloc": false
+    }
+  }
+}

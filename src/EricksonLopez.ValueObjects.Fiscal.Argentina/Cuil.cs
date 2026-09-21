@@ -29,6 +29,11 @@ public readonly record struct Cuil : ISpanParsable<Cuil>, IUtf8SpanParsable<Cuil
     public Cuit AsCuit => _cuit;
 
     /// <summary>
+    /// Gets a value indicating whether this instance has been explicitly initialized and does not represent the default struct state.
+    /// </summary>
+    public bool IsInitialized => _cuit.IsInitialized;
+
+    /// <summary>
     /// Creates a validated <see cref="Cuil"/> from an 11-digit raw string or formatted <c>XX-XXXXXXXX-X</c>.
     /// </summary>
     /// <param name="value">The raw or formatted 11-digit CUIL string.</param>
@@ -69,7 +74,7 @@ public readonly record struct Cuil : ISpanParsable<Cuil>, IUtf8SpanParsable<Cuil
     /// <inheritdoc/>
     public int CompareTo(Cuil other) => _cuit.CompareTo(other._cuit);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="Cuil"/> is less than the right <see cref="Cuil"/>.
     /// </summary>
     /// <param name="left">The first <see cref="Cuil"/> to compare.</param>
@@ -128,8 +133,14 @@ public readonly record struct Cuil : ISpanParsable<Cuil>, IUtf8SpanParsable<Cuil
     /// <inheritdoc/>
     public static bool TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Cuil result)
     {
-        Span<char> chars = stackalloc char[utf8Text.Length];
-        Encoding.UTF8.TryGetChars(utf8Text, chars, out int written);
+        if (utf8Text.Length > 64)
+        {
+            result = default;
+            return false;
+        }
+
+        Span<char> chars = stackalloc char[64];
+        int written = Encoding.UTF8.GetChars(utf8Text, chars);
         return TryParse(chars[..written], provider, out result);
     }
 }

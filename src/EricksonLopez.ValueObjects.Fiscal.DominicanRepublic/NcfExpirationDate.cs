@@ -1,4 +1,4 @@
-﻿// Copyright © Erickson Lopez. MIT License.
+// Copyright © Erickson Lopez. MIT License.
 using System;
 using System.Globalization;
 using EricksonLopez.Result;
@@ -53,7 +53,7 @@ public readonly record struct NcfExpirationDate : IValueObject<NcfExpirationDate
     public int CompareTo(object? obj) =>
         obj is NcfExpirationDate other ? CompareTo(other) : throw new ArgumentException("Object is not an NcfExpirationDate", nameof(obj));
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="NcfExpirationDate"/> is less than the right <see cref="NcfExpirationDate"/>.
     /// </summary>
     /// <param name="left">The first <see cref="NcfExpirationDate"/> to compare.</param>

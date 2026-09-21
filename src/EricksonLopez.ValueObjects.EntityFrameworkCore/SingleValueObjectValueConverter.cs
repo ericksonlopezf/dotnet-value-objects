@@ -44,17 +44,23 @@ public class SingleValueObjectValueConverter<[DynamicallyAccessedMembers(Dynamic
         var method = typeof(TVO).GetMethod("Create", BindingFlags.Public | BindingFlags.Static, [typeof(TValue)]);
         if (method != null)
         {
-            return val =>
+            if (method.ReturnType == typeof(Result<TVO>))
             {
-                var res = method.Invoke(null, [val]);
-                if (res is Result<TVO> r)
+                var createDelegate = (Func<TValue, Result<TVO>>)Delegate.CreateDelegate(typeof(Func<TValue, Result<TVO>>), method);
+                return val =>
                 {
+                    var r = createDelegate(val);
                     if (r.IsSuccess) return r.Value;
                     throw new InvalidOperationException($"Cannot convert '{val}' to '{typeof(TVO).Name}': {r.Error.Description}");
-                }
-                if (res is TVO direct) return direct;
-                throw new InvalidOperationException($"Unexpected result from factory method 'Create' on '{typeof(TVO).Name}'.");
-            };
+                };
+            }
+
+            if (method.ReturnType == typeof(TVO))
+            {
+                return (Func<TValue, TVO>)Delegate.CreateDelegate(typeof(Func<TValue, TVO>), method);
+            }
+
+            return _ => throw new InvalidOperationException($"Unexpected result from factory method 'Create' on '{typeof(TVO).Name}'.");
         }
 
         var ctor = typeof(TVO).GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, [typeof(TValue)], null);
