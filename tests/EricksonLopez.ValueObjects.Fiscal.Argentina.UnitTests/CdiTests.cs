@@ -94,6 +94,20 @@ public sealed class CdiTests
             (x, y) => x > y,
             (x, y) => x >= y);
     }
+
+    [Fact]
+    public void Cdi_DefaultStruct_ExposesIsInitializedSafely()
+    {
+        Cdi defaultCdi = default;
+        defaultCdi.IsInitialized.Should().BeFalse();
+        defaultCdi.Value.Should().Be(string.Empty);
+        defaultCdi.Formatted.Should().Be(string.Empty);
+        defaultCdi.ToString().Should().Be(string.Empty);
+        defaultCdi.CompareTo(defaultCdi).Should().Be(0);
+
+        var initialized = Cdi.Create("99-12345678-1").Value;
+        initialized.IsInitialized.Should().BeTrue();
+    }
 }
 
 

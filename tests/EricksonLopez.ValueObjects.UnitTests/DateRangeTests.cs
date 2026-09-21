@@ -87,6 +87,65 @@ public sealed class DateRangeTests
 
         range1.ShouldSatisfyEqualityContract(range1Copy, range2, (a, b) => a == b, (a, b) => a != b);
     }
+
+    [Fact]
+    public void Parse_And_TryParse_HandleValidAndInvalidInputs()
+    {
+        var dr = DateRange.Parse("[2026-01-01 .. 2026-01-10]");
+        dr.Start.Should().Be(new DateOnly(2026, 1, 1));
+        dr.End.Should().Be(new DateOnly(2026, 1, 10));
+
+        var drSpan = DateRange.Parse("[2026-01-01 .. 2026-01-10]".AsSpan());
+        drSpan.Start.Should().Be(new DateOnly(2026, 1, 1));
+
+        DateRange.TryParse("[2026-01-01 .. 2026-01-10]", null, out var parsed).Should().BeTrue();
+        parsed.Start.Should().Be(new DateOnly(2026, 1, 1));
+
+        DateRange.TryParse("invalid", null, out _).Should().BeFalse();
+        DateRange.TryParse("[invalid .. 2026-01-10]", null, out _).Should().BeFalse();
+        DateRange.TryParse("[2026-01-01 .. invalid]", null, out _).Should().BeFalse();
+
+        DateRange.TryParse("2026-01-10..2026-01-01", null, out _).Should().BeFalse();
+        DateRange.TryParse("[2026-01-01..2026-01-10", null, out _).Should().BeFalse();
+
+        Action actInvalid = () => DateRange.Parse("invalid");
+        actInvalid.Should().Throw<FormatException>();
+
+        Action actInvalidSpan = () => DateRange.Parse("invalid".AsSpan());
+        actInvalidSpan.Should().Throw<FormatException>();
+    }
+
+    [Fact]
+    public void Comparison_And_Operators_WorkCorrectly()
+    {
+        var dr1 = DateRange.Create(new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 10)).Value;
+        var dr2 = DateRange.Create(new DateOnly(2026, 1, 1), new DateOnly(2026, 1, 20)).Value;
+        var dr3 = DateRange.Create(new DateOnly(2026, 2, 1), new DateOnly(2026, 2, 10)).Value;
+
+        // Start equal, End differs
+        dr1.CompareTo(dr2).Should().BeLessThan(0);
+        dr2.CompareTo(dr1).Should().BeGreaterThan(0);
+
+        // Start differs
+        dr1.CompareTo(dr3).Should().BeLessThan(0);
+        dr3.CompareTo(dr1).Should().BeGreaterThan(0);
+
+        // Object comparison
+        dr1.CompareTo((object)dr2).Should().BeLessThan(0);
+        Action actBadObj = () => dr1.CompareTo("not a daterange");
+        actBadObj.Should().Throw<ArgumentException>();
+
+        // Operators
+        var dr1Copy = DateRange.Create(dr1.Start, dr1.End).Value;
+        (dr1 < dr2).Should().BeTrue();
+        (dr1 <= dr2).Should().BeTrue();
+        (dr1 <= dr1Copy).Should().BeTrue();
+        (dr2 > dr1).Should().BeTrue();
+        (dr2 >= dr1).Should().BeTrue();
+        (dr1 >= dr1Copy).Should().BeTrue();
+        (dr2 < dr1).Should().BeFalse();
+        (dr1 > dr2).Should().BeFalse();
+    }
 }
 
 

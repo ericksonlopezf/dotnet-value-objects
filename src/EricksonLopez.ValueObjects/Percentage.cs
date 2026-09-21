@@ -8,6 +8,13 @@ namespace EricksonLopez.ValueObjects;
 /// <summary>
 /// Represents a bounded percentage value between 0 and 100 inclusive.
 /// </summary>
+/// <remarks>
+/// <para>
+/// <b>Caution on Value Type Defaults:</b> As a value type (<c>readonly record struct</c>), C# permits
+/// uninitialized instances via <c>default(Percentage)</c>. While its value is 0%, always favor explicit creation
+/// via <see cref="Create(decimal)"/>, <see cref="FromFraction(decimal)"/>, or <see cref="Zero"/> to express intent.
+/// </para>
+/// </remarks>
 public readonly record struct Percentage : IValueObject<Percentage>, IComparable<Percentage>, IComparable, IParsable<Percentage>, ISpanParsable<Percentage>, IFormattable, ISpanFormattable
 {
     /// <summary>
@@ -154,16 +161,21 @@ public readonly record struct Percentage : IValueObject<Percentage>, IComparable
     /// <inheritdoc/>
     public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
     {
-        string formatted = ToString(format.ToString(), provider);
-        if (formatted.Length <= destination.Length)
+        if (!Value.TryFormat(destination, out int valChars, format, provider ?? CultureInfo.InvariantCulture))
         {
-            formatted.AsSpan().CopyTo(destination);
-            charsWritten = formatted.Length;
-            return true;
+            charsWritten = 0;
+            return false;
         }
 
-        charsWritten = 0;
-        return false;
+        if (destination.Length < valChars + 1)
+        {
+            charsWritten = 0;
+            return false;
+        }
+
+        destination[valChars] = '%';
+        charsWritten = valChars + 1;
+        return true;
     }
 
     /// <summary>

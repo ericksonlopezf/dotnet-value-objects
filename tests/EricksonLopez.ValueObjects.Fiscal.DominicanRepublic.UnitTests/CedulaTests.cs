@@ -62,6 +62,15 @@ public sealed class CedulaTests
         (a != c).Should().BeTrue();
         a.ToString().Should().Be("00112345673");
     }
+
+    [Fact]
+    public void Create_HugePayload_DoesNotCauseStackOverflow_AndReturnsInvalidLength()
+    {
+        string hugeString = new string('1', 500_000);
+        var result = Cedula.Create(hugeString);
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Cedula.InvalidLength");
+    }
 }
 
 

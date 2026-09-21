@@ -122,8 +122,8 @@ public static class Level07_ZeroAllocationAot
 
         for (int i = 0; i < 1_000; i++)
         {
-            var m1  = Money.Create(100m, "USD").Value;
-            var m2  = Money.Create(50m, "USD").Value;
+            var m1 = Money.Create(100m, "USD").Value;
+            var m2 = Money.Create(50m, "USD").Value;
             var sum = m1 + m2;
             _ = sum.Amount;
         }
@@ -144,7 +144,7 @@ public static class Level07_ZeroAllocationAot
 
         Parallel.For(0, iterations, _ =>
         {
-            var split     = baseMoney.Allocate(50, 30, 20);
+            var split = baseMoney.Allocate(50, 30, 20);
             var itemTotal = split[0].Amount + split[1].Amount + split[2].Amount;
             lock (syncLock) { totalAccumulator += itemTotal; }
         });

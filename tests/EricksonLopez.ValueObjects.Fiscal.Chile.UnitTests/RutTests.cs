@@ -253,6 +253,33 @@ public sealed class RutTests
             (x, y) => x > y,
             (x, y) => x >= y);
     }
+
+    [Fact]
+    public void Rut_DefaultStruct_ExposesIsInitializedSafely()
+    {
+        Rut defaultRut = default;
+        defaultRut.IsInitialized.Should().BeFalse();
+        defaultRut.ToCanonicalString().Should().Be(string.Empty);
+        defaultRut.ToFormattedString().Should().Be(string.Empty);
+        defaultRut.ToString().Should().Be(string.Empty);
+
+        var initialized = Rut.Create(76192083).Value;
+        initialized.IsInitialized.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Utf8Parsing_WorksCorrectly()
+    {
+        var rut = Rut.Parse("76192083-9"u8);
+        rut.IsInitialized.Should().BeTrue();
+        Rut.TryParse("76192083-9"u8, null, out var parsed).Should().BeTrue();
+        parsed.IsInitialized.Should().BeTrue();
+        Rut.TryParse("invalid"u8, null, out _).Should().BeFalse();
+        Rut.TryParse(new byte[100], null, out _).Should().BeFalse();
+
+        Action actInvalid = () => Rut.Parse("invalid"u8);
+        actInvalid.Should().Throw<FormatException>();
+    }
 }
 
 

@@ -178,7 +178,20 @@ public sealed class ValueObjectImmutabilityAnalyzerTests
         var diagnostics = await RoslynAnalyzerTestHelper.RunAnalyzerAsync(_analyzer, source, TestContext.Current.CancellationToken);
         diagnostics.Should().ContainSingle(d => d.Id == "ELVO003" && d.GetMessage().Contains("MutableCounter"));
     }
+
+    [Fact]
+    public void Initialize_ConfiguresConcurrentExecutionAndGeneratedCode()
+    {
+        var context = new RoslynAnalyzerTestHelper.TrackingAnalysisContext();
+        _analyzer.Initialize(context);
+
+        context.ConcurrentExecutionEnabled.Should().BeTrue();
+        context.GeneratedCodeFlags.Should().Be(Microsoft.CodeAnalysis.Diagnostics.GeneratedCodeAnalysisFlags.None);
+        context.SymbolActionRegistered.Should().BeTrue();
+    }
 }
+
+
 
 
 

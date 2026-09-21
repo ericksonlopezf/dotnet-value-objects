@@ -119,7 +119,7 @@ public readonly record struct VatRate : ISpanParsable<VatRate>, IComparable<VatR
     /// <inheritdoc/>
     public int CompareTo(VatRate other) => _percentage.CompareTo(other._percentage);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="VatRate"/> is less than the right <see cref="VatRate"/>.
     /// </summary>
     /// <param name="left">The first <see cref="VatRate"/> to compare.</param>

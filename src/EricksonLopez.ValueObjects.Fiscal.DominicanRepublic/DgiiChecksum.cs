@@ -36,14 +36,19 @@ public static class DgiiChecksum
         }
 
         int remainder = sum % 11;
-        int expectedCheckDigit = remainder switch
-        {
-            0 => 2,
-            1 => 1,
-            _ => 11 - remainder
-        };
+        int checkDigit = digits[8] - '0';
 
-        return (digits[8] - '0') == expectedCheckDigit;
+        if (remainder == 0)
+        {
+            return checkDigit is 0 or 2;
+        }
+
+        if (remainder == 1)
+        {
+            return checkDigit == 1;
+        }
+
+        return checkDigit == (11 - remainder);
     }
 }
 

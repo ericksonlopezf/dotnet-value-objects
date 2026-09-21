@@ -3,7 +3,7 @@ name: Bug Report
 about: Create a report to help us improve EricksonLopez.ValueObjects
 title: '[BUG] '
 labels: 'bug'
-assignees: 'ericksonlopez'
+assignees: 'ericksonlopezf'
 ---
 
 ## Description
@@ -16,9 +16,9 @@ assignees: 'ericksonlopez'
 
 ## Environment Information
 
-- **.NET SDK Version**: (e.g., 10.0.100)
+- **.NET SDK Version**: (e.g., 10.0.401)
 - **OS**: (e.g., Windows 11, Ubuntu 24.04, macOS Sonoma)
-- **Package Version**: (e.g., 1.0.0)
+- **Package Version**: (e.g., 2.0.0)
 - **Native AOT**: [Yes / No]
 
 ## Steps to Reproduce

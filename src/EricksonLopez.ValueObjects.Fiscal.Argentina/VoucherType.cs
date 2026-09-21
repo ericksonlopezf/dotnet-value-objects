@@ -141,7 +141,7 @@ public readonly record struct VoucherType : ISpanParsable<VoucherType>, ICompara
     /// <inheritdoc/>
     public int CompareTo(VoucherType other) => _code.CompareTo(other._code);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="VoucherType"/> is less than the right <see cref="VoucherType"/>.
     /// </summary>
     /// <param name="left">The first <see cref="VoucherType"/> to compare.</param>

@@ -89,7 +89,7 @@ public readonly record struct VoucherLetter : ISpanParsable<VoucherLetter>, ICom
     /// <inheritdoc/>
     public int CompareTo(VoucherLetter other) => _letter.CompareTo(other._letter);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="VoucherLetter"/> is less than the right <see cref="VoucherLetter"/>.
     /// </summary>
     /// <param name="left">The first <see cref="VoucherLetter"/> to compare.</param>

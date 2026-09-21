@@ -23,17 +23,17 @@ public readonly record struct Curp : ISpanParsable<Curp>, IComparable<Curp>
     /// <summary>
     /// Gets the 18-character uppercase CURP string.
     /// </summary>
-    public string Value => _value;
+    public string Value => _value ?? string.Empty;
 
     /// <summary>
     /// Gets the 2-character federal entity state code (positions 12-13).
     /// </summary>
-    public string StateCode => _value.Substring(11, 2);
+    public string StateCode => _value is not null ? _value.Substring(11, 2) : string.Empty;
 
     /// <summary>
     /// Gets the gender character ('H' for Hombre, 'M' for Mujer, 'X' for No Binario, position 11).
     /// </summary>
-    public char Gender => _value[10];
+    public char Gender => _value is not null ? _value[10] : '\0';
 
     /// <summary>
     /// Creates a validated <see cref="Curp"/> from an 18-character string.
@@ -92,12 +92,12 @@ public readonly record struct Curp : ISpanParsable<Curp>, IComparable<Curp>
     }
 
     /// <inheritdoc/>
-    public override string ToString() => _value;
+    public override string ToString() => _value ?? string.Empty;
 
     /// <inheritdoc/>
-    public int CompareTo(Curp other) => string.Compare(_value, other._value, StringComparison.Ordinal);
+    public int CompareTo(Curp other) => string.Compare(_value ?? string.Empty, other._value ?? string.Empty, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="Curp"/> is less than the right <see cref="Curp"/>.
     /// </summary>
     /// <param name="left">The first <see cref="Curp"/> to compare.</param>

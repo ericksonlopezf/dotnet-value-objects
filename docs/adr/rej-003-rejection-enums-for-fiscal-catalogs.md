@@ -1,5 +1,11 @@
 # REJ-003: Rejection of Closed Enums for Government Catalogs
 
+## Status
+Rejected
+
+## Date
+2026-08-16
+
 - **Status:** Rejected
 - **Date:** 2026-08-16
 - **Original Proposal:** Declare government catalogs (SAT CFDI products, SUNAT catalogs, DIAN tax codes) as static C# `enum` types.

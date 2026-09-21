@@ -65,6 +65,15 @@ public sealed class RncTests
         (a != c).Should().BeTrue();
         a.ToString().Should().Be("131880738");
     }
+
+    [Fact]
+    public void Create_HugePayload_DoesNotCauseStackOverflow_AndReturnsValidationFailure()
+    {
+        string hugeString = new string('1', 500_000);
+        var result = Rnc.Create(hugeString);
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Rnc.InvalidLength");
+    }
 }
 
 

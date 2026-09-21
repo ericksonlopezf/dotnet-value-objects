@@ -3,7 +3,7 @@ name: Feature Request
 about: Suggest an idea or new Value Object for this framework
 title: '[FEATURE] '
 labels: 'enhancement'
-assignees: 'ericksonlopez'
+assignees: 'ericksonlopezf'
 ---
 
 ## Feature Summary

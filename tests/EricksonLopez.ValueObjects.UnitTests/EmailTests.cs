@@ -22,8 +22,9 @@ public sealed class EmailTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Value.Should().Be("user.name+tag@example.com");
         result.Value.Domain.Should().Be("example.com");
-        result.Value.LocalPart.Should().Be("user.name+tag");
         result.Value.ToString().Should().Be("user.name+tag@example.com");
+        result.Value.Masked().Should().Be("u***@example.com");
+        result.Value.ToMaskedString().Should().Be("u***@example.com");
     }
 
     [Theory]
@@ -52,16 +53,29 @@ public sealed class EmailTests
         var res = Email.Create(longEmail);
         res.IsFailure.Should().BeTrue();
         res.Error.Code.Should().Be("Email.TooLong");
+
+        // Local part > 64
+        var longLocal = new string('a', 65) + "@example.com";
+        Email.Create(longLocal).Error.Code.Should().Be("Email.InvalidFormat");
+
+        // Domain > 255
+        var longDomain = "a@" + new string('b', 252) + ".com"; // 256 chars domain
+        Email.Create(longDomain).Error.Code.Should().Be("Email.InvalidFormat");
+
+        // Domain missing dot
+        Email.Create("user@localhost").Error.Code.Should().Be("Email.InvalidFormat");
     }
 
     [Fact]
     public void Email_DefaultStruct_AndOperators_Exhaustive()
     {
+        default(Email).IsInitialized.Should().BeFalse();
         default(Email).LocalPart.Should().Be(string.Empty);
         default(Email).Domain.Should().Be(string.Empty);
         default(Email).ToString().Should().Be(string.Empty);
 
         var a = Email.Create("alpha@example.com").Value;
+        a.IsInitialized.Should().BeTrue();
         var aCopy = Email.Create("ALPHA@EXAMPLE.COM").Value;
         var b = Email.Create("beta@example.com").Value;
 

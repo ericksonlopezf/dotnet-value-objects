@@ -22,7 +22,7 @@ namespace EricksonLopez.ValueObjects;
 /// </typeparam>
 /// <typeparam name="TValue">The underlying primitive or complex value type.</typeparam>
 [System.Diagnostics.DebuggerDisplay("{" + nameof(ToString) + "()}")]
-public abstract record SingleValueObject<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TSelf, TValue> : IValueObject, IComparable<TSelf>, IComparable
+public abstract record SingleValueObject<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TSelf, TValue> : IValueObject<TSelf>, IComparable<TSelf>, IComparable
     where TSelf : SingleValueObject<TSelf, TValue>
     where TValue : notnull
 {

@@ -34,6 +34,11 @@ public readonly record struct Rut : ISpanParsable<Rut>, IUtf8SpanParsable<Rut>, 
     public int Body => _body;
 
     /// <summary>
+    /// Gets a value indicating whether this instance has been explicitly initialized and does not represent the default struct state.
+    /// </summary>
+    public bool IsInitialized => _body > 0;
+
+    /// <summary>
     /// Gets the uppercase verification check digit (DV, '0'-'9' or 'K').
     /// </summary>
     public char Dv => _dv;
@@ -175,12 +180,12 @@ public readonly record struct Rut : ISpanParsable<Rut>, IUtf8SpanParsable<Rut>, 
     /// <summary>
     /// Formats the RUT in canonical format without dots: <c>12345678-K</c>.
     /// </summary>
-    public string ToCanonicalString() => $"{_body.ToString(CultureInfo.InvariantCulture)}-{_dv}";
+    public string ToCanonicalString() => _body > 0 ? $"{_body.ToString(CultureInfo.InvariantCulture)}-{_dv}" : string.Empty;
 
     /// <summary>
     /// Formats the RUT with thousands separators: <c>12.345.678-K</c>.
     /// </summary>
-    public string ToFormattedString() => $"{_body.ToString("N0", new CultureInfo("es-CL"))}-{_dv}";
+    public string ToFormattedString() => _body > 0 ? $"{_body.ToString("N0", new CultureInfo("es-CL"))}-{_dv}" : string.Empty;
 
     /// <inheritdoc/>
     public override string ToString() => ToCanonicalString();
@@ -188,7 +193,7 @@ public readonly record struct Rut : ISpanParsable<Rut>, IUtf8SpanParsable<Rut>, 
     /// <inheritdoc/>
     public int CompareTo(Rut other) => _body.CompareTo(other._body);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="Rut"/> is less than the right <see cref="Rut"/>.
     /// </summary>
     /// <param name="left">The first <see cref="Rut"/> to compare.</param>
@@ -247,8 +252,14 @@ public readonly record struct Rut : ISpanParsable<Rut>, IUtf8SpanParsable<Rut>, 
     /// <inheritdoc/>
     public static bool TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Rut result)
     {
-        Span<char> chars = stackalloc char[utf8Text.Length];
-        Encoding.UTF8.TryGetChars(utf8Text, chars, out int written);
+        if (utf8Text.Length > 64)
+        {
+            result = default;
+            return false;
+        }
+
+        Span<char> chars = stackalloc char[64];
+        int written = Encoding.UTF8.GetChars(utf8Text, chars);
         return TryParse(chars[..written], provider, out result);
     }
 }

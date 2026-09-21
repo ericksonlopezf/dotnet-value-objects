@@ -9,7 +9,7 @@
     <IsTrimmable>false</IsTrimmable>
     <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
     <Description>Roslyn Incremental Source Generator for EricksonLopez.ValueObjects boilerplate-free creation.</Description>
-    <PackageTags>$(CommonPackageTags);roslyn;source-generator;incremental-generator;code-generation;boilerplate</PackageTags>
+    <PackageTags>$(CommonPackageTags);roslyn;source-generator;source-generators;incremental-generator;code-generation;metaprogramming</PackageTags>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
@@ -23,9 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>EricksonLopez.ValueObjects.Generators.UnitTests</_Parameter1>
-    </AssemblyAttribute>
+    <InternalsVisibleTo Include="EricksonLopez.ValueObjects.Generators.UnitTests" />
   </ItemGroup>
 
   <ItemGroup>

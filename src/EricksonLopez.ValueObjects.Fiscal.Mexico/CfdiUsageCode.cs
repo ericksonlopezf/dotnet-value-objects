@@ -107,7 +107,7 @@ public readonly record struct CfdiUsageCode : ISpanParsable<CfdiUsageCode>, ICom
     /// <inheritdoc/>
     public int CompareTo(CfdiUsageCode other) => string.Compare(_code, other._code, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="CfdiUsageCode"/> is less than the right <see cref="CfdiUsageCode"/>.
     /// </summary>
     /// <param name="left">The first <see cref="CfdiUsageCode"/> to compare.</param>

@@ -1,5 +1,11 @@
 # ADR-005: Decoupling of Fiscal Persistence Adapters
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Entity Framework Core & Dapper Persistence

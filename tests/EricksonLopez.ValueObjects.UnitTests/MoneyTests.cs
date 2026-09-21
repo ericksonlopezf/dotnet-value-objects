@@ -112,6 +112,22 @@ public sealed class MoneyTests
     }
 
     [Fact]
+    public void ToString_WhenCurrencyHasZeroDecimals_FormatsWithoutDecimals()
+    {
+        var jpy = CurrencyCode.JPY;
+        var money = Money.Create(100m, jpy, 0).Value;
+        money.ToString().Should().Be("100 JPY");
+    }
+
+    [Fact]
+    public void ToString_WhenCurrencyHasThreeDecimals_FormatsWithThreeDecimals()
+    {
+        var bhd = CurrencyCode.BHD;
+        var money = Money.Create(10.500m, bhd, 3).Value;
+        money.ToString().Should().Be("10.500 BHD");
+    }
+
+    [Fact]
     public void Zero_WhenCurrencyProvided_ReturnsZeroInstance()
     {
         var zero = Money.Zero(CurrencyCode.USD);
@@ -260,6 +276,16 @@ public sealed class MoneyTests
         Action invalidRatio = () => money.Allocate(0, 1);
         invalidRatio.Should().Throw<ArgumentException>()
             .WithMessage("*Ratios must be strictly positive.*");
+    }
+
+    [Fact]
+    public void Allocate_WithNegativeAmount_ConservesTotalSum()
+    {
+        var money = Money.Create(-100.00m, CurrencyCode.USD).Value;
+        var parts = money.Allocate(1, 1, 1);
+
+        parts.Should().HaveCount(3);
+        parts.Sum(p => p.Amount).Should().Be(-100.00m);
     }
 
     [Fact]
@@ -412,6 +438,158 @@ public sealed class MoneyTests
         Action act = () => total.Distribute(0);
         act.Should().Throw<DomainException>()
             .WithMessage("Cannot distribute Money into 0 parts.");
+    }
+
+    [Fact]
+    public void DefaultMoney_ToStringAndTryFormat_FormatsWithoutTrailingSpace()
+    {
+        var def = default(Money);
+        def.ToString().Should().Be("0.00");
+        def.ToString(null, null).Should().Be("0.00");
+
+        Span<char> buffer = stackalloc char[32];
+        def.TryFormat(buffer, out int charsWritten, default, CultureInfo.InvariantCulture).Should().BeTrue();
+        buffer[..charsWritten].ToString().Should().Be("0.00");
+    }
+
+    [Fact]
+    public void DefaultMoney_Operations_FailsOrThrowsForUninitializedCurrency()
+    {
+        var def = default(Money);
+        var validUsd = Money.Create(10m, CurrencyCode.USD).Value;
+
+        def.Add(validUsd).IsFailure.Should().BeTrue();
+        def.Add(validUsd).Error.Code.Should().Be("Money.UninitializedCurrency");
+
+        def.Subtract(validUsd).IsFailure.Should().BeTrue();
+        def.Subtract(validUsd).Error.Code.Should().Be("Money.UninitializedCurrency");
+
+        Action addOp = () => { var _ = def + validUsd; };
+        addOp.Should().Throw<DomainException>()
+            .WithMessage("Cannot operate on Money with uninitialized currency.");
+
+        Action subOp = () => { var _ = def - validUsd; };
+        subOp.Should().Throw<DomainException>()
+            .WithMessage("Cannot operate on Money with uninitialized currency.");
+
+        Action cmpOp = () => def.IsGreaterThan(validUsd);
+        cmpOp.Should().Throw<DomainException>()
+            .WithMessage("Cannot operate on Money with uninitialized currency.");
+    }
+
+    [Fact]
+    public void Arithmetic_WhenResultExceedsMaxAbsoluteAmount_FailsOrThrows()
+    {
+        var large = Money.Create(999_999_999_999_999m, CurrencyCode.USD).Value;
+        var small = Money.Create(2m, CurrencyCode.USD).Value;
+
+        var addResult = large.Add(large);
+        addResult.IsFailure.Should().BeTrue();
+        addResult.Error.Code.Should().Be("Money.AmountOutOfRange");
+
+        Action addOp = () => { var _ = large + large; };
+        addOp.Should().Throw<DomainException>()
+            .WithMessage("Money amount is outside the supported range.");
+
+        var negLarge = Money.Create(-999_999_999_999_999m, CurrencyCode.USD).Value;
+        var subResult = negLarge.Subtract(large);
+        subResult.IsFailure.Should().BeTrue();
+        subResult.Error.Code.Should().Be("Money.AmountOutOfRange");
+
+        Action multOp = () => large.Multiply(2m);
+        multOp.Should().Throw<DomainException>()
+            .WithMessage("Money amount is outside the supported range.");
+    }
+
+    [Fact]
+    public void IsInitialized_WhenCreatedViaFactory_ReturnsTrue()
+    {
+        var money = Money.Create(100m, CurrencyCode.USD).Value;
+        money.IsInitialized.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsInitialized_WhenDefaultStruct_ReturnsFalse()
+    {
+        var money = default(Money);
+        money.IsInitialized.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Distribute_LargeParts_AllocatesSuccessfully()
+    {
+        var money = Money.Create(1000m, CurrencyCode.USD).Value;
+        var parts = money.Distribute(150);
+        parts.Length.Should().Be(150);
+        parts.Sum(p => p.Amount).Should().Be(1000m);
+    }
+
+    [Fact]
+    public void TryApplyPercentage_UninitializedCurrency_ReturnsFailure()
+    {
+        var uninit = default(Money);
+        var pct = Percentage.Create(50m).Value;
+        var result = uninit.TryApplyPercentage(pct);
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Money.UninitializedCurrency");
+    }
+
+    [Fact]
+    public void Parsing_EdgeCases_Covered()
+    {
+        Money.TryParse(null, null, out _).Should().BeFalse();
+        Money.TryParse("   ".AsSpan(), null, out _).Should().BeFalse();
+
+        var parsedSpan = Money.Parse("100.50 USD".AsSpan());
+        parsedSpan.Amount.Should().Be(100.50m);
+        parsedSpan.Currency.Should().Be(CurrencyCode.USD);
+
+        Action act = () => Money.Parse("INVALID".AsSpan());
+        act.Should().Throw<FormatException>();
+
+        Money.TryParse("USD 100.50", null, out var parsedReverse).Should().BeTrue();
+        parsedReverse.Amount.Should().Be(100.50m);
+        parsedReverse.Currency.Should().Be(CurrencyCode.USD);
+
+        Money.TryParse("USD INVALID_AMT", null, out _).Should().BeFalse();
+        Money.TryParse("INVALID_AMT USD", null, out _).Should().BeFalse();
+        Money.TryParse("USD 999999999999999999999999999999", null, out _).Should().BeFalse();
+        Money.TryParse("999999999999999999999999999999 USD", null, out _).Should().BeFalse();
+    }
+
+    [Fact]
+    public void TryMultiply_OverflowAndRange_ReturnsFailure()
+    {
+        var money = Money.Create(1000m, CurrencyCode.USD).Value;
+        var overflowResult = money.TryMultiply(decimal.MaxValue);
+        overflowResult.IsFailure.Should().BeTrue();
+        overflowResult.Error.Code.Should().Be("Money.AmountOutOfRange");
+
+        var outOfRangeResult = money.TryMultiply(1_000_000_000_000_000m);
+        outOfRangeResult.IsFailure.Should().BeTrue();
+        outOfRangeResult.Error.Code.Should().Be("Money.AmountOutOfRange");
+    }
+
+    [Fact]
+    public void TryFormat_SupportsDifferentCurrencyDecimalPlaces()
+    {
+        Span<char> dest = stackalloc char[32];
+
+        var jpy = Money.Create(1000m, CurrencyCode.JPY).Value;
+        jpy.TryFormat(dest, out int writtenJpy, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture).Should().BeTrue();
+        new string(dest[..writtenJpy]).Should().Be("1,000 JPY");
+
+        var bhd = Money.Create(10.555m, CurrencyCode.BHD).Value;
+        bhd.TryFormat(dest, out int writtenBhd, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture).Should().BeTrue();
+        new string(dest[..writtenBhd]).Should().Be("10.555 BHD");
+
+        var clfCurrency = CurrencyCode.Create("CLF").Value;
+        var clf = Money.Create(10.1234m, clfCurrency).Value;
+        clf.TryFormat(dest, out int writtenClf, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture).Should().BeTrue();
+        new string(dest[..writtenClf]).Should().Be("10.1234 CLF");
+
+        Span<char> tinyDest = stackalloc char[2];
+        jpy.TryFormat(tinyDest, out _, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture).Should().BeFalse();
     }
 }
 

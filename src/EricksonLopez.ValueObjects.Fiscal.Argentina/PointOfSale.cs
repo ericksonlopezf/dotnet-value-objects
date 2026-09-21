@@ -78,7 +78,7 @@ public readonly record struct PointOfSale : ISpanParsable<PointOfSale>, ICompara
     /// <inheritdoc/>
     public int CompareTo(PointOfSale other) => _value.CompareTo(other._value);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="PointOfSale"/> is less than the right <see cref="PointOfSale"/>.
     /// </summary>
     /// <param name="left">The first <see cref="PointOfSale"/> to compare.</param>

@@ -1,5 +1,11 @@
 # REJ-001: Rejection of Unified GlobalTaxId Abstraction
 
+## Status
+Rejected
+
+## Date
+2026-08-16
+
 - **Status:** Rejected
 - **Date:** 2026-08-16
 - **Original Proposal:** Create an `ITaxId` interface or abstract base class `GlobalTaxId(string Value, CountryCode Country)` to unify all global tax identification numbers.

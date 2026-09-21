@@ -126,7 +126,7 @@ public readonly record struct JurisdictionCode : ISpanParsable<JurisdictionCode>
     /// <inheritdoc/>
     public int CompareTo(JurisdictionCode other) => _code.CompareTo(other._code);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="JurisdictionCode"/> is less than the right <see cref="JurisdictionCode"/>.
     /// </summary>
     /// <param name="left">The first <see cref="JurisdictionCode"/> to compare.</param>

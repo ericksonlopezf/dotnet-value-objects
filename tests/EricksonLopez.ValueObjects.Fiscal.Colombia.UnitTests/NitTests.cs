@@ -214,6 +214,32 @@ public sealed class NitTests
             (x, y) => x > y,
             (x, y) => x >= y);
     }
+
+    [Fact]
+    public void Nit_DefaultStruct_ExposesIsInitializedSafely()
+    {
+        Nit defaultNit = default;
+        defaultNit.IsInitialized.Should().BeFalse();
+        defaultNit.ToCanonicalString().Should().Be(string.Empty);
+        defaultNit.ToString().Should().Be(string.Empty);
+
+        var initialized = Nit.Create("800197268-4").Value;
+        initialized.IsInitialized.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Utf8Parsing_WorksCorrectly()
+    {
+        var nit = Nit.Parse("800197268-4"u8);
+        nit.IsInitialized.Should().BeTrue();
+        Nit.TryParse("800197268-4"u8, null, out var parsed).Should().BeTrue();
+        parsed.IsInitialized.Should().BeTrue();
+        Nit.TryParse("invalid"u8, null, out _).Should().BeFalse();
+        Nit.TryParse(new byte[100], null, out _).Should().BeFalse();
+
+        Action actInvalid = () => Nit.Parse("invalid"u8);
+        actInvalid.Should().Throw<FormatException>();
+    }
 }
 
 

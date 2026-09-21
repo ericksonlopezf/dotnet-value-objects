@@ -1,4 +1,4 @@
-﻿// Copyright © Erickson Lopez. MIT License.
+// Copyright © Erickson Lopez. MIT License.
 using System;
 using System.Diagnostics;
 using System.Linq;

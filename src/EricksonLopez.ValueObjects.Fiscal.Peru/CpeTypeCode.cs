@@ -22,17 +22,17 @@ namespace EricksonLopez.ValueObjects.Fiscal.Peru;
 public readonly record struct CpeTypeCode : ISpanParsable<CpeTypeCode>, IComparable<CpeTypeCode>
 {
     /// <summary>Gets CPE code 01 (Factura).</summary>
-    public static CpeTypeCode Factura => new("01", "Factura");
+    public static CpeTypeCode Invoice => new("01", "Factura");
     /// <summary>Gets CPE code 03 (Boleta de Venta).</summary>
-    public static CpeTypeCode Boleta => new("03", "Boleta de Venta");
+    public static CpeTypeCode Receipt => new("03", "Boleta de Venta");
     /// <summary>Gets CPE code 07 (Nota de Crédito).</summary>
-    public static CpeTypeCode NotaCredito => new("07", "Nota de Crédito");
+    public static CpeTypeCode CreditNote => new("07", "Nota de Crédito");
     /// <summary>Gets CPE code 08 (Nota de Débito).</summary>
-    public static CpeTypeCode NotaDebito => new("08", "Nota de Débito");
+    public static CpeTypeCode DebitNote => new("08", "Nota de Débito");
     /// <summary>Gets CPE code 09 (Guía de Remisión Remitente).</summary>
-    public static CpeTypeCode GuiaRemitente => new("09", "Guía de Remisión Remitente");
+    public static CpeTypeCode SenderDispatchGuide => new("09", "Guía de Remisión Remitente");
     /// <summary>Gets CPE code 31 (Guía de Remisión Transportista).</summary>
-    public static CpeTypeCode GuiaTransportista => new("31", "Guía de Remisión Transportista");
+    public static CpeTypeCode CarrierDispatchGuide => new("31", "Guía de Remisión Transportista");
 
 
     private readonly string _code;
@@ -68,12 +68,12 @@ public readonly record struct CpeTypeCode : ISpanParsable<CpeTypeCode>, ICompara
         ReadOnlySpan<char> trimmed = input.Trim();
         return trimmed switch
         {
-            "01" => Result<CpeTypeCode>.Success(Factura),
-            "03" => Result<CpeTypeCode>.Success(Boleta),
-            "07" => Result<CpeTypeCode>.Success(NotaCredito),
-            "08" => Result<CpeTypeCode>.Success(NotaDebito),
-            "09" => Result<CpeTypeCode>.Success(GuiaRemitente),
-            "31" => Result<CpeTypeCode>.Success(GuiaTransportista),
+            "01" => Result<CpeTypeCode>.Success(Invoice),
+            "03" => Result<CpeTypeCode>.Success(Receipt),
+            "07" => Result<CpeTypeCode>.Success(CreditNote),
+            "08" => Result<CpeTypeCode>.Success(DebitNote),
+            "09" => Result<CpeTypeCode>.Success(SenderDispatchGuide),
+            "31" => Result<CpeTypeCode>.Success(CarrierDispatchGuide),
             _ => Result<CpeTypeCode>.Failure(Error.Validation(
                 "CpeTypeCode.InvalidCode", $"The CPE document type '{trimmed.ToString()}' is not recognized by SUNAT."))
         };
@@ -85,7 +85,7 @@ public readonly record struct CpeTypeCode : ISpanParsable<CpeTypeCode>, ICompara
     /// <inheritdoc/>
     public int CompareTo(CpeTypeCode other) => string.Compare(_code, other._code, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="CpeTypeCode"/> is less than the right <see cref="CpeTypeCode"/>.
     /// </summary>
     /// <param name="left">The first <see cref="CpeTypeCode"/> to compare.</param>

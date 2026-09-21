@@ -27,12 +27,12 @@ public readonly record struct Cvu : ISpanParsable<Cvu>, IUtf8SpanParsable<Cvu>, 
     /// <summary>
     /// Gets the 8-digit PSP routing block.
     /// </summary>
-    public string PspCode => _cbu.Value[..8];
+    public string PspCode => _cbu.Value.Length >= 8 ? _cbu.Value[..8] : string.Empty;
 
     /// <summary>
     /// Gets the 14-digit virtual account block.
     /// </summary>
-    public string AccountNumber => _cbu.Value[8..];
+    public string AccountNumber => _cbu.Value.Length >= 8 ? _cbu.Value[8..] : string.Empty;
 
     /// <summary>
     /// Creates a validated <see cref="Cvu"/> from a 22-digit numeric string.
@@ -71,7 +71,7 @@ public readonly record struct Cvu : ISpanParsable<Cvu>, IUtf8SpanParsable<Cvu>, 
     /// <inheritdoc/>
     public int CompareTo(Cvu other) => _cbu.CompareTo(other._cbu);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="Cvu"/> is less than the right <see cref="Cvu"/>.
     /// </summary>
     /// <param name="left">The first <see cref="Cvu"/> to compare.</param>
@@ -130,8 +130,14 @@ public readonly record struct Cvu : ISpanParsable<Cvu>, IUtf8SpanParsable<Cvu>, 
     /// <inheritdoc/>
     public static bool TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Cvu result)
     {
-        Span<char> chars = stackalloc char[utf8Text.Length];
-        Encoding.UTF8.TryGetChars(utf8Text, chars, out int written);
+        if (utf8Text.Length > 64)
+        {
+            result = default;
+            return false;
+        }
+
+        Span<char> chars = stackalloc char[64];
+        int written = Encoding.UTF8.GetChars(utf8Text, chars);
         return TryParse(chars[..written], provider, out result);
     }
 }

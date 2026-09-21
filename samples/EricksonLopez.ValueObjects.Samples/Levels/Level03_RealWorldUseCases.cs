@@ -29,8 +29,8 @@ public static class Level03_RealWorldUseCases
 
         // Create overloads
         var usd100 = Money.Create(100.00m, "USD").Value;
-        var usd50  = Money.Create(50.00m, CurrencyCode.USD).Value;
-        var zero   = Money.Zero(CurrencyCode.USD);
+        var usd50 = Money.Create(50.00m, CurrencyCode.USD).Value;
+        var zero = Money.Zero(CurrencyCode.USD);
 
         Console.WriteLine($"  - usd100   : {usd100}");
         Console.WriteLine($"  - usd50    : {usd50}");
@@ -53,10 +53,10 @@ public static class Level03_RealWorldUseCases
         Console.WriteLine($"  - -$25 IsNegative: {negMoney.IsNegative}");
 
         // Arithmetic operators
-        var sum  = usd100 + usd50;
+        var sum = usd100 + usd50;
         var diff = usd100 - usd50;
         var mult = usd100 * 1.5m;
-        var neg  = -usd100;
+        var neg = -usd100;
         Console.WriteLine($"  - $100 + $50     : {sum}");
         Console.WriteLine($"  - $100 - $50     : {diff}");
         Console.WriteLine($"  - $100 × 1.5     : {mult}");
@@ -78,15 +78,15 @@ public static class Level03_RealWorldUseCases
 
         // Rounding
         var rough = Money.Create(100.005m, "USD").Value;
-        var bankers    = rough.Round();       // Banker's rounding (ToEven)
+        var bankers = rough.Round();       // Banker's rounding (ToEven)
         var commercial = rough.RoundCommercial(); // AwayFromZero
         Console.WriteLine($"  - Round (banker)    : {bankers}");
         Console.WriteLine($"  - Round (commercial): {commercial}");
 
         // ApplyPercentage
         var invoice100 = Money.Create(100.00m, "USD").Value;
-        var vatPct     = Percentage.Create(18.0m).Value;
-        var vatAmount  = invoice100.ApplyPercentage(vatPct);
+        var vatPct = Percentage.Create(18.0m).Value;
+        var vatAmount = invoice100.ApplyPercentage(vatPct);
         Console.WriteLine($"  - $100 × 18% VAT : {vatAmount}");
 
         // Allocate — Fowler anti-penny-loss
@@ -132,7 +132,7 @@ public static class Level03_RealWorldUseCases
         Console.WriteLine("\n[3. DiscountRate — Commercial Discount Application]");
         var discount10 = DiscountRate.Create(10.0m).Value;
         var noDiscount = DiscountRate.None;
-        var priceBase  = 500.00m;
+        var priceBase = 500.00m;
         var priceMoney = Money.Create(priceBase, "USD").Value;
 
         Console.WriteLine($"  - Discount 10%          : {discount10} (IsZero: {discount10.IsZero})");
@@ -184,8 +184,8 @@ public static class Level03_RealWorldUseCases
         Console.WriteLine($"  - Value            : {fullNameStr.Value}");
 
         // Overload 2: strongly-typed name components
-        var firstNameResult  = FirstName.Create("Maria");
-        var lastNameResult   = LastName.Create("Gonzalez");
+        var firstNameResult = FirstName.Create("Maria");
+        var lastNameResult = LastName.Create("Gonzalez");
         var middleNameResult = MiddleName.Create("Fernanda");
         if (firstNameResult.IsSuccess && lastNameResult.IsSuccess && middleNameResult.IsSuccess)
         {
@@ -217,12 +217,12 @@ public static class Level03_RealWorldUseCases
 
         // ─── 8. Supply Chain ──────────────────────────────────────────────────────────
         Console.WriteLine("\n[8. Supply Chain and Traceability]");
-        var sku       = SKU.Create("PROD-MACBOOK-M3-PRO").Value;
-        var barcode   = Barcode.Create("7501031311309").Value;
-        var qty       = Quantity.Create(45).Value;
+        var sku = SKU.Create("PROD-MACBOOK-M3-PRO").Value;
+        var barcode = Barcode.Create("7501031311309").Value;
+        var qty = Quantity.Create(45).Value;
         var warehouse = WarehouseCode.Create("WH-CENTRAL-01").Value;
-        var batch     = BatchNumber.Create("LOT-202608-A").Value;
-        var serial    = SerialNumber.Create("SN-A1B2C3D4E5").Value;
+        var batch = BatchNumber.Create("LOT-202608-A").Value;
+        var serial = SerialNumber.Create("SN-A1B2C3D4E5").Value;
 
         Console.WriteLine($"  - SKU        : {sku}");
         Console.WriteLine($"  - Barcode    : {barcode}");
@@ -234,16 +234,16 @@ public static class Level03_RealWorldUseCases
         // ─── 9. Commercial Operations ─────────────────────────────────────────────────
         Console.WriteLine("\n[9. Commercial Operations, Identity, and Address]");
         var customerCode = CustomerCode.Create("CUST-9921").Value;
-        var orderNum     = OrderNumber.Create("ORD-2026-8832").Value;
-        var channel      = SalesChannelCode.Create("ECOMMERCE_PORTAL").Value;
-        var invoiceNum   = DocumentNumber.Create("FAC-B01-00000042").Value;
-        var refNum       = ReferenceNumber.Create("REF-PAYPAL-987654").Value;
+        var orderNum = OrderNumber.Create("ORD-2026-8832").Value;
+        var channel = SalesChannelCode.Create("ECOMMERCE_PORTAL").Value;
+        var invoiceNum = DocumentNumber.Create("FAC-B01-00000042").Value;
+        var refNum = ReferenceNumber.Create("REF-PAYPAL-987654").Value;
 
         Console.WriteLine($"  - Order      : {orderNum} by {customerCode} via {channel}");
         Console.WriteLine($"  - Invoice    : {invoiceNum} (Ref: {refNum})");
 
         var totalInvoice = Money.Create(100.00m, "USD").Value;
-        var allocShares  = totalInvoice.Allocate(1, 1, 1);
+        var allocShares = totalInvoice.Allocate(1, 1, 1);
         Console.WriteLine($"  - Allocating $100.00 into 3 parts (1:1:1):");
         Console.WriteLine($"    Part 1 : {allocShares[0]}");
         Console.WriteLine($"    Part 2 : {allocShares[1]}");
@@ -252,20 +252,20 @@ public static class Level03_RealWorldUseCases
 
         // ─── 10. Identity and Address ─────────────────────────────────────────────────
         Console.WriteLine("\n[10. Identity, Employees, and Composite Address]");
-        var fullName   = FullName.Create("Erickson", "Lopez").Value;
-        var company    = CompanyName.Create("EricksonLopez Software Solutions").Value;
-        var position   = PositionTitle.Create("Principal Software Architect").Value;
-        var dept       = DepartmentName.Create("Cloud Architecture & Security").Value;
+        var fullName = FullName.Create("Erickson", "Lopez").Value;
+        var company = CompanyName.Create("EricksonLopez Software Solutions").Value;
+        var position = PositionTitle.Create("Principal Software Architect").Value;
+        var dept = DepartmentName.Create("Cloud Architecture & Security").Value;
         var nationalId = NationalId.Create("001-1234567-8").Value;
-        var passport   = PassportNumber.Create("RD98765432").Value;
+        var passport = PassportNumber.Create("RD98765432").Value;
 
-        var countryDo  = Country.Create("DO").Value;
-        var postal     = PostalCode.Create("10148").Value;
-        var address    = Address.Create(
-            street:     "Av. Winston Churchill #1099, Torre Empresarial",
-            city:       "Santo Domingo",
-            province:   "Distrito Nacional",
-            country:    countryDo,
+        var countryDo = Country.Create("DO").Value;
+        var postal = PostalCode.Create("10148").Value;
+        var address = Address.Create(
+            street: "Av. Winston Churchill #1099, Torre Empresarial",
+            city: "Santo Domingo",
+            province: "Distrito Nacional",
+            country: countryDo,
             postalCode: postal).Value;
 
         Console.WriteLine($"  - Employee    : {fullName} ({position} in {dept})");

@@ -116,6 +116,38 @@ public sealed class CuilTests
             (x, y) => x > y,
             (x, y) => x >= y);
     }
+
+    [Fact]
+    public void Cuil_DefaultStruct_ExposesIsInitializedSafely()
+    {
+        Cuil defaultCuil = default;
+        defaultCuil.IsInitialized.Should().BeFalse();
+        defaultCuil.Value.Should().Be(string.Empty);
+        defaultCuil.Formatted.Should().Be(string.Empty);
+        defaultCuil.ToString().Should().Be(string.Empty);
+
+        var initialized = Cuil.Create("20-12345678-6").Value;
+        initialized.IsInitialized.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Utf8Parsing_WorksCorrectly()
+    {
+        var cuil = Cuil.Parse("20-12345678-6"u8);
+        cuil.IsInitialized.Should().BeTrue();
+        Cuil.TryParse("20-12345678-6"u8, null, out var parsed).Should().BeTrue();
+        parsed.IsInitialized.Should().BeTrue();
+        Cuil.TryParse(new byte[100], null, out _).Should().BeFalse();
+        Cuil.TryParse(new byte[65], null, out _).Should().BeFalse();
+
+        byte[] paddedCuil = Encoding.UTF8.GetBytes("20-12345678-6".PadRight(64, ' '));
+        Cuil.TryParse(paddedCuil, null, out var pCuil).Should().BeTrue();
+        pCuil.IsInitialized.Should().BeTrue();
+
+        Action actInvalid = () => Cuil.Parse("invalid"u8);
+        actInvalid.Should().Throw<FormatException>();
+    }
+
 }
 
 

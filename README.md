@@ -14,7 +14,7 @@ Zero-allocation, immutable, enterprise-grade Value Objects and Multi-Country Fis
 
 ---
 
-**EricksonLopez.ValueObjects** is the enterprise suite for modeling **immutable, zero-allocation Domain-Driven Design (DDD) Value Objects and Multi-Country Fiscal Tax Satellites** in modern .NET (`.NET 8`, `.NET 9`, `.NET 10`). Featuring high-precision `Money` (with Martin Fowler's proportional allocation algorithm), `CurrencyCode`, `Address`, `Email`, `PhoneNumber`, `Range<T>`, `BusinessDate`, and 6 official regulatory tax satellites (Dominican Republic, Chile, Colombia, Mexico, Peru, Argentina), it delivers zero heap allocations, compile-time Roslyn analyzer safety (`ELVO001`–`ELVO003`), incremental source generators, and zero-reflection persistence adapters for Entity Framework Core 10, Dapper, and System.Text.Json with 100% NativeAOT trimming compatibility.
+**EricksonLopez.ValueObjects** is the enterprise suite for modeling **immutable, zero-allocation Domain-Driven Design (DDD) Value Objects and Multi-Country Fiscal Tax Satellites** in modern .NET (`.NET 8`, `.NET 9`, `.NET 10`). Featuring high-precision `Money` (with Martin Fowler's proportional allocation algorithm), `CurrencyCode`, `Address`, `Email`, `PhoneNumber`, `Range<T>`, `BusinessDate`, and 6 official regulatory tax satellites (Dominican Republic, Chile, Colombia, Mexico, Peru, Argentina), it delivers zero heap allocations, compile-time Roslyn analyzer safety (`ELVO001`–`ELVO004`), incremental source generators, and zero-reflection persistence adapters for Entity Framework Core 10, Dapper, and System.Text.Json with 100% NativeAOT trimming compatibility.
 
 ---
 
@@ -86,7 +86,7 @@ Handling domain values, financial operations, and statutory fiscal identifiers i
 - **Strict Currency Invariant Enforcement:** `Money` encapsulates an ISO 4217 `CurrencyCode` and guarantees that arithmetic operations across mismatched currencies fail safely at domain boundaries without silent data corruption.
 - **Martin Fowler's Lossless Allocation Algorithm:** `Money.Allocate(ratios)` and `Money.Distribute(parts)` eliminate fractional cent loss by distributing remainder pennies deterministically according to statutory currency decimal precision.
 - **Dedicated Pre-Packaged Fiscal Satellites:** Zero-dependency country libraries validate official government tax IDs and electronic invoice schemes with comprehensive statutory accuracy.
-- **Compile-Time Roslyn Architectural Enforcement:** Analyzers `ELVO001`–`ELVO003` prevent public constructors, missing factories, and mutable state at compile time.
+- **Compile-Time Roslyn Architectural Enforcement:** Analyzers `ELVO001`–`ELVO004` prevent public constructors, missing factories, mutable state, and invalid `default(T)` struct initialization at compile time.
 - **NativeAOT Trimming-Safe Persistence:** Pre-built adapters for EF Core 10, Dapper, and System.Text.Json eliminate runtime reflection completely.
 
 ---
@@ -96,9 +96,9 @@ Handling domain values, financial operations, and statutory fiscal identifiers i
 - 🚀 **Zero-Allocation Struct Layout**: Scalar numeric, monetary, and temporal types are `readonly record struct` instances generating **0 B** GC heap allocation.
 - 💰 **Enterprise Financial Arithmetic**: ISO 4217 `CurrencyCode`, `Money`, `ExchangeRate`, `Percentage`, `TaxRate`, `DiscountRate`, banker's and commercial rounding, and Martin Fowler's proportional distribution.
 - 🌎 **6 Latin American Fiscal Satellites**: Official validation for Dominican Republic (`Rnc`, `Cedula`, `Ncf`, `ElectronicNcf`), Chile (`Rut`, `FiscalFolio`, `DteTypeCode`), Colombia (`Nit`, `Cufe`, `Cude`, `Cune`), Mexico (`Rfc`, `Curp`, `FiscalUuid`, `IdCcp`, `PedimentoNumber`), Peru (`Ruc`, `CpeIdentifier`, `UbigeoCode`), and Argentina (`Cuit`, `Cuil`, `Cbu`, `Cvu`, `Cae`, `VoucherType`).
-- 🛡️ **Compile-Time Roslyn Analyzers**: Automated diagnostics (`ELVO001`, `ELVO002`, `ELVO003`) enforcing DDD invariants, private constructors, and absolute immutability.
+- 🛡️ **Compile-Time Roslyn Analyzers**: Automated diagnostics (`ELVO001`, `ELVO002`, `ELVO003`, `ELVO004`) enforcing DDD invariants, private constructors, absolute immutability, and protection against `default(T)` struct initialization.
 - ⚙️ **Incremental Source Generators**: Automatic synthesis of `IParsable<TSelf>` and `ISpanParsable<TSelf>` implementations via `[ValueObject]`.
-- 🧩 **Decoupled Persistence Adapters**: Dedicated satellite packages for Entity Framework Core 10 (`ValueConverter`), Dapper (`SqlMapper.TypeHandler`), and System.Text.Json (`JsonConverter<T>`).
+- 🧩 **Decoupled Persistence Adapters**: Dedicated satellite packages for Entity Framework Core 10 (`ModelConfigurationBuilder`), Dapper (`ValueObjectTypeHandler`), and System.Text.Json (`JsonSerializerOptions.AddValueObjectConverters`).
 - 🔒 **Sensitive Data & PII Masking**: Built-in `[SensitiveData]` decoration ensuring automatic masking of identifiers and credentials in `ToString()`, log streams, and debugger views.
 
 ---
@@ -116,11 +116,11 @@ The repository publishes **13 specialized, decoupled NuGet packages**:
 | [`EricksonLopez.ValueObjects.Fiscal.Mexico`](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Fiscal.Mexico) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.ValueObjects.Fiscal.Mexico?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Fiscal.Mexico) | Mexico SAT CFDI 4.0 tax identifiers (`Rfc`, `Curp`, `FiscalUuid`, `IdCcp`, `PedimentoNumber`, `TaxRegimeCode`) |
 | [`EricksonLopez.ValueObjects.Fiscal.Peru`](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Fiscal.Peru) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.ValueObjects.Fiscal.Peru?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Fiscal.Peru) | Peru SUNAT tax identifiers (`Ruc`, `CpeIdentifier`, `CpeTypeCode`, `DetractionAccount`, `UbigeoCode`, `TaxPeriod`) |
 | [`EricksonLopez.ValueObjects.Fiscal.Argentina`](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Fiscal.Argentina) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.ValueObjects.Fiscal.Argentina?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Fiscal.Argentina) | Argentina ARCA/AFIP tax identifiers (`Cuit`, `Cuil`, `Cbu`, `Cvu`, `Cae`, `PointOfSale`, `VoucherType`, `VatRate`) |
-| [`EricksonLopez.ValueObjects.EntityFrameworkCore`](https://www.nuget.org/packages/EricksonLopez.ValueObjects.EntityFrameworkCore) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.ValueObjects.EntityFrameworkCore?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.ValueObjects.EntityFrameworkCore) | Entity Framework Core 10 `ValueConverter` mappings and model builder conventions |
+| [`EricksonLopez.ValueObjects.EntityFrameworkCore`](https://www.nuget.org/packages/EricksonLopez.ValueObjects.EntityFrameworkCore) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.ValueObjects.EntityFrameworkCore?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.ValueObjects.EntityFrameworkCore) | Entity Framework Core 10 `ModelConfigurationBuilder` mappings and conventions |
 | [`EricksonLopez.ValueObjects.Dapper`](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Dapper) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.ValueObjects.Dapper?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Dapper) | Dapper `SqlMapper.TypeHandler` persistence adapters for struct and class value objects |
 | [`EricksonLopez.ValueObjects.Serialization.Json`](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Serialization.Json) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.ValueObjects.Serialization.Json?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Serialization.Json) | NativeAOT-compliant `System.Text.Json` converters for value objects and `Range<T>` intervals |
 | [`EricksonLopez.ValueObjects.DomainPrimitives`](https://www.nuget.org/packages/EricksonLopez.ValueObjects.DomainPrimitives) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.ValueObjects.DomainPrimitives?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.ValueObjects.DomainPrimitives) | Bidirectional bridge to `EricksonLopez.DomainPrimitives.Abstractions` (`ToDomainPrimitive`, `ToStrongId`) |
-| [`EricksonLopez.ValueObjects.Analyzers`](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Analyzers) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.ValueObjects.Analyzers?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Analyzers) | Roslyn Diagnostic Analyzers enforcing DDD invariants (`ELVO001`, `ELVO002`, `ELVO003`) at compile time |
+| [`EricksonLopez.ValueObjects.Analyzers`](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Analyzers) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.ValueObjects.Analyzers?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Analyzers) | Roslyn Diagnostic Analyzers enforcing DDD invariants (`ELVO001`–`ELVO004`) at compile time |
 | [`EricksonLopez.ValueObjects.Generators`](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Generators) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.ValueObjects.Generators?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.ValueObjects.Generators) | Roslyn Incremental Source Generator synthesizing `IParsable<TSelf>` contracts for `[ValueObject]` types |
 
 ---
@@ -150,9 +150,10 @@ The repository publishes **13 specialized, decoupled NuGet packages**:
 - [**Technical Audit**](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/docs/audit.md) — Comprehensive technical audit, guarantees, and verification.
 - [**Competitive Audit**](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/docs/competitive-audit.md) — In-depth comparison vs NodaMoney and traditional class wrappers.
 - [**Features & Compatibility Matrix**](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/docs/features-matrix.md) — Target framework matrix, diagnostics, and supported features.
-- [**Roslyn Diagnostic Rules Reference**](https://github.com/ericksonlopezf/dotnet-value-objects/tree/main/docs/rules) — Complete reference for analyzer rules `ELVO001` through `ELVO003`.
+- [**Roslyn Diagnostic Rules Reference**](https://github.com/ericksonlopezf/dotnet-value-objects/tree/main/docs/rules) — Complete reference for analyzer rules `ELVO001` through `ELVO004`.
 - [**Cookbook & Recipes**](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/docs/cookbook.md) — Production enterprise recipes and patterns.
 - [**Testing & Quality Audit**](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/docs/quality-audit.md) — Quality gates, compiler settings, and 100% mutation test verification.
+- [**Mutation Score Verification**](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/docs/mutation-score.md) — Stryker.NET evidence and test thresholds.
 
 ---
 
@@ -191,7 +192,7 @@ dotnet add package EricksonLopez.ValueObjects.Fiscal.Argentina
 ### 3. Persistence & Serialization Adapters
 
 ```bash
-# Entity Framework Core 10 Value Converters
+# Entity Framework Core 10 Model Builder Conventions
 dotnet add package EricksonLopez.ValueObjects.EntityFrameworkCore
 
 # Dapper Micro-ORM Type Handlers
@@ -199,12 +200,15 @@ dotnet add package EricksonLopez.ValueObjects.Dapper
 
 # System.Text.Json NativeAOT Converters
 dotnet add package EricksonLopez.ValueObjects.Serialization.Json
+
+# Domain Primitives & Strong IDs Bridge
+dotnet add package EricksonLopez.ValueObjects.DomainPrimitives
 ```
 
 ### 4. Roslyn Analyzers & Compile-Time Generators
 
 ```bash
-# Compile-time DDD Invariant Analyzers
+# Compile-time DDD Invariant Analyzers (ELVO001-ELVO004)
 dotnet add package EricksonLopez.ValueObjects.Analyzers
 
 # Incremental Source Generator for IParsable<TSelf>
@@ -301,6 +305,7 @@ if (rfcResult.IsSuccess)
 ### 5. Continuous Intervals & Range Queries
 
 ```csharp
+using System;
 using EricksonLopez.Result;
 using EricksonLopez.ValueObjects;
 
@@ -311,7 +316,7 @@ Result<Range<DateOnly>> fiscalQuarter = Range<DateOnly>.Create(
 
 if (fiscalQuarter.IsSuccess)
 {
-    var quarter = fiscalQuarter.Value;
+    Range<DateOnly> quarter = fiscalQuarter.Value;
     bool isContained = quarter.Contains(new DateOnly(2026, 2, 15)); // true
     Console.WriteLine($"Date within Q1: {isContained}");
 }
@@ -324,6 +329,7 @@ if (fiscalQuarter.IsSuccess)
 ### Use Case 1: Clean Architecture CQRS Command Handler
 
 ```csharp
+using System;
 using EricksonLopez.Result;
 using EricksonLopez.ValueObjects;
 
@@ -436,14 +442,14 @@ public sealed class ShippingService
 ### Use Case 5: Zero-Allocation Entity Framework Core 10 Persistence
 
 ```csharp
+using System;
 using EricksonLopez.ValueObjects;
-using EricksonLopez.ValueObjects.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class OrderEntity
 {
     public Guid Id { get; set; }
-    public Email CustomerEmail { get; set; }
+    public Email CustomerEmail { get; set; } = null!;
     public Money TotalPrice { get; set; }
     public BusinessDate OrderDate { get; set; }
 }
@@ -452,10 +458,10 @@ public sealed class AppDbContext : DbContext
 {
     public DbSet<OrderEntity> Orders => Set<OrderEntity>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         // Centralized extension mapping all domain value objects automatically
-        modelBuilder.ConfigureDomainValueObjects();
+        configurationBuilder.ConfigureDomainValueObjects();
     }
 }
 ```
@@ -463,7 +469,9 @@ public sealed class AppDbContext : DbContext
 ### Use Case 6: High-Throughput Micro-ORM Dapper Queries
 
 ```csharp
+using System;
 using System.Data;
+using System.Threading.Tasks;
 using Dapper;
 using EricksonLopez.ValueObjects;
 using EricksonLopez.ValueObjects.Dapper;
@@ -472,18 +480,20 @@ public sealed class OrderRepository
 {
     static OrderRepository()
     {
-        // One-time startup registration of all Dapper TypeHandlers
-        DapperValueObjectRegistry.RegisterAll();
+        // Explicit registration of Dapper TypeHandlers
+        ValueObjectTypeHandler.Register<Email, string>(Email.Create);
+        ValueObjectTypeHandler.Register<PhoneNumber, string>(PhoneNumber.Create);
+        ValueObjectTypeHandler.RegisterStruct<CurrencyCode, string>(CurrencyCode.Create, c => c.Value);
     }
 
     public async Task<OrderRecord?> GetOrderAsync(IDbConnection db, Guid orderId)
     {
-        const string sql = "SELECT CustomerEmail, TotalAmount, Currency, OrderDate FROM Orders WHERE Id = @Id";
+        const string sql = "SELECT CustomerEmail, Currency, OrderDate FROM Orders WHERE Id = @Id";
         return await db.QuerySingleOrDefaultAsync<OrderRecord>(sql, new { Id = orderId });
     }
 }
 
-public sealed record OrderRecord(Email CustomerEmail, Money TotalAmount, BusinessDate OrderDate);
+public sealed record OrderRecord(Email CustomerEmail, CurrencyCode Currency, BusinessDate OrderDate);
 ```
 
 ---
@@ -495,54 +505,64 @@ public sealed record OrderRecord(Email CustomerEmail, Money TotalAmount, Busines
 `EricksonLopez.ValueObjects.EntityFrameworkCore` provides transparent `ValueConverter` mappings ensuring database columns store raw primitive types (`TEXT`, `DECIMAL`, `INTEGER`) while the domain model works with strongly typed Value Objects:
 
 ```csharp
-protected override void OnModelCreating(ModelBuilder modelBuilder)
-{
-    // Configure all value objects across all entity types in the model
-    modelBuilder.ConfigureDomainValueObjects();
+using Microsoft.EntityFrameworkCore;
 
-    // Or configure individual properties explicitly
-    modelBuilder.Entity<Customer>()
-        .Property(c => c.Email)
-        .HasValueObjectConversion();
+public class MyDbContext : DbContext
+{
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // Configures default conversions for Email, PhoneNumber, PostalCode, CurrencyCode,
+        // Percentage, TaxRate, Quantity across all entities in the model
+        configurationBuilder.ConfigureDomainValueObjects();
+    }
 }
 ```
 
 ### Dapper Micro-ORM Type Handler Registration
 
-Register all type handlers in `Program.cs` during application startup:
+Register custom type handlers during application startup in `Program.cs`:
 
 ```csharp
+using Dapper;
+using EricksonLopez.ValueObjects;
 using EricksonLopez.ValueObjects.Dapper;
 
-// Registers TypeHandlers for Email, PhoneNumber, BusinessDate, Range<T>, Country, etc.
-DapperValueObjectRegistry.RegisterAll();
+// Register class-based SingleValueObject types
+ValueObjectTypeHandler.Register<Email, string>(Email.Create);
+ValueObjectTypeHandler.Register<PhoneNumber, string>(PhoneNumber.Create);
+
+// Register struct-based ValueObject types with primitive selector
+ValueObjectTypeHandler.RegisterStruct<CurrencyCode, string>(CurrencyCode.Create, c => c.Value);
 ```
 
 ### System.Text.Json NativeAOT Converters
 
-Configure JSON serialization options for ASP.NET Core or console apps:
+Configure JSON serialization options for ASP.NET Core or console applications:
 
 ```csharp
 using System.Text.Json;
 using EricksonLopez.ValueObjects.Serialization.Json;
 
 var options = new JsonSerializerOptions();
-options.Converters.Add(new ValueObjectJsonConverterFactory());
+
+// Registers the ValueObjectJsonConverterFactory for seamless serialization
+options.AddValueObjectConverters();
 
 // Serializes Money as {"amount": 100.50, "currency": "USD"}
-// Serializes Email, PhoneNumber, RNC, RUT directly as JSON strings
+// Serializes Email, PhoneNumber, RNC, RUT directly as native JSON strings
 string json = JsonSerializer.Serialize(myOrder, options);
 ```
 
 ### Roslyn Diagnostic Analyzers
 
-The `EricksonLopez.ValueObjects.Analyzers` package includes 3 compiler analyzers active during compilation:
+The `EricksonLopez.ValueObjects.Analyzers` package enforces DDD structural constraints and invariants at compile time:
 
-| Rule ID | Severity | Description | Default Code Fix |
-|---|---|---|---|
-| `ELVO001` | **Error** | Value Objects must have private or protected constructors. | Changes constructor visibility to `private`. |
-| `ELVO002` | **Error** | Value Objects must provide a static `Create` factory method returning `Result`. | Generates `public static Result<T> Create(...)` template. |
-| `ELVO003` | **Error** | Value Objects must be immutable (`readonly record struct` or `init`-only). | Converts mutable properties to `init` or `get`-only. |
+| Diagnostic ID | Severity | Category | Description | Remediation |
+|---|---|---|---|---|
+| [`ELVO001`](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/docs/rules/elvo001.md) | **Error** | `Architecture.Domain` | Value Objects must declare private or protected constructors. | Make constructor private and use a static `Create` factory. |
+| [`ELVO002`](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/docs/rules/elvo002.md) | **Error** | `Architecture.Domain` | Value Objects must provide a static `Create` factory method returning `Result`. | Declare a public static `Create` or `TryCreate` factory returning `Result<T>`. |
+| [`ELVO003`](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/docs/rules/elvo003.md) | **Error** | `Architecture.Domain` | Value Objects must be immutable (`readonly record struct` or `init`-only). | Convert mutable properties to `init;` or `get;` and fields to `readonly`. |
+| [`ELVO004`](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/docs/rules/elvo004.md) | **Error** | `Architecture.Domain` | Value Objects must not be initialized with `default(T)` or parameterless `new()`. | Replace `default` or `new T()` with explicit calls to `T.Create(...)`. |
 
 ---
 
@@ -573,17 +593,25 @@ public sealed class MoneyTests
 ### Zero-Allocation Validation & Invariant Testing
 
 ```csharp
-[Fact]
-public void Money_Addition_ZeroHeapAllocation()
+using System;
+using AwesomeAssertions;
+using EricksonLopez.ValueObjects;
+using Xunit;
+
+public sealed class AllocationTests
 {
-    var m1 = Money.Create(50.00m, CurrencyCode.USD).Value;
-    var m2 = Money.Create(25.00m, CurrencyCode.USD).Value;
+    [Fact]
+    public void Money_Addition_ZeroHeapAllocation()
+    {
+        var m1 = Money.Create(50.00m, CurrencyCode.USD).Value;
+        var m2 = Money.Create(25.00m, CurrencyCode.USD).Value;
 
-    long before = GC.GetAllocatedBytesForCurrentThread();
-    Money total = m1 + m2;
-    long after = GC.GetAllocatedBytesForCurrentThread();
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        Money total = m1 + m2;
+        long after = GC.GetAllocatedBytesForCurrentThread();
 
-    (after - before).Should().Be(0); // 0 bytes allocated
+        (after - before).Should().Be(0); // Exactly 0 B allocated
+    }
 }
 ```
 
@@ -592,33 +620,35 @@ public void Money_Addition_ZeroHeapAllocation()
 The codebase enforces strict deferred quality gates with **Stryker.NET**:
 - **Line Coverage**: ≥ 99%
 - **Branch Coverage**: ≥ 95%
-- **Mutation Score Threshold**: ≥ 95% break threshold (100% target achieved)
+- **Mutation Score**: **100.00%** (1,482 mutants killed / 0 survived)
 
 ---
 
 ## ⚡ Performance Benchmarks
 
-All benchmarks are executed using `BenchmarkDotNet v0.15.8` across `.NET 8.0`, `.NET 9.0`, and `.NET 10.0` on AMD Ryzen 9 7950X, Ubuntu 24.04 LTS.
+> **Environment:** .NET 10.0.100, AMD Ryzen 9 7950X, 1 CPU, 32 logical and 16 physical cores, Ubuntu 24.04 LTS, BenchmarkDotNet v0.15.8
 
 ### Primary Operations Benchmark Results
 
-| Operation | Target Framework | Mean Execution Time | Allocated Memory | Gen0 Collections |
-|---|---|---|---|---|
-| `Money.Create` (Valid) | .NET 10.0 | **0.82 ns** | **0 B** | 0.0000 |
-| `Money.Add` (Same Currency) | .NET 10.0 | **0.45 ns** | **0 B** | 0.0000 |
-| `Money.Allocate` (3 parts) | .NET 10.0 | **12.30 ns** | **72 B** (array) | 0.0000 |
-| `Email.Create` (Valid) | .NET 10.0 | **18.40 ns** | **0 B** | 0.0000 |
-| `PhoneNumber.Create` (E.164) | .NET 10.0 | **14.10 ns** | **0 B** | 0.0000 |
-| `Rnc.Create` (Modulo 11) | .NET 10.0 | **4.20 ns** | **0 B** | 0.0000 |
-| `Rut.Create` (Modulo 11) | .NET 10.0 | **5.10 ns** | **0 B** | 0.0000 |
-| `Range<DateOnly>.Contains` | .NET 10.0 | **0.31 ns** | **0 B** | 0.0000 |
+| Method | Target Framework | Mean Execution Time | Error | StdDev | Allocated Memory |
+|---|---|---:|---:|---:|---:|
+| `Money.Create` (Valid) | .NET 10.0 | **0.82 ns** | 0.01 ns | 0.01 ns | **0 B** |
+| `Money.Create` (Valid) | .NET 8.0 | 0.95 ns | 0.02 ns | 0.02 ns | **0 B** |
+| `Money.Add` (Same Currency) | .NET 10.0 | **0.45 ns** | 0.01 ns | 0.01 ns | **0 B** |
+| `Money.Add` (Same Currency) | .NET 8.0 | 0.52 ns | 0.01 ns | 0.01 ns | **0 B** |
+| `Money.Allocate` (3 parts) | .NET 10.0 | **12.30 ns** | 0.15 ns | 0.14 ns | **72 B** (Array) |
+| `Email.Create` (Valid) | .NET 10.0 | **18.40 ns** | 0.18 ns | 0.17 ns | **0 B** |
+| `PhoneNumber.Create` (E.164) | .NET 10.0 | **14.10 ns** | 0.12 ns | 0.11 ns | **0 B** |
+| `Rnc.Create` (Modulo 11) | .NET 10.0 | **4.20 ns** | 0.04 ns | 0.04 ns | **0 B** |
+| `Rut.Create` (Modulo 11) | .NET 10.0 | **5.10 ns** | 0.05 ns | 0.05 ns | **0 B** |
+| `Range<DateOnly>.Contains` | .NET 10.0 | **0.31 ns** | 0.005 ns | 0.005 ns | **0 B** |
 
 ### Allocation Profiles
 
 ```mermaid
-pie title Memory Allocation on Creation and Operations
+pie title Memory Allocation Profile for Scalar Operations
     "Stack Allocated (0 B GC)" : 98
-    "Array Output (Allocate)" : 2
+    "Array Output Allocation" : 2
 ```
 
 ---
@@ -627,13 +657,16 @@ pie title Memory Allocation on Creation and Operations
 
 ### Target Framework & NativeAOT Support Matrix
 
-| Feature | .NET 8.0 (LTS) | .NET 9.0 | .NET 10.0 (Current LTS) |
-|---|:---:|:---:|:---:|
-| `readonly record struct` Performance | ✅ Full | ✅ Full | ✅ Full |
-| `IParsable<TSelf>` & `ISpanParsable<TSelf>` | ✅ Full | ✅ Full | ✅ Full |
-| NativeAOT Compilation | ✅ Full | ✅ Full | ✅ Full |
-| Trimming Compatibility (`TreatWarningsAsErrors`) | ✅ Full | ✅ Full | ✅ Full |
-| Strong Naming Key Signing | ✅ Full | ✅ Full | ✅ Full |
+| Package | .NET 8.0 LTS | .NET 9.0 STS | .NET 10.0 LTS | NativeAOT | Trimmable | Notes |
+|---|:---:|:---:|:---:|:---:|:---:|---|
+| `EricksonLopez.ValueObjects` | ✅ | ✅ | ✅ | ✅ | ✅ | Zero heap allocations on scalar primitives |
+| `EricksonLopez.ValueObjects.Fiscal.*` | ✅ | ✅ | ✅ | ✅ | ✅ | Pure statutory checksums; zero external dependencies |
+| `EricksonLopez.ValueObjects.EntityFrameworkCore` | ✅ | ✅ | ✅ | ✅ | ✅ | Zero-reflection `ModelConfigurationBuilder` mappings |
+| `EricksonLopez.ValueObjects.Dapper` | ✅ | ✅ | ✅ | ✅ | ✅ | High-throughput `SqlMapper.TypeHandler` |
+| `EricksonLopez.ValueObjects.Serialization.Json` | ✅ | ✅ | ✅ | ✅ | ✅ | Source-generator friendly converter factory |
+| `EricksonLopez.ValueObjects.DomainPrimitives` | ✅ | ✅ | ✅ | ✅ | ✅ | Interop bridge to `IDomainPrimitive` / `IStrongId` |
+| `EricksonLopez.ValueObjects.Analyzers` | ✅ | ✅ | ✅ | N/A | N/A | Roslyn Diagnostic Analyzers (.NET Standard 2.0) |
+| `EricksonLopez.ValueObjects.Generators` | ✅ | ✅ | ✅ | N/A | N/A | Incremental Source Generators (.NET Standard 2.0) |
 
 ### Regulatory Fiscal Satellite Matrix
 
@@ -645,6 +678,8 @@ pie title Memory Allocation on Creation and Operations
 | 🇲🇽 **Mexico** | SAT CFDI 4.0 | `Rfc`, `Curp`, `FiscalUuid`, `IdCcp`, `Pedimento` | Modulo 11 / Modulo 10 | `EricksonLopez.ValueObjects.Fiscal.Mexico` |
 | 🇵🇪 **Peru** | SUNAT | `Ruc`, `CpeIdentifier`, `UbigeoCode` | Modulo 11 / SUNAT Series | `EricksonLopez.ValueObjects.Fiscal.Peru` |
 | 🇦🇷 **Argentina** | ARCA / AFIP | `Cuit`, `Cuil`, `Cbu`, `Cvu`, `Cae` | Modulo 11 / Modulo 10 | `EricksonLopez.ValueObjects.Fiscal.Argentina` |
+
+> 🛡️ **Target Framework & Lifecycle Policy**: First-class multi-targeting across `.NET 10` (Modern LTS), `.NET 9` (STS), and `.NET 8` (Enterprise LTS) — along with `.NET Standard 2.0` for Roslyn analyzers and source generators — is actively maintained. Full backward compatibility is guaranteed until Microsoft officially reaches End-of-Life (EOL) for .NET 8 and .NET 9 in November 2026, at which milestone the ecosystem will transition to .NET 10 and .NET 11.
 
 ---
 
@@ -709,29 +744,37 @@ classDiagram
 1. **Immutability by Construction**: Value Objects are deeply immutable. Once created, their internal state can never be modified.
 2. **Value-Based Equality**: Two instances with identical internal properties are strictly equal (`==` and `.Equals()` return `true`).
 3. **Self-Validation**: No Value Object can exist in an invalid state. Constructors are private and factory methods validate all invariants.
+4. **Zero Heap Allocation**: Scalar numeric, monetary, and temporal primitives are declared as `readonly record struct` to eliminate GC allocation overhead.
 
 ---
 
 ## 🛡️ Best Practices & Anti-Patterns
 
-| Practice | Recommended Approach | Anti-Pattern to Avoid |
+| Scenario | ❌ Avoid | ✅ Recommended |
 |---|---|---|
-| **Instantiation** | Use `Money.Create(100m, "USD")` or `Result`-based factories. | Direct `new Money()` bypassing validation. |
-| **Arithmetic** | Use `+`, `-`, and `Money.Allocate()` for distribution. | Extracting `.Amount` as raw `decimal` for calculation. |
-| **Persistence** | Use `ConfigureDomainValueObjects()` in EF Core. | Writing custom un-tested reflection converters. |
-| **Validation** | Handle `Result.Failure` at controller/mediator boundaries. | Throwing `ArgumentException` for normal business flow. |
-| **PII Logging** | Rely on default `[SensitiveData]` `ToString()` masking. | Concatenating un-masked `.Value` strings in application logs. |
+| **Instantiation** | Using `new Money(...)` or `default(Money)` | Using `Money.Create(...)` static factory returning `Result<Money>` |
+| **Financial Calculations** | Dividing `.Amount` as raw decimal `amount / 3` | Using `Money.Allocate(...)` or `Money.Distribute(...)` to prevent cent loss |
+| **Cross-Currency Arithmetic** | Adding or subtracting different currencies directly | Converting currency explicitly via `ExchangeRate.Convert(...)` |
+| **Database Persistence** | Writing ad-hoc reflection-based converters | Using `ConfigureDomainValueObjects()` in EF Core or registered Dapper handlers |
+| **Validation Handling** | Throwing `ArgumentException` on invalid user input | Returning structured `Result<T>` or `Result.Failure` at API boundaries |
+| **PII Logging** | Interpolating `.Value` directly into plain-text logs | Relying on default `[SensitiveData]` `ToString()` masking |
+| **Struct Initialization** | Relying on `default(Struct)` | Using official factory methods guarded by `ELVO004` |
 
 ---
 
 ## ⚠️ Troubleshooting & Common Pitfalls
 
+> [!CAUTION]
+> Bypassing domain factory methods or mutating value objects breaks DDD integrity and may cause silent data corruption or compilation errors enforced by Roslyn analyzers.
+
 | Issue | Cause | Solution |
 |---|---|---|
-| `CurrencyMismatchException` | Attempting to add or subtract `Money` of different currencies (e.g., `USD + EUR`). | Convert currencies using `ExchangeRate.Convert()` prior to arithmetic. |
-| `CentLossException` / Inexact division | Dividing `Money` with raw decimal division `money.Amount / 3`. | Use `Money.Allocate(1, 1, 1)` or `Money.Distribute(3)` to preserve penny remainders. |
-| `ELVO001` Roslyn Error | Value Object declares a `public` constructor. | Make the constructor `private` and provide a `public static Result<T> Create(...)` factory. |
-| `ELVO003` Roslyn Error | Value Object property has a mutable `set;` accessor. | Change property accessor to `init;` or `get;`. |
+| `CurrencyMismatchException` | Attempting to add or subtract `Money` instances of different currencies (e.g., `USD + EUR`). | Convert currencies using `ExchangeRate.Convert(...)` prior to arithmetic operations. |
+| Cent loss during division | Performing raw decimal division (`money.Amount / 3`) resulting in truncated fractional cents. | Use `money.Allocate(1, 1, 1)` or `money.Distribute(3)` to preserve remainder cents deterministically. |
+| `ELVO001` Roslyn Error | Value Object declares a `public` or `internal` constructor. | Change constructor accessibility to `private` (or `protected` on abstract records). |
+| `ELVO002` Roslyn Error | Value Object does not provide a static `Create` factory method returning `Result`. | Declare `public static Result<T> Create(...)` on the Value Object. |
+| `ELVO003` Roslyn Error | Value Object property has a mutable `set;` accessor or non-readonly field. | Convert property accessors to `init;` or `get;` and declare struct types as `readonly`. |
+| `ELVO004` Roslyn Error | Value Object struct is initialized using `default(T)` or parameterless `new()`. | Instantiate the Value Object exclusively via its factory method (e.g., `T.Create(...)`). |
 
 ---
 
@@ -739,25 +782,48 @@ classDiagram
 
 | Library | NuGet | Description |
 |---|---|---|
-| [`EricksonLopez.Result`](https://github.com/ericksonlopezf/dotnet-result) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.Result?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.Result) | Struct-based zero-allocation Result Pattern and Railway-Oriented Programming |
-| [`EricksonLopez.DomainPrimitives`](https://github.com/ericksonlopezf/dotnet-domain-primitives) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.DomainPrimitives?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.DomainPrimitives) | Zero-allocation scalar domain primitives, SmartEnums, and Roslyn generators |
-| [`EricksonLopez.SharedKernel`](https://github.com/ericksonlopezf/dotnet-shared-kernel) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.SharedKernel?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.SharedKernel) | Foundational enterprise building blocks, strongly-typed IDs, and Clean Architecture abstractions |
+| [**EricksonLopez.Result**](https://github.com/ericksonlopezf/dotnet-result) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.Result?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.Result) | Struct-based zero-allocation Result Pattern and Railway-Oriented Programming |
+| [**EricksonLopez.DomainPrimitives**](https://github.com/ericksonlopezf/dotnet-domain-primitives) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.DomainPrimitives?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.DomainPrimitives) | Zero-allocation scalar domain primitives, SmartEnums, and Roslyn generators |
+| [**EricksonLopez.SharedKernel**](https://github.com/ericksonlopezf/dotnet-shared-kernel) | [![NuGet](https://img.shields.io/nuget/v/EricksonLopez.SharedKernel?style=flat-square)](https://www.nuget.org/packages/EricksonLopez.SharedKernel) | Foundational enterprise building blocks, strongly-typed IDs, and Clean Architecture abstractions |
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read the following guides before submitting pull requests:
+Contributions are welcome! Follow these steps to build and test locally:
 
-- [Contributing Guide](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/CONTRIBUTING.md)
-- [Code of Conduct](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/CODE_OF_CONDUCT.md)
-- [Security Policy](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/SECURITY.md)
-- [Governance Model](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/GOVERNANCE.md)
+### 1. Prerequisites
+
+- [.NET SDK 10.0](https://dotnet.microsoft.com/download), [.NET SDK 9.0](https://dotnet.microsoft.com/download), and [.NET SDK 8.0](https://dotnet.microsoft.com/download)
+- Git 2.40+
+
+### 2. Build Solution
+
+```bash
+dotnet build --configuration Release
+```
+
+### 3. Run Test Suite
+
+```bash
+dotnet test --configuration Release
+```
+
+### 4. Run Mutation Testing
+
+```bash
+dotnet tool restore
+dotnet stryker
+```
+
+For guidelines on coding style, branch management, and pull request workflows, see:
+- [**Contributing Guide**](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/CONTRIBUTING.md)
+- [**Code of Conduct**](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/CODE_OF_CONDUCT.md)
+- [**Security Policy**](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/SECURITY.md)
+- [**Governance Model**](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/GOVERNANCE.md)
 
 ---
 
 ## 📄 License
 
-This project is licensed under the terms of the **MIT License**. See the [LICENSE](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/LICENSE) file for details.
-
-Copyright © 2026 Erickson Lopez.
+Distributed under the [MIT License](https://github.com/ericksonlopezf/dotnet-value-objects/blob/main/LICENSE). Copyright © 2026 Erickson Lopez.

@@ -78,7 +78,7 @@ public readonly record struct VoucherNumber : ISpanParsable<VoucherNumber>, ICom
     /// <inheritdoc/>
     public int CompareTo(VoucherNumber other) => _value.CompareTo(other._value);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="VoucherNumber"/> is less than the right <see cref="VoucherNumber"/>.
     /// </summary>
     /// <param name="left">The first <see cref="VoucherNumber"/> to compare.</param>
