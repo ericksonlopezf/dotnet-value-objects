@@ -63,7 +63,29 @@ internal static class RoslynAnalyzerTestHelper
         var compilationWithAnalyzers = compilation.WithAnalyzers(ImmutableArray.Create(analyzer));
         return await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(cancellationToken);
     }
+
+    internal sealed class TrackingAnalysisContext : AnalysisContext
+    {
+        public bool ConcurrentExecutionEnabled { get; private set; }
+        public GeneratedCodeAnalysisFlags GeneratedCodeFlags { get; private set; } = (GeneratedCodeAnalysisFlags)(-1);
+        public bool SymbolActionRegistered { get; private set; }
+        public bool SyntaxNodeActionRegistered { get; private set; }
+
+        public override void EnableConcurrentExecution() => ConcurrentExecutionEnabled = true;
+        public override void ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags flags) => GeneratedCodeFlags = flags;
+
+        public override void RegisterSymbolAction(Action<SymbolAnalysisContext> action, ImmutableArray<SymbolKind> symbolKinds) => SymbolActionRegistered = true;
+        public override void RegisterSyntaxNodeAction<TLanguageKindEnum>(Action<SyntaxNodeAnalysisContext> action, ImmutableArray<TLanguageKindEnum> syntaxKinds) => SyntaxNodeActionRegistered = true;
+
+        public override void RegisterCodeBlockAction(Action<CodeBlockAnalysisContext> action) { }
+        public override void RegisterCodeBlockStartAction<TLanguageKindEnum>(Action<CodeBlockStartAnalysisContext<TLanguageKindEnum>> action) { }
+        public override void RegisterCompilationAction(Action<CompilationAnalysisContext> action) { }
+        public override void RegisterCompilationStartAction(Action<CompilationStartAnalysisContext> action) { }
+        public override void RegisterSemanticModelAction(Action<SemanticModelAnalysisContext> action) { }
+        public override void RegisterSyntaxTreeAction(Action<SyntaxTreeAnalysisContext> action) { }
+    }
 }
+
 
 
 

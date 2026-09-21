@@ -1,5 +1,11 @@
 # ADR-014: Standardized Testing Conventions with Osherove Pattern
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Test Architecture, Naming & Diagnostic Clarity

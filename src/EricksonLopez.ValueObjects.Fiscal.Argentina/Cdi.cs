@@ -18,7 +18,12 @@ public readonly record struct Cdi : ISpanParsable<Cdi>, IComparable<Cdi>
     /// <summary>
     /// Gets the raw 11-digit numeric value of the CDI.
     /// </summary>
-    public string Value => _value;
+    public string Value => _value ?? string.Empty;
+
+    /// <summary>
+    /// Gets a value indicating whether this instance has been explicitly initialized and does not represent the default struct state.
+    /// </summary>
+    public bool IsInitialized => !string.IsNullOrEmpty(_value);
 
     /// <summary>
     /// Creates a validated <see cref="Cdi"/> from an 11-digit raw string or formatted <c>XX-XXXXXXXX-X</c>.
@@ -69,15 +74,17 @@ public readonly record struct Cdi : ISpanParsable<Cdi>, IComparable<Cdi>
     /// <summary>
     /// Formats the CDI in standard format: <c>XX-XXXXXXXX-X</c>.
     /// </summary>
-    public string Formatted => $"{_value[..2]}-{_value[2..10]}-{_value[10]}";
+    public string Formatted => !string.IsNullOrEmpty(_value) && _value.Length == 11
+        ? $"{_value[..2]}-{_value[2..10]}-{_value[10]}"
+        : string.Empty;
 
     /// <inheritdoc/>
     public override string ToString() => Formatted;
 
     /// <inheritdoc/>
-    public int CompareTo(Cdi other) => string.Compare(_value, other._value, StringComparison.Ordinal);
+    public int CompareTo(Cdi other) => string.Compare(_value ?? string.Empty, other._value ?? string.Empty, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="Cdi"/> is less than the right <see cref="Cdi"/>.
     /// </summary>
     /// <param name="left">The first <see cref="Cdi"/> to compare.</param>

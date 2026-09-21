@@ -28,6 +28,11 @@ public readonly record struct ExchangeRate : IValueObject<ExchangeRate>
     /// </summary>
     public decimal Rate { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether this <see cref="ExchangeRate"/> instance was initialized through a factory rather than <c>default(ExchangeRate)</c>.
+    /// </summary>
+    public bool IsInitialized => Rate > 0m && FromCurrency.IsInitialized && ToCurrency.IsInitialized;
+
     private ExchangeRate(CurrencyCode fromCurrency, CurrencyCode toCurrency, decimal rate)
     {
         FromCurrency = fromCurrency;
@@ -44,6 +49,12 @@ public readonly record struct ExchangeRate : IValueObject<ExchangeRate>
     /// <returns>A successful <see cref="Result{T}"/> containing the validated exchange rate, or a validation failure.</returns>
     public static Result<ExchangeRate> Create(CurrencyCode fromCurrency, CurrencyCode toCurrency, decimal rate)
     {
+        if (!fromCurrency.IsInitialized || !toCurrency.IsInitialized)
+        {
+            return Result<ExchangeRate>.Failure(Error.Validation(
+                "ExchangeRate.UninitializedCurrency", "Exchange rate currencies must be initialized."));
+        }
+
         if (fromCurrency == toCurrency)
         {
             return Result<ExchangeRate>.Failure(Error.Validation(
@@ -88,6 +99,12 @@ public readonly record struct ExchangeRate : IValueObject<ExchangeRate>
     /// <returns>A successful <see cref="Result{T}"/> containing the inverted exchange rate.</returns>
     public Result<ExchangeRate> Inverse()
     {
+        if (Rate <= 0m)
+        {
+            return Result<ExchangeRate>.Failure(Error.Validation(
+                "ExchangeRate.InvalidRate", "Cannot invert an exchange rate with a zero or negative rate."));
+        }
+
         decimal inverseRate = Math.Round(1m / Rate, 12);
         return Create(ToCurrency, FromCurrency, inverseRate);
     }

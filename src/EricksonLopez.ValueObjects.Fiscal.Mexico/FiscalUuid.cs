@@ -26,6 +26,11 @@ public readonly record struct FiscalUuid : ISpanParsable<FiscalUuid>, IComparabl
     public Guid Value => _value;
 
     /// <summary>
+    /// Gets a value indicating whether this instance has been explicitly initialized and does not represent the default struct state.
+    /// </summary>
+    public bool IsInitialized => _value != Guid.Empty;
+
+    /// <summary>
     /// Creates a validated <see cref="FiscalUuid"/> from an existing <see cref="Guid"/>.
     /// </summary>
     /// <param name="value">The <see cref="Guid"/> representing the fiscal UUID. Must not be <see cref="Guid.Empty"/>.</param>
@@ -78,7 +83,7 @@ public readonly record struct FiscalUuid : ISpanParsable<FiscalUuid>, IComparabl
     /// <inheritdoc/>
     public int CompareTo(FiscalUuid other) => _value.CompareTo(other._value);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="FiscalUuid"/> is less than the right <see cref="FiscalUuid"/>.
     /// </summary>
     /// <param name="left">The first <see cref="FiscalUuid"/> to compare.</param>

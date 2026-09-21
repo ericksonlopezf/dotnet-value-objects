@@ -61,6 +61,15 @@ public sealed class StringPipelineTests
     }
 
     [Fact]
+    public void ContainsControlCharacters_WithFormatCharacters_ReturnsTrue()
+    {
+        // Zero-width space (U+200B, \p{Cf})
+        StringPipeline.ContainsControlCharacters("User\u200BName").Should().BeTrue();
+        // Right-to-left override (U+202E, \p{Cf})
+        StringPipeline.ContainsControlCharacters("Admin\u202EExe").Should().BeTrue();
+    }
+
+    [Fact]
     public void Required_NullOrWhitespace_FailsWithRequiredError()
     {
         var result = StringPipeline.Required<string>(
@@ -180,6 +189,57 @@ public sealed class StringPipelineTests
         StringPipeline.LooseIdentifierPattern.IsMatch("CODE 123.A-B/C").Should().BeTrue();
         StringPipeline.LooseIdentifierPattern.IsMatch(" INVALID").Should().BeFalse();
         StringPipeline.LooseIdentifierPattern.IsMatch("").Should().BeFalse();
+    }
+
+    [Fact]
+    public void Required_NormalizesUnicodeToFormC_EnsuringCanonicalEqualityAndHashConsistency()
+    {
+        // "José" using precomposed 'é' (U+00E9)
+        string precomposed = "Jos\u00e9";
+        // "José" using decomposed 'e' + combining acute accent (U+0301)
+        string decomposed = "Jose\u0301";
+
+        precomposed.Length.Should().Be(4);
+        decomposed.Length.Should().Be(5);
+        precomposed.Should().NotBe(decomposed); // Raw strings differ
+
+        var preRes = StringPipeline.RequiredString(precomposed, "TestField", 1, 50);
+        var decRes = StringPipeline.RequiredString(decomposed, "TestField", 1, 50);
+
+        preRes.IsSuccess.Should().BeTrue();
+        decRes.IsSuccess.Should().BeTrue();
+        preRes.Value.Should().Be(decRes.Value);
+        preRes.Value.Length.Should().Be(4);
+
+        // Verification on domain value object (FirstName)
+        var fn1 = FirstName.Create(precomposed);
+        var fn2 = FirstName.Create(decomposed);
+
+        fn1.IsSuccess.Should().BeTrue();
+        fn2.IsSuccess.Should().BeTrue();
+        (fn1.Value == fn2.Value).Should().BeTrue();
+        fn1.Value.Equals(fn2.Value).Should().BeTrue();
+        fn1.Value.GetHashCode().Should().Be(fn2.Value.GetHashCode());
+    }
+
+    [Theory]
+    [InlineData("\0")]
+    [InlineData("\u0001")]
+    [InlineData("\u001F")]
+    [InlineData("\u007F")]
+    [InlineData("Prefix\u001BPostfix")]
+    public void ContainsControlCharacters_SimdFastPath_DetectsAsciiControlCharacters(string input)
+    {
+        StringPipeline.ContainsControlCharacters(input).Should().BeTrue();
+    }
+
+    [Fact]
+    public void StripFormatCharacters_SanitizesInvisibleCharacters()
+    {
+        StringPipeline.StripFormatCharacters(null!).Should().BeNull();
+        StringPipeline.StripFormatCharacters("").Should().BeEmpty();
+        StringPipeline.StripFormatCharacters("CleanText").Should().Be("CleanText");
+        StringPipeline.StripFormatCharacters("User\u200B\u200CName").Should().Be("UserName");
     }
 }
 

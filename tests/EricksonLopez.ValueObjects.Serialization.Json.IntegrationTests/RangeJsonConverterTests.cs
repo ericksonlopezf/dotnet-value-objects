@@ -77,12 +77,13 @@ public sealed class RangeJsonConverterTests
     [Fact]
     public void Read_WhenExtraPropertiesPresent_IgnoresAndDeserializesSuccessfully()
     {
-        var json = "{\"Extra\": \"value\", \"Start\": 1, \"IgnoredProp\": 999, \"End\": 10}";
+        var json = "{\"Extra\": {\"nested\": 1, \"sub\": [2, 3]}, \"Start\": 1, \"IgnoredProp\": [999, 1000], \"End\": 10}";
         var range = JsonSerializer.Deserialize<Range<int>>(json, _options);
 
         range.Start.Should().Be(1);
         range.End.Should().Be(10);
     }
+
 
     [Fact]
     public void Read_WhenStartIsGreaterThanEnd_ThrowsJsonException()

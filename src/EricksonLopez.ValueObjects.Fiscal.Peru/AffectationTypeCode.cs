@@ -23,13 +23,13 @@ using EricksonLopez.ValueObjects.Attributes;
 public readonly record struct AffectationTypeCode : ISpanParsable<AffectationTypeCode>, IComparable<AffectationTypeCode>
 {
     /// <summary>Gets affectation code 10 (Gravado - Operación Onerosa).</summary>
-    public static AffectationTypeCode GravadoOneroso => new("10", "Gravado - Operación Onerosa", true, false, false, false);
+    public static AffectationTypeCode TaxedOnerous => new("10", "Gravado - Operación Onerosa", true, false, false, false);
     /// <summary>Gets affectation code 20 (Exonerado - Operación Onerosa).</summary>
-    public static AffectationTypeCode ExoneradoOneroso => new("20", "Exonerado - Operación Onerosa", false, true, false, false);
+    public static AffectationTypeCode ExemptOnerous => new("20", "Exonerado - Operación Onerosa", false, true, false, false);
     /// <summary>Gets affectation code 30 (Inafecto - Operación Onerosa).</summary>
-    public static AffectationTypeCode InafectoOneroso => new("30", "Inafecto - Operación Onerosa", false, false, true, false);
+    public static AffectationTypeCode UnaffectedOnerous => new("30", "Inafecto - Operación Onerosa", false, false, true, false);
     /// <summary>Gets affectation code 40 (Exportación de Bienes o Servicios).</summary>
-    public static AffectationTypeCode Exportacion => new("40", "Exportación de Bienes o Servicios", false, false, false, true);
+    public static AffectationTypeCode Export => new("40", "Exportación de Bienes o Servicios", false, false, false, true);
 
 
     private readonly string _code;
@@ -85,10 +85,10 @@ public readonly record struct AffectationTypeCode : ISpanParsable<AffectationTyp
         ReadOnlySpan<char> trimmed = input.Trim();
         return trimmed switch
         {
-            "10" => Result<AffectationTypeCode>.Success(GravadoOneroso),
-            "20" => Result<AffectationTypeCode>.Success(ExoneradoOneroso),
-            "30" => Result<AffectationTypeCode>.Success(InafectoOneroso),
-            "40" => Result<AffectationTypeCode>.Success(Exportacion),
+            "10" => Result<AffectationTypeCode>.Success(TaxedOnerous),
+            "20" => Result<AffectationTypeCode>.Success(ExemptOnerous),
+            "30" => Result<AffectationTypeCode>.Success(UnaffectedOnerous),
+            "40" => Result<AffectationTypeCode>.Success(Export),
             _ => Result<AffectationTypeCode>.Failure(Error.Validation(
                 "AffectationTypeCode.InvalidCode", $"The IGV affectation code '{trimmed.ToString()}' is not recognized or supported."))
         };
@@ -100,7 +100,7 @@ public readonly record struct AffectationTypeCode : ISpanParsable<AffectationTyp
     /// <inheritdoc/>
     public int CompareTo(AffectationTypeCode other) => string.Compare(_code, other._code, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="AffectationTypeCode"/> is less than the right <see cref="AffectationTypeCode"/>.
     /// </summary>
     /// <param name="left">The first <see cref="AffectationTypeCode"/> to compare.</param>

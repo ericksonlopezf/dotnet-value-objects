@@ -92,9 +92,9 @@ public sealed class AddressTests
     public void Create_WhenStreetContainsExcessiveWhitespace_NormalizesProperly()
     {
         var country = Country.Create("DO").Value;
-        var result = Address.Create("Calle   Principal   123", "Ciudad", "Provincia", country);
+        var result = Address.Create("Main   Street   123", "City", "Province", country);
         result.IsSuccess.Should().BeTrue();
-        result.Value.Street.Should().Be("Calle Principal 123");
+        result.Value.Street.Should().Be("Main Street 123");
     }
 
     [Fact]

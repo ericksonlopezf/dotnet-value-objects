@@ -90,6 +90,18 @@ public sealed class CaeTests
         (a == aCopy).Should().BeTrue();
         (a != b).Should().BeTrue();
     }
+
+    [Fact]
+    public void Cae_DefaultStruct_ExposesIsInitializedSafely()
+    {
+        Cae defaultCae = default;
+        defaultCae.IsInitialized.Should().BeFalse();
+        defaultCae.Code.Should().Be(string.Empty);
+        defaultCae.ToString().Should().Be(string.Empty);
+
+        var initialized = Cae.Create("12345678901234", new DateOnly(2026, 12, 31)).Value;
+        initialized.IsInitialized.Should().BeTrue();
+    }
 }
 
 

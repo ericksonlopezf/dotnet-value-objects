@@ -14,10 +14,10 @@ public sealed class CpeIdentifierTests
     [Fact]
     public void Create_FromComponents_Succeeds()
     {
-        var result = CpeIdentifier.Create(CpeTypeCode.Factura, "f001", 1);
+        var result = CpeIdentifier.Create(CpeTypeCode.Invoice, "f001", 1);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Type.Should().Be(CpeTypeCode.Factura);
+        result.Value.Type.Should().Be(CpeTypeCode.Invoice);
         result.Value.Series.Should().Be("F001");
         result.Value.Number.Should().Be(1);
         result.Value.Canonical.Should().Be("01-F001-00000001");
@@ -51,7 +51,7 @@ public sealed class CpeIdentifierTests
     [InlineData(null)]
     public void Create_RequiredSeries_ReturnsError(string? series)
     {
-        var result = CpeIdentifier.Create(CpeTypeCode.Factura, series, 1);
+        var result = CpeIdentifier.Create(CpeTypeCode.Invoice, series, 1);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("CpeIdentifier.RequiredSeries");
@@ -63,7 +63,7 @@ public sealed class CpeIdentifierTests
     [InlineData("F")]
     public void Create_InvalidSeriesLength_ReturnsError(string series)
     {
-        var result = CpeIdentifier.Create(CpeTypeCode.Factura, series, 1);
+        var result = CpeIdentifier.Create(CpeTypeCode.Invoice, series, 1);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("CpeIdentifier.InvalidSeriesLength");
@@ -75,7 +75,7 @@ public sealed class CpeIdentifierTests
     [InlineData(100_000_000)]
     public void Create_NumberOutOfRange_ReturnsError(int number)
     {
-        var result = CpeIdentifier.Create(CpeTypeCode.Factura, "F001", number);
+        var result = CpeIdentifier.Create(CpeTypeCode.Invoice, "F001", number);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("CpeIdentifier.NumberOutOfRange");

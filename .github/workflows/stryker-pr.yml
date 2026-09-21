@@ -1,0 +1,195 @@
+# Copyright © Erickson Lopez. MIT License.
+name: Targeted PR Mutation Testing (Stryker)
+
+# ─── Purpose ─────────────────────────────────────────────────────────────────
+# Intelligent Selective Mutation Testing for Pull Requests:
+#   1. Detects modified packages in src/ against the target base branch (main).
+#   2. Dynamically schedules targeted Stryker runs ONLY for affected projects.
+#   3. Utilizes Stryker incremental diff analysis (--since) to mutate only changed lines.
+#   4. Executes with optimal concurrency (2 workers) avoiding runner oversubscription.
+#   5. Skips mutation testing automatically for documentation or non-src changes.
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "Directory.Build.props"
+      - "Directory.Packages.props"
+
+concurrency:
+  group: stryker-pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+permissions:
+  contents: read
+
+jobs:
+  detect-changes:
+    name: Detect Affected Packages
+    runs-on: ubuntu-latest
+    outputs:
+      has-targets: ${{ steps.filter.outputs.has-targets }}
+      matrix: ${{ steps.filter.outputs.matrix }}
+    steps:
+      - name: Checkout Code with Git History
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Compute Affected Source Packages
+        id: filter
+        shell: pwsh
+        run: |
+          $baseBranch = "origin/${{ github.base_ref }}"
+          Write-Host "Diffing against base branch: $baseBranch"
+          $diffFiles = git diff --name-only $baseBranch...HEAD
+
+          $packageMap = @{
+              "src/EricksonLopez.ValueObjects/" = @{
+                  name = "Core"
+                  test_dir = "tests/EricksonLopez.ValueObjects.UnitTests"
+                  config = "stryker-config.json"
+                  output_dir = "StrykerOutput/core"
+              }
+              "src/EricksonLopez.ValueObjects.Analyzers/" = @{
+                  name = "Analyzers"
+                  test_dir = "tests/EricksonLopez.ValueObjects.Analyzers.UnitTests"
+                  config = "stryker-analyzers-config.json"
+                  output_dir = "StrykerOutput/analyzers"
+              }
+              "src/EricksonLopez.ValueObjects.Generators/" = @{
+                  name = "Generators"
+                  test_dir = "tests/EricksonLopez.ValueObjects.Generators.UnitTests"
+                  config = "stryker-generators-config.json"
+                  output_dir = "StrykerOutput/generators"
+              }
+              "src/EricksonLopez.ValueObjects.Dapper/" = @{
+                  name = "Dapper"
+                  test_dir = "tests/EricksonLopez.ValueObjects.Dapper.IntegrationTests"
+                  config = "stryker-dapper-config.json"
+                  output_dir = "StrykerOutput/dapper"
+              }
+              "src/EricksonLopez.ValueObjects.EntityFrameworkCore/" = @{
+                  name = "EFCore"
+                  test_dir = "tests/EricksonLopez.ValueObjects.EntityFrameworkCore.IntegrationTests"
+                  config = "stryker-efcore-config.json"
+                  output_dir = "StrykerOutput/efcore"
+              }
+              "src/EricksonLopez.ValueObjects.Serialization.Json/" = @{
+                  name = "Json"
+                  test_dir = "tests/EricksonLopez.ValueObjects.Serialization.Json.IntegrationTests"
+                  config = "stryker-json-config.json"
+                  output_dir = "StrykerOutput/json"
+              }
+              "src/EricksonLopez.ValueObjects.DomainPrimitives/" = @{
+                  name = "DomainPrimitives"
+                  test_dir = "tests/EricksonLopez.ValueObjects.DomainPrimitives.UnitTests"
+                  config = "stryker-domainprimitives-config.json"
+                  output_dir = "StrykerOutput/domainprimitives"
+              }
+              "src/EricksonLopez.ValueObjects.Fiscal.Argentina/" = @{
+                  name = "FiscalArgentina"
+                  test_dir = "tests/EricksonLopez.ValueObjects.Fiscal.Argentina.UnitTests"
+                  config = "stryker-fiscal-argentina-config.json"
+                  output_dir = "StrykerOutput/fiscal-argentina"
+              }
+              "src/EricksonLopez.ValueObjects.Fiscal.Chile/" = @{
+                  name = "FiscalChile"
+                  test_dir = "tests/EricksonLopez.ValueObjects.Fiscal.Chile.UnitTests"
+                  config = "stryker-fiscal-chile-config.json"
+                  output_dir = "StrykerOutput/fiscal-chile"
+              }
+              "src/EricksonLopez.ValueObjects.Fiscal.Colombia/" = @{
+                  name = "FiscalColombia"
+                  test_dir = "tests/EricksonLopez.ValueObjects.Fiscal.Colombia.UnitTests"
+                  config = "stryker-fiscal-colombia-config.json"
+                  output_dir = "StrykerOutput/fiscal-colombia"
+              }
+              "src/EricksonLopez.ValueObjects.Fiscal.DominicanRepublic/" = @{
+                  name = "FiscalDominicanRepublic"
+                  test_dir = "tests/EricksonLopez.ValueObjects.Fiscal.DominicanRepublic.UnitTests"
+                  config = "stryker-fiscal-dominicanrepublic-config.json"
+                  output_dir = "StrykerOutput/fiscal-dominicanrepublic"
+              }
+              "src/EricksonLopez.ValueObjects.Fiscal.Mexico/" = @{
+                  name = "FiscalMexico"
+                  test_dir = "tests/EricksonLopez.ValueObjects.Fiscal.Mexico.UnitTests"
+                  config = "stryker-fiscal-mexico-config.json"
+                  output_dir = "StrykerOutput/fiscal-mexico"
+              }
+              "src/EricksonLopez.ValueObjects.Fiscal.Peru/" = @{
+                  name = "FiscalPeru"
+                  test_dir = "tests/EricksonLopez.ValueObjects.Fiscal.Peru.UnitTests"
+                  config = "stryker-fiscal-peru-config.json"
+                  output_dir = "StrykerOutput/fiscal-peru"
+              }
+          }
+
+          $matchedTargets = @()
+          foreach ($prefix in $packageMap.Keys) {
+              $hasChanges = $diffFiles | Where-Object { $_.StartsWith($prefix) }
+              if ($hasChanges) {
+                  $matchedTargets += $packageMap[$prefix]
+              }
+          }
+
+          if ($matchedTargets.Count -gt 0) {
+              $matrixJson = ($matchedTargets | ConvertTo-Json -Compress)
+              if ($matchedTargets.Count -eq 1) {
+                  $matrixJson = "[$matrixJson]"
+              }
+              Write-Host "Detected $($matchedTargets.Count) target package(s) for mutation testing."
+              echo "has-targets=true" >> $env:GITHUB_OUTPUT
+              echo "matrix=$matrixJson" >> $env:GITHUB_OUTPUT
+          } else {
+              Write-Host "Zero source code changes requiring mutation testing."
+              echo "has-targets=false" >> $env:GITHUB_OUTPUT
+              echo "matrix=[]" >> $env:GITHUB_OUTPUT
+          }
+
+  targeted-mutation-test:
+    name: Stryker PR — ${{ matrix.name }}
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has-targets == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+    steps:
+      - name: Checkout Code with Git History
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore EricksonLopez.ValueObjects.slnx
+
+      - name: Build Solution (Release)
+        run: dotnet build EricksonLopez.ValueObjects.slnx --no-restore --configuration Release
+
+      - name: Install Stryker Tool
+        run: dotnet tool install --global dotnet-stryker
+
+      - name: Execute Targeted Stryker (${{ matrix.name }})
+        working-directory: ${{ matrix.test_dir }}
+        run: |
+          dotnet stryker \
+            --config-file "$GITHUB_WORKSPACE/${{ matrix.config }}" \
+            --test-runner mtp \
+            --since:origin/${{ github.base_ref }} \
+            --mutation-level Standard \
+            --output "$GITHUB_WORKSPACE/${{ matrix.output_dir }}"

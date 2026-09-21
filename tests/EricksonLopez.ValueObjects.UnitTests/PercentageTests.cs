@@ -59,6 +59,14 @@ public sealed class PercentageTests
     }
 
     [Fact]
+    public void FromFraction_WhenFractionProducesTrailingZeros_Succeeds()
+    {
+        var result = Percentage.FromFraction(0.0000001m);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Value.Should().Be(0.00001m);
+    }
+
+    [Fact]
     public void ComparisonAndDefaults_WhenComparedAgainstInvalidType_ThrowsArgumentException()
     {
         var p1 = Percentage.Create(10m).Value;

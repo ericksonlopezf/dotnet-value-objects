@@ -41,12 +41,12 @@ public readonly record struct Rfc : ISpanParsable<Rfc>, IUtf8SpanParsable<Rfc>, 
     /// <summary>
     /// Gets a value indicating whether this RFC corresponds to a physical person (13 characters).
     /// </summary>
-    public bool IsIndividual => _value.Length == 13;
+    public bool IsIndividual => _value is not null && _value.Length == 13;
 
     /// <summary>
     /// Gets a value indicating whether this RFC corresponds to a legal entity (12 characters).
     /// </summary>
-    public bool IsCompany => _value.Length == 12;
+    public bool IsCompany => _value is not null && _value.Length == 12;
 
     /// <summary>
     /// Gets a value indicating whether this RFC is the generic national public-in-general RFC (<c>XAXX010101000</c>).
@@ -115,12 +115,12 @@ public readonly record struct Rfc : ISpanParsable<Rfc>, IUtf8SpanParsable<Rfc>, 
     }
 
     /// <inheritdoc/>
-    public override string ToString() => _value;
+    public override string ToString() => _value ?? string.Empty;
 
     /// <inheritdoc/>
     public int CompareTo(Rfc other) => string.Compare(_value, other._value, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="Rfc"/> is less than the right <see cref="Rfc"/>.
     /// </summary>
     /// <param name="left">The first <see cref="Rfc"/> to compare.</param>
@@ -179,8 +179,19 @@ public readonly record struct Rfc : ISpanParsable<Rfc>, IUtf8SpanParsable<Rfc>, 
     /// <inheritdoc/>
     public static bool TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Rfc result)
     {
-        Span<char> chars = stackalloc char[utf8Text.Length];
-        Encoding.UTF8.TryGetChars(utf8Text, chars, out int written);
+        if (utf8Text.Length > 64)
+        {
+            result = default;
+            return false;
+        }
+
+        Span<char> chars = stackalloc char[64];
+        if (!Encoding.UTF8.TryGetChars(utf8Text, chars, out int written))
+        {
+            result = default;
+            return false;
+        }
+
         return TryParse(chars[..written], provider, out result);
     }
 }

@@ -28,22 +28,22 @@ public readonly record struct Cbu : ISpanParsable<Cbu>, IUtf8SpanParsable<Cbu>, 
     /// <summary>
     /// Gets the raw 22-digit CBU string.
     /// </summary>
-    public string Value => _value;
+    public string Value => _value ?? string.Empty;
 
     /// <summary>
     /// Gets the 3-digit bank code.
     /// </summary>
-    public string BankCode => _value[..3];
+    public string BankCode => _value is not null ? _value[..3] : string.Empty;
 
     /// <summary>
     /// Gets the 4-digit branch code.
     /// </summary>
-    public string BranchCode => _value[3..7];
+    public string BranchCode => _value is not null ? _value[3..7] : string.Empty;
 
     /// <summary>
     /// Gets the 13-digit account identifier.
     /// </summary>
-    public string AccountNumber => _value[8..21];
+    public string AccountNumber => _value is not null ? _value[8..21] : string.Empty;
 
     /// <summary>
     /// Creates a validated <see cref="Cbu"/> from a 22-digit numeric string.
@@ -133,12 +133,12 @@ public readonly record struct Cbu : ISpanParsable<Cbu>, IUtf8SpanParsable<Cbu>, 
 
 
     /// <inheritdoc/>
-    public override string ToString() => _value;
+    public override string ToString() => _value ?? string.Empty;
 
     /// <inheritdoc/>
-    public int CompareTo(Cbu other) => string.Compare(_value, other._value, StringComparison.Ordinal);
+    public int CompareTo(Cbu other) => string.Compare(_value ?? string.Empty, other._value ?? string.Empty, StringComparison.Ordinal);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="Cbu"/> is less than the right <see cref="Cbu"/>.
     /// </summary>
     /// <param name="left">The first <see cref="Cbu"/> to compare.</param>
@@ -197,8 +197,19 @@ public readonly record struct Cbu : ISpanParsable<Cbu>, IUtf8SpanParsable<Cbu>, 
     /// <inheritdoc/>
     public static bool TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Cbu result)
     {
-        Span<char> chars = stackalloc char[utf8Text.Length];
-        Encoding.UTF8.TryGetChars(utf8Text, chars, out int written);
+        if (utf8Text.Length > 64)
+        {
+            result = default;
+            return false;
+        }
+
+        Span<char> chars = stackalloc char[64];
+        if (!Encoding.UTF8.TryGetChars(utf8Text, chars, out int written))
+        {
+            result = default;
+            return false;
+        }
+
         return TryParse(chars[..written], provider, out result);
     }
 }

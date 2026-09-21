@@ -22,8 +22,9 @@ public sealed class EmailTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Value.Should().Be("user.name+tag@example.com");
         result.Value.Domain.Should().Be("example.com");
-        result.Value.LocalPart.Should().Be("user.name+tag");
         result.Value.ToString().Should().Be("user.name+tag@example.com");
+        result.Value.Masked().Should().Be("u***@example.com");
+        result.Value.ToMaskedString().Should().Be("u***@example.com");
     }
 
     [Theory]
@@ -57,11 +58,13 @@ public sealed class EmailTests
     [Fact]
     public void Email_DefaultStruct_AndOperators_Exhaustive()
     {
+        default(Email).IsInitialized.Should().BeFalse();
         default(Email).LocalPart.Should().Be(string.Empty);
         default(Email).Domain.Should().Be(string.Empty);
         default(Email).ToString().Should().Be(string.Empty);
 
         var a = Email.Create("alpha@example.com").Value;
+        a.IsInitialized.Should().BeTrue();
         var aCopy = Email.Create("ALPHA@EXAMPLE.COM").Value;
         var b = Email.Create("beta@example.com").Value;
 

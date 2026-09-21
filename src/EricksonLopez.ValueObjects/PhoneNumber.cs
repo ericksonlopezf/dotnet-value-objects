@@ -1,4 +1,4 @@
-﻿// Copyright © Erickson Lopez. MIT License.
+// Copyright © Erickson Lopez. MIT License.
 using System;
 using System.Linq;
 using EricksonLopez.Result;
@@ -22,32 +22,60 @@ public readonly record struct PhoneNumber : IValueObject<PhoneNumber>, IComparab
     /// </summary>
     /// <param name="value">The raw telephone string.</param>
     /// <returns>A successful <see cref="Result{T}"/> containing the validated phone number, or a validation failure.</returns>
-    public static Result<PhoneNumber> Create(string? value)
+    public static Result<PhoneNumber> Create(string? value) =>
+        Create(value.AsSpan());
+
+    /// <summary>
+    /// Creates a validated <see cref="PhoneNumber"/> instance from an input telephone character span.
+    /// </summary>
+    /// <param name="value">The raw telephone character span.</param>
+    /// <returns>A successful <see cref="Result{T}"/> containing the validated phone number, or a validation failure.</returns>
+    public static Result<PhoneNumber> Create(ReadOnlySpan<char> value)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        ReadOnlySpan<char> trimmed = value.Trim();
+        if (trimmed.IsEmpty)
         {
             return Result<PhoneNumber>.Failure(Error.Validation(
                 "PhoneNumber.Required", "Phone number is required."));
         }
 
-        string digits = value.Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "");
+        Span<char> buffer = trimmed.Length <= 64 ? stackalloc char[trimmed.Length] : new char[trimmed.Length];
+        int pos = 0;
+        foreach (char c in trimmed)
+        {
+            if (c is not (' ' or '-' or '(' or ')'))
+            {
+                buffer[pos++] = c;
+            }
+        }
 
-        if (!digits.StartsWith('+'))
+        ReadOnlySpan<char> cleaned = buffer[..pos];
+        if (cleaned.IsEmpty || cleaned[0] != '+')
         {
             return Result<PhoneNumber>.Failure(Error.Validation(
                 "PhoneNumber.MissingCountryCode",
                 "Phone number must start with '+' country code (E.164 format)."));
         }
 
-        string numberPart = digits[1..];
-        if (numberPart.Length is < 8 or > 15 || !numberPart.All(char.IsDigit))
+        ReadOnlySpan<char> numberPart = cleaned[1..];
+        if (numberPart.Length is < 8 or > 15)
         {
             return Result<PhoneNumber>.Failure(Error.Validation(
                 "PhoneNumber.InvalidFormat",
                 "Phone number must be E.164 format with 8-15 digits after '+'."));
         }
 
-        return Result<PhoneNumber>.Success(new PhoneNumber(digits));
+        for (int i = 0; i < numberPart.Length; i++)
+        {
+            if (!char.IsAsciiDigit(numberPart[i]))
+            {
+                return Result<PhoneNumber>.Failure(Error.Validation(
+                    "PhoneNumber.InvalidFormat",
+                    "Phone number must be E.164 format with 8-15 digits after '+'."));
+            }
+        }
+
+        return Result<PhoneNumber>.Success(new PhoneNumber(new string(cleaned)));
     }
 
     /// <summary>
@@ -148,8 +176,11 @@ public readonly record struct PhoneNumber : IValueObject<PhoneNumber>, IComparab
     /// <param name="s">The span of characters to parse.</param>
     /// <param name="provider">An optional format provider.</param>
     /// <returns>The parsed <see cref="PhoneNumber"/>.</returns>
-    public static PhoneNumber Parse(ReadOnlySpan<char> s, IFormatProvider? provider = null) =>
-        Parse(s.ToString(), provider);
+    public static PhoneNumber Parse(ReadOnlySpan<char> s, IFormatProvider? provider = null)
+    {
+        var result = Create(s);
+        return result.IsSuccess ? result.Value : throw new FormatException(result.Error.Description);
+    }
 
     /// <summary>
     /// Attempts to parse a span of characters into a <see cref="PhoneNumber"/>.
@@ -158,8 +189,18 @@ public readonly record struct PhoneNumber : IValueObject<PhoneNumber>, IComparab
     /// <param name="provider">An optional format provider.</param>
     /// <param name="result">When this method returns, contains the parsed phone number if successful; otherwise, default.</param>
     /// <returns><see langword="true"/> if parsed successfully; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out PhoneNumber result) =>
-        TryParse(s.ToString(), provider, out result);
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out PhoneNumber result)
+    {
+        var res = Create(s);
+        if (res.IsSuccess)
+        {
+            result = res.Value;
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
 }
 
 

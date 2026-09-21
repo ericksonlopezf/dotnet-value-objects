@@ -1,5 +1,11 @@
 # REJ-002: Rejection of Raw Decimal Math for Tax Calculations
 
+## Status
+Rejected
+
+## Date
+2026-08-16
+
 - **Status:** Rejected
 - **Date:** 2026-08-16
 - **Original Proposal:** Expose static utility methods like `public static decimal CalculateTax(decimal baseAmount, decimal rate)`.

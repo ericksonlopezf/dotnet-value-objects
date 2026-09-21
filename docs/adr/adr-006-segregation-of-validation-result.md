@@ -1,5 +1,11 @@
 # ADR-006: Segregation of ValidationResult to Foundation Layer
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Core Domain Abstractions & Result Pattern Alignment

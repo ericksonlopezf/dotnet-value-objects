@@ -1,5 +1,11 @@
 # ADR-007: Conceptual Separation between Domain Primitives and Value Objects
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Architectural Governance (AO-VO-001)

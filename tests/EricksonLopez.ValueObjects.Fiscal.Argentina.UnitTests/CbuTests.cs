@@ -132,6 +132,24 @@ public sealed class CbuTests
         byte[] brokenUtf8 = [0xFF, 0xFE, 0xFD];
         Cbu.TryParse(brokenUtf8, null, out var tryBroken).Should().BeFalse();
         tryBroken.Should().Be(default(Cbu));
+
+        Cbu.TryParse(new byte[100], null, out _).Should().BeFalse();
+        Cbu.TryParse(new byte[65], null, out _).Should().BeFalse();
+
+        // Exactly 64 bytes: 22 digits padded with 42 spaces
+        byte[] padded64 = Encoding.UTF8.GetBytes("0720000700000001234565".PadRight(64, ' '));
+        Cbu.TryParse(padded64, null, out var tryPadded).Should().BeTrue();
+        tryPadded.Value.Should().Be("0720000700000001234565");
+    }
+
+    [Fact]
+    public void Default_Instance_Properties_ReturnEmpty()
+    {
+        var d = default(Cbu);
+        d.Value.Should().Be(string.Empty);
+        d.BankCode.Should().Be(string.Empty);
+        d.BranchCode.Should().Be(string.Empty);
+        d.AccountNumber.Should().Be(string.Empty);
     }
 
     [Fact]
@@ -149,6 +167,7 @@ public sealed class CbuTests
             (x, y) => x >= y);
     }
 }
+
 
 
 

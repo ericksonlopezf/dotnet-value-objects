@@ -28,7 +28,13 @@ public sealed record Cedula : StringValueObject<Cedula>
                 "Cedula.Required", "Cedula is required."));
         }
 
-        Span<char> digitsBuffer = stackalloc char[value.Length];
+        if (value.Length > 32)
+        {
+            return Result<Cedula>.Failure(Error.Validation(
+                "Cedula.InvalidLength", "Cedula input exceeds maximum allowed length."));
+        }
+
+        Span<char> digitsBuffer = stackalloc char[32];
         int digitCount = 0;
         foreach (char c in value)
         {

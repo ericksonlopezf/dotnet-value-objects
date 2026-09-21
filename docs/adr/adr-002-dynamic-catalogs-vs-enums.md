@@ -1,5 +1,11 @@
 # ADR-002: Fiscal Catalogs as Dynamic Value Objects, NOT Enums
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Fiscal Jurisdictions (SAT, SUNAT, DIAN, DGII, SII, ARCA)
