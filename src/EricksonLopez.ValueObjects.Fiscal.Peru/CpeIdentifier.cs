@@ -125,7 +125,7 @@ public readonly record struct CpeIdentifier : ISpanParsable<CpeIdentifier>, ICom
         return Number.CompareTo(other.Number);
     }
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="CpeIdentifier"/> is less than the right <see cref="CpeIdentifier"/>.
     /// </summary>
     /// <param name="left">The first <see cref="CpeIdentifier"/> to compare.</param>

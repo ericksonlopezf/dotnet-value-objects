@@ -29,27 +29,27 @@ namespace EricksonLopez.ValueObjects.Fiscal.Chile;
 public readonly record struct DteTypeCode : ISpanParsable<DteTypeCode>, IComparable<DteTypeCode>
 {
     /// <summary>Gets DTE code 33 (Factura Electrónica).</summary>
-    public static DteTypeCode FacturaElectronica => new(33, "Factura Electrónica");
+    public static DteTypeCode ElectronicInvoice => new(33, "Factura Electrónica");
     /// <summary>Gets DTE code 34 (Factura No Afecta o Exenta Electrónica).</summary>
-    public static DteTypeCode FacturaExenta => new(34, "Factura No Afecta o Exenta Electrónica");
+    public static DteTypeCode ExemptInvoice => new(34, "Factura No Afecta o Exenta Electrónica");
     /// <summary>Gets DTE code 39 (Boleta Electrónica).</summary>
-    public static DteTypeCode BoletaElectronica => new(39, "Boleta Electrónica");
+    public static DteTypeCode ElectronicReceipt => new(39, "Boleta Electrónica");
     /// <summary>Gets DTE code 41 (Boleta Exenta Electrónica).</summary>
-    public static DteTypeCode BoletaExenta => new(41, "Boleta Exenta Electrónica");
+    public static DteTypeCode ExemptReceipt => new(41, "Boleta Exenta Electrónica");
     /// <summary>Gets DTE code 46 (Factura de Compra Electrónica).</summary>
-    public static DteTypeCode FacturaCompra => new(46, "Factura de Compra Electrónica");
+    public static DteTypeCode PurchaseInvoice => new(46, "Factura de Compra Electrónica");
     /// <summary>Gets DTE code 52 (Guía de Despacho Electrónica).</summary>
-    public static DteTypeCode GuiaDespacho => new(52, "Guía de Despacho Electrónica");
+    public static DteTypeCode DispatchGuide => new(52, "Guía de Despacho Electrónica");
     /// <summary>Gets DTE code 56 (Nota de Débito Electrónica).</summary>
-    public static DteTypeCode NotaDebito => new(56, "Nota de Débito Electrónica");
+    public static DteTypeCode DebitNote => new(56, "Nota de Débito Electrónica");
     /// <summary>Gets DTE code 61 (Nota de Crédito Electrónica).</summary>
-    public static DteTypeCode NotaCredito => new(61, "Nota de Crédito Electrónica");
+    public static DteTypeCode CreditNote => new(61, "Nota de Crédito Electrónica");
     /// <summary>Gets DTE code 110 (Factura de Exportación Electrónica).</summary>
-    public static DteTypeCode FacturaExportacion => new(110, "Factura de Exportación Electrónica");
+    public static DteTypeCode ExportInvoice => new(110, "Factura de Exportación Electrónica");
     /// <summary>Gets DTE code 111 (Nota de Débito de Exportación Electrónica).</summary>
-    public static DteTypeCode NotaDebitoExportacion => new(111, "Nota de Débito de Exportación Electrónica");
+    public static DteTypeCode ExportDebitNote => new(111, "Nota de Débito de Exportación Electrónica");
     /// <summary>Gets DTE code 112 (Nota de Crédito de Exportación Electrónica).</summary>
-    public static DteTypeCode NotaCreditoExportacion => new(112, "Nota de Crédito de Exportación Electrónica");
+    public static DteTypeCode ExportCreditNote => new(112, "Nota de Crédito de Exportación Electrónica");
 
 
     private readonly int _code;
@@ -80,17 +80,17 @@ public readonly record struct DteTypeCode : ISpanParsable<DteTypeCode>, ICompara
     {
         return code switch
         {
-            33 => Result<DteTypeCode>.Success(FacturaElectronica),
-            34 => Result<DteTypeCode>.Success(FacturaExenta),
-            39 => Result<DteTypeCode>.Success(BoletaElectronica),
-            41 => Result<DteTypeCode>.Success(BoletaExenta),
-            46 => Result<DteTypeCode>.Success(FacturaCompra),
-            52 => Result<DteTypeCode>.Success(GuiaDespacho),
-            56 => Result<DteTypeCode>.Success(NotaDebito),
-            61 => Result<DteTypeCode>.Success(NotaCredito),
-            110 => Result<DteTypeCode>.Success(FacturaExportacion),
-            111 => Result<DteTypeCode>.Success(NotaDebitoExportacion),
-            112 => Result<DteTypeCode>.Success(NotaCreditoExportacion),
+            33 => Result<DteTypeCode>.Success(ElectronicInvoice),
+            34 => Result<DteTypeCode>.Success(ExemptInvoice),
+            39 => Result<DteTypeCode>.Success(ElectronicReceipt),
+            41 => Result<DteTypeCode>.Success(ExemptReceipt),
+            46 => Result<DteTypeCode>.Success(PurchaseInvoice),
+            52 => Result<DteTypeCode>.Success(DispatchGuide),
+            56 => Result<DteTypeCode>.Success(DebitNote),
+            61 => Result<DteTypeCode>.Success(CreditNote),
+            110 => Result<DteTypeCode>.Success(ExportInvoice),
+            111 => Result<DteTypeCode>.Success(ExportDebitNote),
+            112 => Result<DteTypeCode>.Success(ExportCreditNote),
             _ => Result<DteTypeCode>.Failure(Error.Validation(
                 "DteTypeCode.InvalidCode", $"The DTE code '{code.ToString(CultureInfo.InvariantCulture)}' is not recognized by the SII."))
         };
@@ -127,7 +127,7 @@ public readonly record struct DteTypeCode : ISpanParsable<DteTypeCode>, ICompara
     /// <inheritdoc/>
     public int CompareTo(DteTypeCode other) => _code.CompareTo(other._code);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="DteTypeCode"/> is less than the right <see cref="DteTypeCode"/>.
     /// </summary>
     /// <param name="left">The first <see cref="DteTypeCode"/> to compare.</param>

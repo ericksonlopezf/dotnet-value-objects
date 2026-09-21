@@ -1,5 +1,11 @@
 # ADR-009: Refactoring Domain Primitives via Source Generators
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Compile-Time Boilerplate Reduction

@@ -23,11 +23,22 @@ public abstract record StringValueObject<[DynamicallyAccessedMembers(Dynamically
     where TSelf : StringValueObject<TSelf>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="StringValueObject{TSelf}"/> class.
+    /// Initializes a new instance of the <see cref="StringValueObject{TSelf}"/> class, 
+    /// explicitly normalizing the string to Unicode FormC to prevent canonicalization vulnerabilities,
+    /// and enforcing a hard 20,000 character maximum limit as a last-resort guard against Large Object Heap (LOH) exhaustion.
     /// </summary>
-    /// <param name="value">The normalized string value to encapsulate.</param>
+    /// <remarks>
+    /// Each concrete value object is expected to enforce its own, stricter domain-specific maximum via its
+    /// factory method returning <see cref="EricksonLopez.Result.Result{T}"/>. This base limit is a safety net only.
+    /// A 20,000-character UTF-16 string is approximately 40 KB, well below the 85 KB LOH threshold.
+    /// </remarks>
+    /// <param name="value">The raw string value to encapsulate and normalize.</param>
     /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/></exception>
-    protected StringValueObject(string value) : base(value) { }
+    /// <exception cref="ArgumentException">The string exceeds the maximum allowed length of 20,000 characters.</exception>
+    protected StringValueObject(string value) : base(
+        (value?.Length > 20000 ? throw new ArgumentException("Value exceeds the maximum allowed length of 20,000 characters to prevent memory exhaustion.", nameof(value)) : value)?
+        .Normalize(System.Text.NormalizationForm.FormC)!)
+    { }
 }
 
 

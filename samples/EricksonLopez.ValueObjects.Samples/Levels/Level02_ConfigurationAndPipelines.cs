@@ -69,7 +69,7 @@ public static class Level02_ConfigurationAndPipelines
         // Range<DateTimeOffset> Duration extension
         Console.WriteLine("\n[3. Range<DateTimeOffset> — Duration extension]");
         var sessionStart = new DateTimeOffset(2026, 8, 24, 9, 0, 0, TimeSpan.Zero);
-        var sessionEnd   = new DateTimeOffset(2026, 8, 24, 17, 30, 0, TimeSpan.Zero);
+        var sessionEnd = new DateTimeOffset(2026, 8, 24, 17, 30, 0, TimeSpan.Zero);
         var workday = Range<DateTimeOffset>.Create(sessionStart, sessionEnd).Value;
         TimeSpan workDuration = workday.Duration();
         Console.WriteLine($"  - Workday Schedule      : [{workday.Start:HH:mm} .. {workday.End:HH:mm}]");
@@ -78,8 +78,8 @@ public static class Level02_ConfigurationAndPipelines
         // 3. BusinessDate — Domain date without time component
         Console.WriteLine("\n[4. BusinessDate — Domain Date without Time Component]");
         var invoiceDate = BusinessDate.Create(new DateOnly(2026, 8, 24)).Value;
-        var dueDate     = BusinessDate.Create(new DateOnly(2026, 9, 24)).Value;
-        var fromDto     = BusinessDate.FromDateTimeOffset(DateTimeOffset.UtcNow).Value;
+        var dueDate = BusinessDate.Create(new DateOnly(2026, 9, 24)).Value;
+        var fromDto = BusinessDate.FromDateTimeOffset(DateTimeOffset.UtcNow).Value;
 
         Console.WriteLine($"  - Issue Date            : {invoiceDate}");
         Console.WriteLine($"  - Due Date              : {dueDate}");
@@ -97,7 +97,7 @@ public static class Level02_ConfigurationAndPipelines
 
         // 4. TimeRange with Overnight Support
         Console.WriteLine("\n[5. TimeRange & Overnight Shifts — Contains, Overlaps, Duration]");
-        var dayShift   = TimeRange.Create(new TimeOnly(8, 0), new TimeOnly(17, 0)).Value;
+        var dayShift = TimeRange.Create(new TimeOnly(8, 0), new TimeOnly(17, 0)).Value;
         var nightShift = TimeRange.Create(new TimeOnly(22, 0), new TimeOnly(6, 0), allowOvernight: true).Value;
 
         Console.WriteLine($"  - Day Shift             : {dayShift} (Overnight: {dayShift.CrossesMidnight})");
@@ -108,7 +108,7 @@ public static class Level02_ConfigurationAndPipelines
         Console.WriteLine($"  - Night Shift Duration  : {nightShift.Duration.TotalHours}h");
 
         // TimeRange.Contains(TimeOnly)
-        var noonTime   = new TimeOnly(12, 0);
+        var noonTime = new TimeOnly(12, 0);
         var midnightTime = new TimeOnly(0, 30);
         Console.WriteLine($"  - Day Shift contains 12:00  : {dayShift.Contains(noonTime)}");
         Console.WriteLine($"  - Night Shift contains 00:30: {nightShift.Contains(midnightTime)}");
@@ -120,7 +120,7 @@ public static class Level02_ConfigurationAndPipelines
 
         // 5. Specialized Financial Rates
         Console.WriteLine("\n[6. Specialized Financial Rates with Strong Semantics]");
-        var taxRate     = TaxRate.Create(18.0m).Value;
+        var taxRate = TaxRate.Create(18.0m).Value;
         var discountRate = DiscountRate.Create(5.5m).Value;
         var exchangeRate = ExchangeRate.Create(CurrencyCode.USD, CurrencyCode.DOP, 60.25m).Value;
 

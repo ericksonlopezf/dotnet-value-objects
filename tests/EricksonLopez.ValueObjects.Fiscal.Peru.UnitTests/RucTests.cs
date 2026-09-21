@@ -184,6 +184,34 @@ public sealed class RucTests
             (x, y) => x > y,
             (x, y) => x >= y);
     }
+
+    [Fact]
+    public void Ruc_DefaultStruct_ExposesIsInitializedSafely()
+    {
+        Ruc defaultRuc = default;
+        defaultRuc.IsInitialized.Should().BeFalse();
+        defaultRuc.Value.Should().Be(string.Empty);
+        defaultRuc.Prefix.Should().Be(0);
+        defaultRuc.ToString().Should().Be(string.Empty);
+        defaultRuc.CompareTo(defaultRuc).Should().Be(0);
+
+        var initialized = Ruc.Create("20100070970").Value;
+        initialized.IsInitialized.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Utf8Parsing_WorksCorrectly()
+    {
+        var ruc = Ruc.Parse("20100070970"u8);
+        ruc.IsInitialized.Should().BeTrue();
+        Ruc.TryParse("20100070970"u8, null, out var parsed).Should().BeTrue();
+        parsed.IsInitialized.Should().BeTrue();
+        Ruc.TryParse("invalid"u8, null, out _).Should().BeFalse();
+        Ruc.TryParse(new byte[100], null, out _).Should().BeFalse();
+
+        Action actInvalid = () => Ruc.Parse("invalid"u8);
+        actInvalid.Should().Throw<FormatException>();
+    }
 }
 
 

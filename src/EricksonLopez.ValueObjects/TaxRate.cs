@@ -53,11 +53,8 @@ public readonly record struct TaxRate : IValueObject<TaxRate>, IComparable<TaxRa
     /// </summary>
     /// <param name="baseAmount">The base monetary value.</param>
     /// <returns>The calculated tax <see cref="Money"/> amount.</returns>
-    public Money CalculateTax(Money baseAmount)
-    {
-        var percentage = Percentage.Create(Value).Value;
-        return baseAmount.ApplyPercentage(percentage);
-    }
+    public Money CalculateTax(Money baseAmount) =>
+        new(Math.Round(baseAmount.Amount * Fraction, baseAmount.Currency.DecimalPlaces, MidpointRounding.ToEven), baseAmount.Currency);
 
     /// <summary>
     /// Gets a value indicating whether the tax rate is zero (tax exempt).

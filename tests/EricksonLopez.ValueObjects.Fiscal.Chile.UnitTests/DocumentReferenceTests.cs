@@ -12,13 +12,13 @@ namespace EricksonLopez.ValueObjects.Fiscal.Chile.UnitTests;
 public sealed class DocumentReferenceTests
 {
     [Theory]
-    [InlineData((byte)1, "Anula factura por error de emisión")]
-    [InlineData((byte)2, "Corrige razón social")]
-    [InlineData((byte)3, "Corrige montos facturados")]
+    [InlineData((byte)1, "Cancels invoice due to issuance error")]
+    [InlineData((byte)2, "Corrects company name")]
+    [InlineData((byte)3, "Corrects invoiced amounts")]
     [InlineData((byte)1, null)]
     public void Create_ValidParameters_ExtractsAllProperties(byte referenceCode, string? reason)
     {
-        var targetType = DteTypeCode.FacturaElectronica;
+        var targetType = DteTypeCode.ElectronicInvoice;
         var folio = FiscalFolio.Create(500).Value;
         var date = new DateOnly(2026, 8, 1);
 
@@ -39,7 +39,7 @@ public sealed class DocumentReferenceTests
     [InlineData((byte)255)]
     public void Create_InvalidReferenceCode_ReturnsError(byte referenceCode)
     {
-        var targetType = DteTypeCode.FacturaElectronica;
+        var targetType = DteTypeCode.ElectronicInvoice;
         var folio = FiscalFolio.Create(500).Value;
         var date = new DateOnly(2026, 8, 1);
 
@@ -52,7 +52,7 @@ public sealed class DocumentReferenceTests
     [Fact]
     public void DocumentReference_DefaultState_Equality()
     {
-        var targetType = DteTypeCode.FacturaElectronica;
+        var targetType = DteTypeCode.ElectronicInvoice;
         var folio = FiscalFolio.Create(500).Value;
         var date = new DateOnly(2026, 8, 1);
 

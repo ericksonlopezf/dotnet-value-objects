@@ -95,7 +95,7 @@ public readonly record struct TaxPeriod : ISpanParsable<TaxPeriod>, IComparable<
         return yearComp != 0 ? yearComp : _month.CompareTo(other._month);
     }
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="TaxPeriod"/> is less than the right <see cref="TaxPeriod"/>.
     /// </summary>
     /// <param name="left">The first <see cref="TaxPeriod"/> to compare.</param>

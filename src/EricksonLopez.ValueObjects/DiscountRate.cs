@@ -55,14 +55,22 @@ public readonly record struct DiscountRate : IValueObject<DiscountRate>, ICompar
     public decimal ApplyTo(decimal baseAmount) => Math.Round(baseAmount * (1m - Fraction), 6);
 
     /// <summary>
+    /// Calculates the absolute discount monetary amount for a specified base monetary value using banker's rounding.
+    /// </summary>
+    /// <param name="baseAmount">The base monetary value before discount.</param>
+    /// <returns>The calculated discount <see cref="Money"/> amount.</returns>
+    public Money CalculateDiscount(Money baseAmount) =>
+        new(Math.Round(baseAmount.Amount * Fraction, baseAmount.Currency.DecimalPlaces, MidpointRounding.ToEven), baseAmount.Currency);
+
+    /// <summary>
     /// Calculates the net monetary amount remaining after applying the discount using banker's rounding.
     /// </summary>
     /// <param name="baseAmount">The base monetary amount before discount.</param>
     /// <returns>The net <see cref="Money"/> remaining after discount.</returns>
     public Money ApplyTo(Money baseAmount)
     {
-        var percentage = Percentage.Create(Value).Value;
-        return baseAmount - baseAmount.ApplyPercentage(percentage);
+        decimal discount = Math.Round(baseAmount.Amount * Fraction, baseAmount.Currency.DecimalPlaces, MidpointRounding.ToEven);
+        return new Money(baseAmount.Amount - discount, baseAmount.Currency);
     }
 
     /// <summary>

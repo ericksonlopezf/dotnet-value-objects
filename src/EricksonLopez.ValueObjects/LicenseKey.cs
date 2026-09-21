@@ -21,7 +21,7 @@ namespace EricksonLopez.ValueObjects;
 [DebuggerDisplay("{" + nameof(ToString) + "()}")]
 public sealed partial record LicenseKey : StringValueObject<LicenseKey>
 {
-    [GeneratedRegex(@"^[A-Z0-9]{4,8}(-[A-Z0-9]{4,8}){2,8}$")]
+    [GeneratedRegex(@"^[A-Z0-9]{4,8}(-[A-Z0-9]{4,8}){1,8}$")]
     private static partial Regex LicenseKeyPattern();
 
     private LicenseKey(string value) : base(value) { }
@@ -33,7 +33,7 @@ public sealed partial record LicenseKey : StringValueObject<LicenseKey>
     /// <returns>A <see cref="Result{LicenseKey}"/> containing the created instance or a validation error.</returns>
     public static Result<LicenseKey> Create(string? value)
     {
-        return StringPipeline.Required(value, nameof(LicenseKey), 14, 80,
+        return StringPipeline.Required(value, nameof(LicenseKey), 9, 80,
             static n => new LicenseKey(n),
             static raw => raw.Trim().ToUpperInvariant(),
             LicenseKeyPattern(),

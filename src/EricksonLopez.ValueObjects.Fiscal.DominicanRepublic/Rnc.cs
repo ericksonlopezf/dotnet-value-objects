@@ -40,7 +40,13 @@ public sealed record Rnc : StringValueObject<Rnc>
                 "Rnc.Required", "RNC is required."));
         }
 
-        Span<char> digitsBuffer = stackalloc char[value.Length];
+        if (value.Length > 32)
+        {
+            return Result<Rnc>.Failure(Error.Validation(
+                "Rnc.InvalidLength", "RNC input exceeds maximum allowed length."));
+        }
+
+        Span<char> digitsBuffer = stackalloc char[32];
         int digitCount = 0;
         foreach (char c in value)
         {

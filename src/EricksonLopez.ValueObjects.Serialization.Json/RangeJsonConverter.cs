@@ -48,6 +48,10 @@ public sealed class RangeJsonConverter<T> : JsonConverter<Range<T>>
                 {
                     end = converter.Read(ref reader, typeof(T), options);
                 }
+                else
+                {
+                    reader.Skip();
+                }
             }
         }
 

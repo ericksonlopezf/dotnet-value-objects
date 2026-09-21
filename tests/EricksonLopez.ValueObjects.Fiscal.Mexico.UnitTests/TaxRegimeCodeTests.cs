@@ -37,11 +37,11 @@ public sealed class TaxRegimeCodeTests
     [Fact]
     public void StaticFields_DefaultState_ExhaustiveVerification()
     {
-        TaxRegimeCode.GeneralPersonasMorales.Code.Should().Be("601");
-        TaxRegimeCode.SueldosYSalarios.Code.Should().Be("605");
-        TaxRegimeCode.Arrendamiento.Code.Should().Be("606");
-        TaxRegimeCode.ActividadesEmpresariales.Code.Should().Be("612");
-        TaxRegimeCode.Resico.Code.Should().Be("626");
+        TaxRegimeCode.GeneralLegalEntities.Code.Should().Be("601");
+        TaxRegimeCode.WagesAndSalaries.Code.Should().Be("605");
+        TaxRegimeCode.Leasing.Code.Should().Be("606");
+        TaxRegimeCode.BusinessActivities.Code.Should().Be("612");
+        TaxRegimeCode.SimplifiedTrustRegime.Code.Should().Be("626");
     }
 
     [Theory]
@@ -78,8 +78,8 @@ public sealed class TaxRegimeCodeTests
     [Fact]
     public void TaxRegimeCode_DefaultState_ComparisonOperators()
     {
-        var r1 = TaxRegimeCode.GeneralPersonasMorales;
-        var r2 = TaxRegimeCode.Resico;
+        var r1 = TaxRegimeCode.GeneralLegalEntities;
+        var r2 = TaxRegimeCode.SimplifiedTrustRegime;
         var r1Clone = TaxRegimeCode.Create("601").Value;
 
         (r1 < r2).Should().BeTrue();

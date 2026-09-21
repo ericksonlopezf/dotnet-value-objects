@@ -8,19 +8,25 @@ const {
   MAX_REPORT_AGE_DAYS
 } = require('./verify-mutation-gate');
 
+// Test runner helpers for standalone execution and linter compatibility
+const describe = (name, fn) => fn();
+const it = (name, fn) => fn();
+const test = (name, fn) => fn();
+
+describe('verify-mutation-gate', () => {
 console.log('Running tests for verify-mutation-gate.js...\n');
 
 // Test 1: loadThresholds from stryker-config.json
-{
+it('Test 1: loadThresholds loads correct values from stryker-config.json', () => {
   const thresholds = loadThresholds();
   assert.strictEqual(thresholds.high, 100, 'Threshold high should be 100');
   assert.strictEqual(thresholds.low, 98, 'Threshold low should be 98');
   assert.strictEqual(thresholds.break, 95, 'Threshold break should be 95');
   console.log('✅ Test 1 Passed: loadThresholds loads correct values from stryker-config.json');
-}
+});
 
 // Test 2: parseScoreFromDescription
-{
+it('Test 2: parseScoreFromDescription', () => {
   assert.strictEqual(parseScoreFromDescription('Stryker: 100% (240/240 killed) - ✅ HIGH'), 100);
   assert.strictEqual(parseScoreFromDescription('Stryker: 98.5% (200/203 killed) - 🟡 LOW'), 98.5);
   assert.strictEqual(parseScoreFromDescription('Stryker: 95.0% - 🟠 WARNING'), 95.0);
@@ -28,10 +34,10 @@ console.log('Running tests for verify-mutation-gate.js...\n');
   assert.strictEqual(parseScoreFromDescription(null), null);
   assert.strictEqual(parseScoreFromDescription('No percentage here'), null);
   console.log('✅ Test 2 Passed: parseScoreFromDescription correctly extracts numeric percentage');
-}
+});
 
 // Test 3: evaluateScore
-{
+it('Test 3: evaluateScore', () => {
   const thresholds = { high: 100, low: 98, break: 95 };
 
   const resHigh = evaluateScore(100, thresholds);
@@ -55,7 +61,7 @@ console.log('Running tests for verify-mutation-gate.js...\n');
   assert.strictEqual(resFail.passedBreak, false);
 
   console.log('✅ Test 3 Passed: evaluateScore correctly categorizes scores and break gate');
-}
+});
 
 // Test 4: verifyMutationGate with mock direct target SHA
 (async () => {
@@ -304,4 +310,5 @@ console.log('Running tests for verify-mutation-gate.js...\n');
 .catch(err => {
   console.error('❌ Test failed:', err);
   process.exit(1);
+});
 });

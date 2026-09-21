@@ -127,6 +127,18 @@ public sealed class IdCcpTests
         IdCcp.TryParse("invalid".AsSpan(), null, out var tryFail2).Should().BeFalse();
         tryFail2.Should().Be(default(IdCcp));
     }
+
+    [Fact]
+    public void IdCcp_DefaultStruct_ExposesIsInitializedSafely()
+    {
+        IdCcp defaultIdCcp = default;
+        defaultIdCcp.IsInitialized.Should().BeFalse();
+        defaultIdCcp.Formatted.Should().Be(string.Empty);
+        defaultIdCcp.ToString().Should().Be(string.Empty);
+
+        var initialized = IdCcp.Create(ValidIdCcpStr).Value;
+        initialized.IsInitialized.Should().BeTrue();
+    }
 }
 
 

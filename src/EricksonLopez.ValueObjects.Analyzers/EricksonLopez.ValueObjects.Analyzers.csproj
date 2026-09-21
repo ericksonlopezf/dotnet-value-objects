@@ -9,7 +9,7 @@
     <IsTrimmable>false</IsTrimmable>
     <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
     <Description>Roslyn Analyzers enforcing DDD Value Object invariants, immutability, and safety rules.</Description>
-    <PackageTags>$(CommonPackageTags);roslyn;analyzers;code-analysis;static-analysis;immutability;code-quality</PackageTags>
+    <PackageTags>$(CommonPackageTags);roslyn;roslyn-analyzers;analyzers;code-analysis;static-analysis;immutability;code-quality</PackageTags>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>

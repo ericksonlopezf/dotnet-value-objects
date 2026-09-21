@@ -211,6 +211,69 @@ public sealed class ValueObjectConstructorAnalyzerTests
         var diagnostics = await RoslynAnalyzerTestHelper.RunAnalyzerAsync(_analyzer, source, TestContext.Current.CancellationToken);
         diagnostics.Should().BeEmpty();
     }
+
+    [Fact]
+    public async Task Analyze_WhenValueObjectDecoratedWithAttributeHasPublicConstructor_ReportsDiagnostic()
+    {
+        var source = """
+        namespace SampleNamespace;
+        using System;
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+        public sealed class ValueObjectAttribute : Attribute {}
+
+        [ValueObject]
+        public sealed class AttributeDecoratedVo
+        {
+            public string Value { get; }
+            public AttributeDecoratedVo(string value) => Value = value;
+        }
+        """;
+
+        var diagnostics = await RoslynAnalyzerTestHelper.RunAnalyzerAsync(_analyzer, source, TestContext.Current.CancellationToken);
+        diagnostics.Should().ContainSingle(d => d.Id == "ELVO001" && d.GetMessage().Contains("AttributeDecoratedVo"));
+    }
+
+    [Fact]
+    public async Task Analyze_WhenValueObjectDecoratedWithAttributeHasPrivateConstructor_DoesNotReportDiagnostic()
+    {
+        var source = """
+        namespace SampleNamespace;
+        using System;
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+        public sealed class ValueObjectAttribute : Attribute {}
+
+        [ValueObject]
+        public sealed class AttributeDecoratedVo
+        {
+            public string Value { get; }
+            private AttributeDecoratedVo(string value) => Value = value;
+            public static AttributeDecoratedVo Create(string value) => new(value);
+        }
+        """;
+
+        var diagnostics = await RoslynAnalyzerTestHelper.RunAnalyzerAsync(_analyzer, source, TestContext.Current.CancellationToken);
+        diagnostics.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Analyze_WhenValueObjectHasImplicitConstructor_ReportsDiagnostic()
+    {
+        var source = """
+        namespace SampleNamespace;
+
+        using EricksonLopez.ValueObjects;
+
+        public sealed class ImplicitVo : IValueObject
+        {
+            public string Value { get; set; }
+        }
+        """;
+
+        var diagnostics = await RoslynAnalyzerTestHelper.RunAnalyzerAsync(_analyzer, source, TestContext.Current.CancellationToken);
+        diagnostics.Should().ContainSingle(d => d.Id == "ELVO001" && d.GetMessage().Contains("ImplicitVo"));
+    }
 }
 
 

@@ -800,5 +800,5 @@ graph LR
 - **Clean Compilation:** 0 errors, 0 warnings (`TreatWarningsAsErrors=true`).
 - **Automated Tests:** 918 tests passing across all packages.
 - **Showcase Runtime:** Execution verified with exit code 0 across all 11 levels (0–10).
-- **Domain Purity:** 100% compliance with `AGENTS.md` and repository architectural invariants.
+- **Domain Purity:** 100% compliance with repository architectural invariants and domain design rules.
 - **Last Synchronized:** 2026-08-24 — All public APIs in Core Library and Infrastructure are covered by at least one executable example.

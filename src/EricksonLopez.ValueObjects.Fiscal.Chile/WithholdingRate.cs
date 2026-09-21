@@ -114,7 +114,7 @@ public readonly record struct WithholdingRate : ISpanParsable<WithholdingRate>, 
     /// <inheritdoc/>
     public int CompareTo(WithholdingRate other) => _percentage.CompareTo(other._percentage);
 
-        /// <summary>
+    /// <summary>
     /// Determines whether the left <see cref="WithholdingRate"/> is less than the right <see cref="WithholdingRate"/>.
     /// </summary>
     /// <param name="left">The first <see cref="WithholdingRate"/> to compare.</param>

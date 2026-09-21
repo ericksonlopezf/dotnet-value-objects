@@ -43,6 +43,14 @@ public sealed class TaxpayerIdTests
         result.Error.Code.Should().Be("TaxpayerId.InvalidLength");
     }
 
+    [Fact]
+    public void Create_ExceedsMaxLength_ReturnsFailure()
+    {
+        var result = TaxpayerId.Create(new string('1', 35));
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("TaxpayerId.InvalidLength");
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData("")]

@@ -116,6 +116,20 @@ public sealed class CvuTests
             (x, y) => x > y,
             (x, y) => x >= y);
     }
+
+    [Fact]
+    public void Utf8Parsing_WorksCorrectly()
+    {
+        var cvu = Cvu.Parse("0000000000000000000000"u8);
+        cvu.Value.Should().Be("0000000000000000000000");
+        Cvu.TryParse("0000000000000000000000"u8, null, out var parsed).Should().BeTrue();
+        parsed.Value.Should().Be("0000000000000000000000");
+        Cvu.TryParse("invalid"u8, null, out _).Should().BeFalse();
+        Cvu.TryParse(new byte[100], null, out _).Should().BeFalse();
+
+        Action actInvalid = () => Cvu.Parse("invalid"u8);
+        actInvalid.Should().Throw<FormatException>();
+    }
 }
 
 

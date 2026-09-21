@@ -61,7 +61,13 @@ public sealed record TaxpayerId : ValueObject
                 "TaxpayerId.Required", "Taxpayer identifier (RNC or Cedula) is required."));
         }
 
-        Span<char> digitsBuffer = stackalloc char[value.Length];
+        if (value.Length > 32)
+        {
+            return Result<TaxpayerId>.Failure(Error.Validation(
+                "TaxpayerId.InvalidLength", "Taxpayer identifier exceeds maximum allowed length."));
+        }
+
+        Span<char> digitsBuffer = stackalloc char[32];
         int digitCount = 0;
         foreach (char c in value)
         {

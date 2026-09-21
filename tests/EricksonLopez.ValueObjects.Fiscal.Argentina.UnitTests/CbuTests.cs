@@ -132,6 +132,8 @@ public sealed class CbuTests
         byte[] brokenUtf8 = [0xFF, 0xFE, 0xFD];
         Cbu.TryParse(brokenUtf8, null, out var tryBroken).Should().BeFalse();
         tryBroken.Should().Be(default(Cbu));
+
+        Cbu.TryParse(new byte[100], null, out _).Should().BeFalse();
     }
 
     [Fact]

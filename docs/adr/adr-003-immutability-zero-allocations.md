@@ -1,5 +1,11 @@
 # ADR-003: Absolute Immutability and Zero-Allocation Performance
 
+## Status
+Accepted
+
+## Date
+2026-08-16
+
 - **Status:** Accepted
 - **Date:** 2026-08-16
 - **Context:** Core Architecture, Memory Management & GC Pressure

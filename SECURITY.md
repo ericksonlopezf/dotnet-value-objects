@@ -6,7 +6,8 @@ Security updates and patches are provided for the following versions:
 
 | Version | Supported | Target Runtime | Notes |
 |:---|:---:|:---|:---|
-| **1.0.x** | :white_check_mark: | .NET 10.0 (`net10.0`) | Current active LTS target |
+| **2.0.x** | :white_check_mark: | .NET 8.0, 9.0, 10.0 | Current active production release |
+| **1.0.x** | :x: | .NET 8.0, 9.0, 10.0 | Deprecated release — upgrade to v2.0.0 |
 | **< 1.0.0** | :x: | — | Pre-release versions not supported |
 
 ---

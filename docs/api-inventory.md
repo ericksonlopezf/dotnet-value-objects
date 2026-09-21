@@ -44,7 +44,7 @@
 ### Chile (`Fiscal.Chile`)
 - `Rut`: National tax ID with check digit 'K' (Modulo 11).
 - `FiscalFolio`: SII electronic document correlative number.
-- `DteTypeCode`: Document type code (Factura, Boleta, Guía).
+- `DteTypeCode`: Document type code (Invoice, Receipt, Dispatch Guide).
 
 ### Colombia (`Fiscal.Colombia`)
 - `Nit`: Tax identification number with verification digit.

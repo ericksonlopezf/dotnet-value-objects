@@ -16,6 +16,7 @@ public sealed class ValueObjectAttribute : Attribute
 
     /// <summary>
     /// Gets or sets a value indicating whether to generate persistence type handler hooks.
+    /// Reserved for persistence hook synthesis in an upcoming release.
     /// </summary>
     public bool GeneratePersistenceHooks { get; set; } = true;
 }
